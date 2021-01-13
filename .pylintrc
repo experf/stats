@@ -1,0 +1,15 @@
+[MESSAGES CONTROL]
+max-args=8 # 5 is too few IMHO
+
+[DESIGN]
+max-parents=12
+
+disable=wildcard-import,
+        unused-wildcard-import,
+        missing-module-docstring,
+        missing-class-docstring,
+        missing-function-docstring,
+        trailing-whitespace,
+        unsubscriptable-object, # https://github.com/PyCQA/pylint/issues/3882
+        invalid-name, # Just f'ing annoying
+        isinstance-second-argument-not-valid-type # Broken for typings

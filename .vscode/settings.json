@@ -1,3 +1,4 @@
 {
-  "elixirLS.projectDir": "umbrella"
+  "elixirLS.projectDir": "umbrella",
+  "python.pythonPath": "~/.pyenv/versions/3.9.1/envs/experf-stats/bin/python",
 }

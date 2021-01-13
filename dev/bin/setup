@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# 
+# Dev setup script
+# 
+
+# Common / useful `set` commands
+# set -Ee # Exit on error
+# set -o pipefail # Check status of piped commands
+set -u # Error on undefined vars
+# set -v # Print everything
+# set -x # Print commands (with expanded vars)
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT/dev"
+
+bail() {
+  echo "ERROR $1"
+  exit 1
+}
+
+pip () {
+  "$(pyenv which pip)" "$@"
+}
+
+echo "### Checking for the \`brew\` command (Homebrew)... ###################"
+
+if ! type brew > /dev/null; then
+  bail <<-__END
+    \`brew\` command not found, install Homebrew
+    (https://docs.brew.sh/Installation) and/or fix your \$PATH
+__END
+fi
+
+echo "### Installing from the Brewfile... ###################################"
+
+# If this doesn't work try `brew upgrade mercurial`
+if ! brew bundle --no-lock; then
+  echo "Looks like that didn't work, um let me try this..."
+  brew upgrade mercurial
+  brew bundle --no-lock
+fi
+
+cd "$REPO_ROOT"
+
+virtualenv="$(cat ./.python-version)"
+python_version="$(echo "$virtualenv" | awk -F/ '{ print $1 }')"
+
+echo "### Installing Python $python_version through \`pyenv\`... ############"
+
+pyenv install --skip-existing "$python_version"
+status="$?"
+
+if [ "$status" -ne 0 ]; then
+  if [ "$status" -eq 2 ]; then
+    echo  "Looks like \`pyenv\` may not be up-to-date enough, " \
+          "trying an upgrade..."
+    brew update && brew upgrade pyenv
+    pyenv install --skip-existing "$python_version"
+  else
+    bail "\`pyenv install --skip-existing ${python_version}\` failed"
+  fi
+fi
+
+echo "### Creating $virtualenv virtualenv... ################################"
+
+pyenv virtualenv "$python_version" "$virtualenv"
+
+echo "### Upgrading pip and installing wheel ################################"
+
+pip install --upgrade pip
+pip install wheel
+
+echo "### Installing Python dependencies in requirements.txt via \`pip\`... #"
+
+pip install -r ./dev/requirements.txt
+
+echo "### OK! Should be good to go. #########################################"
