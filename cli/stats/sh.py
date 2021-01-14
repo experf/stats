@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 import json
 
-from .io import OUT, ERR, sh
+from .io import OUT, ERR
 
 LOG = logging.getLogger(__name__)
 
@@ -81,7 +81,7 @@ def flatten_args(
     return list(flat_args(args, opts_style=opts_style, opts_sort=opts_sort))
 
 
-def get(*args, chdir=None, fmt=None, encoding="utf-8", **opts):
+def get(*args, chdir=None, fmt=None, encoding="utf-8", **opts) -> Any:
     if isinstance(chdir, Path):
         chdir = str(chdir)
 
@@ -106,6 +106,22 @@ def get(*args, chdir=None, fmt=None, encoding="utf-8", **opts):
         return output
 
 
+def run(*args, chdir=None, check=True, encoding="utf-8", **opts) -> None:
+    if isinstance(chdir, Path):
+        chdir = str(chdir)
+    cmd = flatten_args(args)
+
+    LOG.getChild("get").debug(
+        "Running command...",
+        cmd=cmd,
+        chdir=chdir,
+        encoding=encoding,
+        **opts
+    )
+
+    subprocess.run(cmd, check=check, cwd=chdir, encoding=encoding, **opts)
+
+
 def replace(
     exe: str,
     *args,
@@ -119,7 +135,7 @@ def replace(
         console.file.flush()
     proc_name = basename(exe)
     cmd = flatten_args((exe, *args), opts_style=opts_style, opts_sort=opts_sort)
-    LOG.getChild("exec").info(
+    LOG.getChild("exec").debug(
         "Replacing current process with command...",
         cmd=cmd,
         env=env,

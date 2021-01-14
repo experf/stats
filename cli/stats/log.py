@@ -106,11 +106,12 @@ class RichHandler(logging.Handler):
             self.level_map = {**self.DEFAULT_LEVEL_MAP, **level_map}
 
     def emit(self, record):
+        # pylint: disable=broad-except
         try:
             self._emit_table(record)
-        except (KeyboardInterrupt, SystemExit):
+        except (KeyboardInterrupt, SystemExit) as error:
             # We want these guys to bub' up
-            raise
+            raise error
         except Exception as error:
             ERR.print_exception()
             # self.handleError(record)
@@ -145,7 +146,7 @@ class RichHandler(logging.Handler):
         else:
             msg = str(record.msg)
 
-        output.add_row(None, Text(msg))
+        output.add_row(None, msg)
 
         if hasattr(record, "data") and record.data:
             table = Table.grid(padding=(0, 1))

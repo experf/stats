@@ -47,8 +47,6 @@ def make_parser() -> ArgumentParser:
 
 def log_level_for(verbosity: Optional[int]) -> int:
     if verbosity is None:
-        return logging.WARNING
-    elif verbosity == 1:
         return logging.INFO
     else:
         return logging.DEBUG
@@ -58,8 +56,11 @@ def run():
     parser = make_parser()
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
+    log_level = log_level_for(args.verbose)
 
-    setup(level=log_level_for(args.verbose))
+    setup(level=log_level)
+
+    log = LOG.getChild("run")
 
     # pylint: disable=broad-except
 
@@ -68,10 +69,17 @@ def run():
     except Exception as error:
         if (
             args.backtrace
-            or args.verbose is not None
+            or log_level == logging.DEBUG
             or "STATS_BACKTRACE" in os.environ
         ):
-            ERR.print_exception()
+            log.error(
+                "[holup]Terminting due to unhandled exception[/holup]...",
+                exc_info=True,
+            )
         else:
-            ERR.print("[bad]ERROR[/bad]", str(error))
+            log.error(
+                "Command [uhoh]FAILED[/uhoh].\n\n"
+                f"{type(error).__name__}: {error}\n\n"
+                "Add `--backtrace` to print stack.",
+            )
         sys.exit(1)

@@ -1,3 +1,8 @@
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+class paths:
+    REPO = Path(__file__).resolve().parents[2]
+    DEV = REPO / "dev"
+    UMBRELLA = REPO / "umbrella"
+    CORTEX = UMBRELLA / "apps" / "cortex"
+    CORTEX_WEB = UMBRELLA / "apps" / "cortex_web"

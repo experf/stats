@@ -1,4 +1,4 @@
-from . import console
+from . import console, reset
 
 def add_to(subparsers):
     parser = subparsers.add_parser(
@@ -8,6 +8,6 @@ def add_to(subparsers):
 
     subparsers = parser.add_subparsers()
 
-    for cmd in (console,):
+    for cmd in (console, reset):
         cmd.add_to(subparsers)
 

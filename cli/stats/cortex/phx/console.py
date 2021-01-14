@@ -13,9 +13,9 @@ def run(_args):
         "iex",
         {
             "erl": "-kernel shell_history enabled",
-            "dot-iex": cfg.REPO_ROOT / "dev" / ".iex.exs",
+            "dot-iex": cfg.paths.DEV / ".iex.exs",
         },
         "-S", "mix", "phx.server",
-        chdir=cfg.REPO_ROOT / "umbrella",
+        chdir=cfg.paths.UMBRELLA,
         opts_style=" ",
     )

@@ -11,7 +11,7 @@ def add_to(subparsers):
 
 def run(_args):
     repo_config = sh.get(
-        "mix", "config.repo", fmt="json", chdir=cfg.REPO_ROOT / "umbrella"
+        "mix", "config.repo", fmt="json", chdir=cfg.paths.UMBRELLA
     )
 
     sh.replace(
