@@ -74,4 +74,12 @@ echo "### Installing Python dependencies in requirements.txt via \`pip\`... #"
 
 pip install -r ./dev/requirements.txt
 
+echo "### Installing dotenv 3.0.0 Elixir package as archive... ##############"
+
+cd "$REPO_ROOT/ubmrella"
+
+mix archive.install --force \
+  github avdi/dotenv_elixir \
+  ref 11effeb0ff8519ddeb04dbbbe2e56f071f830fd0
+
 echo "### OK! Should be good to go. #########################################"
