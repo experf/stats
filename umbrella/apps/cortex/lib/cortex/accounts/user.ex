@@ -42,6 +42,9 @@ defmodule Cortex.Accounts.User do
     |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/,
       message: "must have the @ sign and no spaces"
     )
+    |> validate_format(:email, ~r/^[^\s@]+@futureperfect\.studio$/,
+      message: "not a recognized internal email address"
+    )
     |> validate_length(:email, max: 160)
     |> unsafe_validate_unique(:email, Cortex.Repo)
     |> unique_constraint(:email)
