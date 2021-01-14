@@ -7,7 +7,9 @@ defmodule Stats.Umbrella.MixProject do
       version: "0.1.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      # https://elixirforum.com/t/the-inspect-protocol-has-already-been-consolidated-for-ecto-schema-with-redacted-field/34992/8
+      consolidate_protocols: Mix.env() != :dev && Mix.env() != :test,
     ]
   end
 
