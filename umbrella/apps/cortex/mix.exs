@@ -40,7 +40,9 @@ defmodule Cortex.MixProject do
       {:phoenix_pubsub, "~> 2.0"},
       {:ecto_sql, "~> 3.4"},
       {:postgrex, ">= 0.0.0"},
-      {:jason, "~> 1.0"}
+      {:jason, "~> 1.0"},
+      {:swoosh, "~> 1.1.2"},  # Send emails
+      {:hackney, "~> 1.9"}, # HTTP client, Swoosh uses it
     ]
   end
 

@@ -129,7 +129,15 @@ defmodule CortexWeb.UserAuth do
   """
   def require_authenticated_user(conn, _opts) do
     if conn.assigns[:current_user] do
-      conn
+      if conn.assigns[:current_user].confirmed_at do
+        conn
+      else
+        conn
+        |> put_flash(:error, "You must confirm your email. Go click that link.")
+        |> maybe_store_return_to()
+        |> redirect(to: Routes.user_confirmation_path(conn, :new))
+        |> halt()
+      end
     else
       conn
       |> put_flash(:error, "You must log in to access this page.")

@@ -4,7 +4,7 @@ defmodule CortexWeb.UserConfirmationController do
   alias Cortex.Accounts
 
   def new(conn, _params) do
-    render(conn, "new.html")
+    render(conn, "new.html", title: "Confirm Email")
   end
 
   def create(conn, %{"user" => %{"email" => email}}) do

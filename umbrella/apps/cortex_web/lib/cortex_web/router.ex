@@ -16,11 +16,11 @@ defmodule CortexWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", CortexWeb do
-    pipe_through :browser
+  # scope "/", CortexWeb do
+  #   pipe_through :browser
 
-    get "/", PageController, :index
-  end
+  #   get "/", PageController, :index
+  # end
 
   # Other scopes may use custom stacks.
   # scope "/api", CortexWeb do
@@ -61,6 +61,7 @@ defmodule CortexWeb.Router do
   scope "/", CortexWeb do
     pipe_through [:browser, :require_authenticated_user]
 
+    get "/", PageController, :index
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email

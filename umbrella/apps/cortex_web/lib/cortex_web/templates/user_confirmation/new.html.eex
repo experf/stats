@@ -9,7 +9,13 @@
   </div>
 <% end %>
 
-<p>
-  <%= link "Register", to: Routes.user_registration_path(@conn, :new) %> |
-  <%= link "Log in", to: Routes.user_session_path(@conn, :new) %>
-</p>
+<%= if @current_user do %>
+  <p>
+    <%= link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete %>
+  </p>
+<% else %>
+  <p>
+    <%= link "Register", to: Routes.user_registration_path(@conn, :new) %> |
+    <%= link "Log in", to: Routes.user_session_path(@conn, :new) %>
+  </p>
+<% end %>

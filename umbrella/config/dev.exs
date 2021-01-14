@@ -1,5 +1,9 @@
 use Mix.Config
 
+# Load `//dev/.env` if it exists
+dev_env_path = Path.expand("../../dev/.env", __DIR__)
+if File.exists?(dev_env_path), do: Dotenv.load!(dev_env_path)
+
 # Configure your database
 config :cortex, Cortex.Repo,
   username: "postgres",
@@ -74,3 +78,8 @@ config :phoenix, :plug_init_mode, :runtime
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
 config :phoenix, :stacktrace_depth, 20
+
+config :cortex, Cortex.Mailer,
+  adapter: Swoosh.Adapters.Mailgun,
+  api_key: System.get_env("STATS_MAILGUN_API_KEY"),
+  domain: System.get_env("STATS_MAILGUN_DOMAIN")
