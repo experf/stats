@@ -10,7 +10,8 @@ defmodule CortexWeb.Application do
       # Start the Telemetry supervisor
       CortexWeb.Telemetry,
       # Start the Endpoint (http/https)
-      CortexWeb.Endpoint
+      CortexWeb.Endpoint,
+      CortexWeb.Endpoints.LinkEndpoint,
       # Start a worker by calling: CortexWeb.Worker.start_link(arg)
       # {CortexWeb.Worker, arg}
     ]

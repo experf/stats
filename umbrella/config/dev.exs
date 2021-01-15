@@ -83,3 +83,18 @@ config :cortex, Cortex.Mailer,
   adapter: Swoosh.Adapters.Mailgun,
   api_key: System.get_env("STATS_MAILGUN_API_KEY"),
   domain: System.get_env("STATS_MAILGUN_DOMAIN")
+
+config :cortex_web, CortexWeb.Endpoints.LinkEndpoint,
+  http: [port: 4001],
+  debug_errors: true,
+  code_reloader: true,
+  check_origin: false,
+  watchers: [
+    node: [
+      "node_modules/webpack/bin/webpack.js",
+      "--mode",
+      "development",
+      "--watch-stdin",
+      cd: Path.expand("../apps/cortex_web/assets", __DIR__)
+    ]
+  ]

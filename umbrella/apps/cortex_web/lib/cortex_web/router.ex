@@ -62,9 +62,12 @@ defmodule CortexWeb.Router do
     pipe_through [:browser, :require_authenticated_user]
 
     get "/", PageController, :index
+
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+
+    resources "/links", LinkController, except: [:delete]
   end
 
   scope "/", CortexWeb do

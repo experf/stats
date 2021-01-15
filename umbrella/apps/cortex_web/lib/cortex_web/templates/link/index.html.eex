@@ -1,0 +1,34 @@
+<h1>Listing Links</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Destination URL</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for link <- @links do %>
+      <tr>
+        <td>
+          <%= link link.id, to: Routes.link_path(@conn, :show, link) %>
+        </td>
+        <td>
+          <%= link.name %>
+        </td>
+        <td>
+          <%= link  link.destination_url,
+                    to: link.destination_url,
+                    target: "_blank" %>
+        </td>
+        <td>
+          <span><%= link "Edit", to: Routes.link_path(@conn, :edit, link) %></span>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Link", to: Routes.link_path(@conn, :new) %></span>

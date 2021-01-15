@@ -87,8 +87,8 @@ def get(*args, chdir=None, fmt=None, encoding="utf-8", **opts) -> Any:
 
     cmd = flatten_args(args)
 
-    LOG.getChild("get").info(
-        "Getting command output...",
+    LOG.getChild("get").debug(
+        "Getting system command output...",
         cmd=cmd,
         chdir=chdir,
         fmt=fmt,
@@ -112,7 +112,7 @@ def run(*args, chdir=None, check=True, encoding="utf-8", **opts) -> None:
     cmd = flatten_args(args)
 
     LOG.getChild("get").debug(
-        "Running command...",
+        "Running system command...",
         cmd=cmd,
         chdir=chdir,
         encoding=encoding,
@@ -136,7 +136,7 @@ def replace(
     proc_name = basename(exe)
     cmd = flatten_args((exe, *args), opts_style=opts_style, opts_sort=opts_sort)
     LOG.getChild("exec").debug(
-        "Replacing current process with command...",
+        "Replacing current process with system command...",
         cmd=cmd,
         env=env,
         chdir=chdir,
