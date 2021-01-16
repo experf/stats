@@ -12,24 +12,64 @@ from rich.table import Table
 from rich.console import Console, ConsoleRenderable, RichCast
 from rich.text import Text
 from rich.style import Style
-from rich.containers import Renderables
+# from rich.containers import Renderables
 from rich.traceback import Traceback
 from rich.pretty import Pretty
 
 from .io import OUT, ERR
+from . import cfg
+
+CRITICAL = logging.CRITICAL  # 50
+FATAL = logging.FATAL  # ↑
+ERROR = logging.ERROR  # 40
+WARNING = logging.WARNING  # 30
+WARN = logging.WARN  # ↑
+INFO = logging.INFO  # 20
+DEBUG = logging.DEBUG  # 10
+NOTSET = logging.NOTSET  # 0
+
 
 def is_rich_renderable(x: Any) -> bool:
-    return isinstance(x, (ConsoleRenderable, RichCast)) #, str))
+    return isinstance(x, (ConsoleRenderable, RichCast))  # , str))
 
-def setup(level: Optional[int]=None) -> None:
+
+def get_pkg_logger():
+    return logging.getLogger(__name__.split(".")[0])
+
+
+def setup(level: Optional[int] = None) -> None:
     logging.setLoggerClass(KwdsLogger)
 
-    pkg_logger = logging.getLogger("stats")
+    pkg_logger = get_pkg_logger()
 
-    if level is not None:
+    if level is None:
+        pkg_logger.setLevel(cfg.log.level)
+    else:
         pkg_logger.setLevel(level)
 
     pkg_logger.addHandler(RichHandler.singleton())
+
+
+def set_pkg_level(level: int) -> None:
+    get_pkg_logger().setLevel(level)
+
+
+class LogGetter:
+    def __init__(self, *args, **kwds):
+        self._args = args
+        self._kwds = kwds
+
+    @property
+    def _logger(self):
+        return logging.getLogger(*self._args, **self._kwds)
+
+    def __getattr__(self, name):
+        return getattr(self._logger, name)
+
+
+def getLogger(*args, **kwds):
+    return LogGetter(*args, **kwds)
+
 
 class KwdsLogger(logging.getLoggerClass()):
     def _log(
@@ -48,9 +88,9 @@ class KwdsLogger(logging.getLoggerClass()):
 
         if extra is not None:
             if isinstance(extra, dict):
-                extra = {'data': data, **extra}
+                extra = {"data": data, **extra}
         else:
-            extra = {'data': data}
+            extra = {"data": data}
 
         super()._log(
             level,
@@ -60,6 +100,7 @@ class KwdsLogger(logging.getLoggerClass()):
             stack_info=stack_info,
             extra=extra,
         )
+
 
 class RichHandler(logging.Handler):
     # Default consoles, pointing to the two standard output streams
@@ -166,5 +207,3 @@ class RichHandler(logging.Handler):
             output.add_row(None, Traceback.from_exception(*record.exc_info))
 
         console.print(output)
-
-

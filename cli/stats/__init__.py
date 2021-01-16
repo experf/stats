@@ -6,9 +6,8 @@ import argparse
 
 import argcomplete
 
+from . import log as logging, cortex
 from .io import ERR
-from .log import setup
-from . import cortex
 
 LOG = logging.getLogger(__name__)
 
@@ -53,12 +52,13 @@ def log_level_for(verbosity: Optional[int]) -> int:
 
 
 def run():
+    logging.setup()
     parser = make_parser()
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
     log_level = log_level_for(args.verbose)
 
-    setup(level=log_level)
+    logging.set_pkg_level(log_level)
 
     log = LOG.getChild("run")
 
