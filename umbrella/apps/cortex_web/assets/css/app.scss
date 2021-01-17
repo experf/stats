@@ -1,5 +1,192 @@
 /* This file is for your main application css. */
-@import "./phoenix.css";
+@import "./milligram.css";
+@import "./colors.scss";
+@import "./forms.scss";
+
+@font-face {
+  font-family: "din_alternate_lightregular";
+  src: url("/fonts/din_alternate_light-webfont.woff2") format("woff2"),
+    url("/fonts/din_alternate_light-webfont.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-size-adjust: 0.8;
+}
+
+body {
+  background: $color-bg;
+  color: $color-text;
+  font-family: "din_alternate_lightregular";
+  margin-top: 6rem;
+  margin-left: 0;
+  margin-right: 0;
+  font-size: 2em;
+}
+
+.navigation .title,
+.navigation-title {
+  color: $color-text;
+}
+
+.navigation {
+  background: #34373c;
+  border-bottom: 0.1rem solid #1b1c1d;
+}
+
+.header {
+  background-color: #141518;
+}
+
+pre {
+  background: #141518;
+}
+
+.prettyprint {
+  color: $color-text;
+}
+
+.prettyprint.lang-md * {
+  color: $color-text !important;
+}
+
+code {
+  background: #141518;
+}
+
+.prettyprint .atv {
+  color: rgba(73, 158, 223, 1);
+}
+
+/* General style */
+h1 {
+  font-size: 2.6rem;
+  line-height: 1.25;
+  /* text-transform: uppercase; */
+  /* font-variant: small-caps; */
+}
+
+/* h1::first-letter {
+  font-size: 120%;
+} */
+
+h2 {
+  font-size: 2.8rem;
+  line-height: 1.3;
+}
+h3 {
+  font-size: 2.2rem;
+  letter-spacing: -0.08rem;
+  line-height: 1.35;
+}
+h4 {
+  font-size: 1.8rem;
+  letter-spacing: -0.05rem;
+  line-height: 1.5;
+}
+h5 {
+  font-size: 1.6rem;
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+h6 {
+  font-size: 1.4rem;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+pre {
+  padding: 1em;
+}
+
+th {
+  font-variant: small-caps;
+}
+
+a {
+  color: $color-link;
+
+  &:hover,
+  &:active,
+  &:focus {
+    color: $color-hover;
+  }
+}
+
+.container {
+  margin: 0 auto;
+  max-width: 120rem;
+  padding: 0 2rem;
+  position: relative;
+  width: 100%;
+}
+select {
+  width: auto;
+}
+
+/* Headers */
+header {
+  width: 100%;
+  background: $color-bg;
+  position: fixed;
+  top: 0;
+  /* height: 4rem; */
+  z-index: 8888;
+}
+header section {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+header nav {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+}
+
+header nav ul {
+  display: flex;
+  align-items: stretch; /* Default */
+  justify-content: space-between;
+  padding: 0;
+  margin: 0;
+}
+
+header nav ul.left li:first-child {
+  padding-left: 0;
+}
+
+header nav ul.right li:last-child {
+  padding-right: 0;
+}
+
+header nav li {
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
+  display: block;
+  flex: 0 1 auto; /* Default */
+  list-style-type: none;
+  padding: 1rem;
+  font-variant: small-caps;
+}
+
+header nav li.active {
+  border-bottom: 1px solid #55bcd3;
+}
+
+header nav a {
+  display: block;
+}
+
+@media (min-width: 40rem) {
+  /* Small devices (landscape phones, 576px and up) */
+  header section {
+    flex-direction: row;
+  }
+  /* header nav ul {
+    margin: 1rem;
+  } */
+}
 
 /* Alerts and form errors */
 .alert {

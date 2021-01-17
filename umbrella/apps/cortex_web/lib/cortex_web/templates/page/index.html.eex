@@ -3,8 +3,8 @@
   <p>Peace of mind from prototype to production</p>
 </section>
 
-<section class="row">
-  <article class="column">
+<section>
+  <article>
     <h2>Resources</h2>
     <ul>
       <li>
@@ -18,7 +18,7 @@
       </li>
     </ul>
   </article>
-  <article class="column">
+  <article>
     <h2>Help</h2>
     <ul>
       <li>

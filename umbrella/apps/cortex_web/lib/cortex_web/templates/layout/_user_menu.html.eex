@@ -1,4 +1,4 @@
-<ul>
+<ul class="right">
 <%= if @current_user do %>
   <%= if @current_user.confirmed_at do %>
     <li><%= @current_user.email %></li>

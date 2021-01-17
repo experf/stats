@@ -1,0 +1,36 @@
+<header class="container mx-auto p-2">
+  <nav class="flex flex-row justify-between">
+    <div>
+      <ul class="flex flex-row">
+        <li class="item">
+          <%= link "Stats", to: Routes.page_path(@conn, :index) %>
+        </li>
+        <li class="item">
+          <%= link "Links", to: Routes.link_path(@conn, :index) %>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <ul class="hidden md:flex md:flex-row">
+        <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+          <li class="item"><%= link "LiveDashboard", to: Routes.live_dashboard_path(@conn, :home) %></li>
+        <% end %>
+        <%= if @current_user do %>
+          <%= if @current_user.confirmed_at do %>
+            <li class="item"><%= @current_user.email %></li>
+            <li class="item"><%= link "Settings", to: Routes.user_settings_path(@conn, :edit) %></li>
+          <% end %>
+          <li class="item"><%= link "Log out", to: Routes.user_session_path(@conn, :delete), method: :delete %></li>
+        <% else %>
+          <li class="item"><%= link "Register", to: Routes.user_registration_path(@conn, :new) %></li>
+          <li class="item"><%= link "Log in", to: Routes.user_session_path(@conn, :new) %></li>
+        <% end %>
+      </ul>
+
+      <p id="hamburgerbtn" class="md:hidden">
+        menu
+      </p>
+    </div>
+  </nav>
+</header>
