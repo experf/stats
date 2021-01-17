@@ -45,8 +45,8 @@ input[type="button"],
 input[type="reset"],
 input[type="submit"] {
   background-color: transparent;
-  border-top: 0.1rem solid transparent;
-  border-left: 0.1rem solid transparent;
+  border-top: none;
+  border-left: none;
   // border: 0.1rem solid $color-power-aqua;
   border-right: 0.1rem solid $color-link;
   border-bottom: 0.1rem solid $color-link;
@@ -72,12 +72,16 @@ input[type="submit"] {
   &:hover,
   &:active,
   &:focus {
-    background-color: transparent;
+    // background-color: transparent;
     // background-color: $color-hover;
-    border-top: 0.1rem solid $color-link;
-    border-left: 0.1rem solid $color-link;
+    // border-top: 0.1rem solid $color-link;
+    // border-left: 0.1rem solid $color-link;
     border-color: $color-hover;
-    // color: $color-hover;
+    color: $color-hover;
+    background: linear-gradient(
+      transparent,
+      rgba(216, 67, 137, 0.15)
+    );
     box-shadow: 5px 3px 0 0 $color-hover;
   }
 }
