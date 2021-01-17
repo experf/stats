@@ -36,6 +36,7 @@ defmodule Cortex.Trackers do
       ** (Ecto.NoResultsError)
 
   """
+  def get_link!(id), do: Repo.get!(Link, id)
 
   @doc """
   Creates a link.
@@ -49,23 +50,27 @@ defmodule Cortex.Trackers do
       {:error, %Ecto.Changeset{}}
 
   """
-  def get_link!(id), do: Repo.get!(Link, id)
-
   def create_link(user, attrs \\ %{})
 
-  # def create_link(%User{} = user, %{id: id} = attrs) when is_binary(id) do
-  #   %Link{
-  #     inserted_by_id: user.id,
-  #     updated_by_id: user.id
-  #   }
-  #   |> Link.create_changeset(attrs)
-  #   |> Repo.insert()
-  # end
-
-  def create_link(%User{} = user, attrs) do
+  def create_link(%User{} = user, %{id: id} = attrs)
+      when is_binary(id) and byte_size(id) > 0 do
     %Link{}
     |> Link.create_changeset(user, attrs)
     |> Repo.insert()
+  end
+
+  def create_link(%User{} = user, attrs) do
+    changeset = %Link{} |> Link.create_changeset(user, attrs)
+    Enum.reduce_while(1..10, changeset, fn _, changeset ->
+      changeset
+      |> Ecto.Changeset.put_change(:id, Link.gen_id())
+      |> Repo.insert()
+      |> case do
+        {:ok, _} = ok -> {:halt, ok}
+        {:error, changeset} ->
+          {:halt, {:error, changeset}}
+      end
+    end)
   end
 
   @doc """

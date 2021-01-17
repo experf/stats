@@ -26,7 +26,13 @@ defmodule Cortex.Trackers.Link do
     |> validate_required([])
   end
 
-  def gen_id(changeset) do
+  def gen_id() do
+    :crypto.strong_rand_bytes(@link_gen_id_bytes)
+    |> Base.encode16
+    |> String.downcase
+  end
+
+  defp add_generated_id(changeset) do
     case fetch_change(changeset, :id) do
       {:ok, _} ->
         changeset
@@ -46,8 +52,8 @@ defmodule Cortex.Trackers.Link do
   def create_changeset(link, %User{} = user, attrs) do
     link
     |> cast(attrs, [:id, :name, :destination_url, :redirect_method, :notes])
-    |> gen_id()
-    |> validate_required([:id, :destination_url, :redirect_method])
+    # |> add_generated_id()
+    |> validate_required([:destination_url, :redirect_method])
     |> put_change(:inserted_by_id, user.id)
     |> put_change(:updated_by_id, user.id)
   end
