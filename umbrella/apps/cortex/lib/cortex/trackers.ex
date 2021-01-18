@@ -52,7 +52,7 @@ defmodule Cortex.Trackers do
   """
   def create_link(user, attrs \\ %{})
 
-  def create_link(%User{} = user, %{id: id} = attrs)
+  def create_link(%User{} = user, %{"id" => id} = attrs)
       when is_binary(id) and byte_size(id) > 0 do
     %Link{}
     |> Link.create_changeset(user, attrs)
