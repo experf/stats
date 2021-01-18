@@ -7,7 +7,6 @@ defmodule CortexWeb.Routers.LinkRouter do
 
   scope "/", CortexWeb do
     pipe_through [:browser]
-
-    get "/", PageController, :index
+    get "/:id", LinkController, :follow
   end
 end

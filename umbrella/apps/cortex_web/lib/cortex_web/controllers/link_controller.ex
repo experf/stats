@@ -59,4 +59,9 @@ defmodule CortexWeb.LinkController do
     |> put_flash(:info, "Link deleted successfully.")
     |> redirect(to: Routes.link_path(conn, :index))
   end
+
+  def follow(conn, %{"id" => id}) do
+    link = Trackers.get_link!(id)
+    conn |> redirect(external: link.destination_url)
+  end
 end
