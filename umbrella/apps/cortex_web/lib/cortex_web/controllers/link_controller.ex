@@ -6,7 +6,7 @@ defmodule CortexWeb.LinkController do
 
   def index(conn, _params) do
     links = Trackers.list_links()
-    render(conn, "index.html", links: links)
+    render(conn, "index.html", links: links, title: "Links", nav: "Links")
   end
 
   def new(conn, _params) do
