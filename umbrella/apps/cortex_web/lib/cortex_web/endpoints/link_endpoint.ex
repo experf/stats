@@ -1,4 +1,4 @@
-defmodule CortexWeb.Endpoints.LinkEndpoint do
+defmodule CortexWeb.LinkEndpoint do
   use Phoenix.Endpoint, otp_app: :cortex_web
 
   plug Plug.RequestId
@@ -6,5 +6,5 @@ defmodule CortexWeb.Endpoints.LinkEndpoint do
 
   plug Plug.MethodOverride
   plug Plug.Head
-  plug CortexWeb.Routers.LinkRouter
+  plug CortexWeb.LinkRouter
 end

@@ -3,6 +3,7 @@ defmodule CortexWeb.LinkController do
 
   alias Cortex.Trackers
   alias Cortex.Trackers.Link
+  alias Cortex.Events
 
   def index(conn, _params) do
     links = Trackers.list_links()
@@ -60,8 +61,33 @@ defmodule CortexWeb.LinkController do
     |> redirect(to: Routes.link_path(conn, :index))
   end
 
-  def follow(conn, %{"id" => id}) do
+  def click(conn, %{"id" => id}) do
     link = Trackers.get_link!(id)
+
+    Events.produce(%{
+      app: "cortex",
+      type: "link.click",
+      link: %{
+        id: link.id,
+      },
+      dest_url: link.destination_url,
+      src_url: Phoenix.Controller.current_url(conn),
+      # https://hexdocs.pm/plug/Plug.Conn.html
+      request: %{
+        host: conn.host,
+        path: conn.request_path,
+        ip:
+          conn.remote_ip
+          |> Tuple.to_list
+          |> Enum.map(&Integer.to_string/1)
+          |> Enum.join("."),
+        query: conn.query_string,
+        # https://en.wikipedia.org/wiki/List_of_HTTP_header_fields
+        referer: get_req_header(conn, "referer"),
+        user_agent: get_req_header(conn, "user-agent"),
+      },
+    })
+
     conn |> redirect(external: link.destination_url)
   end
 end

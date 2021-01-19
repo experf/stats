@@ -6,7 +6,7 @@ import argparse
 
 import argcomplete
 
-from . import log as logging, cortex
+from . import log as logging, cortex, kafka
 from .io import ERR
 
 LOG = logging.getLogger(__name__)
@@ -14,7 +14,7 @@ LOG = logging.getLogger(__name__)
 
 class ArgumentParser(argparse.ArgumentParser):
     def __init__(self, *args, **kwds):
-        super().__init__(*args, **kwds)
+        super().__init__(*args, formatter_class=argparse.RawTextHelpFormatter, **kwds)
 
         self.add_argument(
             "-v",
@@ -39,7 +39,7 @@ class ArgumentParser(argparse.ArgumentParser):
 def make_parser() -> ArgumentParser:
     parser = ArgumentParser()
     subparsers = parser.add_subparsers(help="Select a command")
-    for cmd in (cortex,):
+    for cmd in (cortex, kafka):
         cmd.add_to(subparsers)
     return parser
 

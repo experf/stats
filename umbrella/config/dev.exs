@@ -84,7 +84,7 @@ config :cortex, Cortex.Mailer,
   api_key: System.get_env("STATS_MAILGUN_API_KEY"),
   domain: System.get_env("STATS_MAILGUN_DOMAIN")
 
-config :cortex_web, CortexWeb.Endpoints.LinkEndpoint,
+config :cortex_web, CortexWeb.LinkEndpoint,
   http: [port: 4001],
   debug_errors: true,
   code_reloader: true,

@@ -6,12 +6,19 @@ defmodule CortexWeb.Application do
   use Application
 
   def start(_type, _args) do
+
+    :ok = :brod.start_client(
+      [{'localhost', 9091}],
+      :cortex,
+      get_brod_client_config()
+    )
+
     children = [
       # Start the Telemetry supervisor
       CortexWeb.Telemetry,
       # Start the Endpoint (http/https)
       CortexWeb.Endpoint,
-      CortexWeb.Endpoints.LinkEndpoint,
+      CortexWeb.LinkEndpoint,
       # Start a worker by calling: CortexWeb.Worker.start_link(arg)
       # {CortexWeb.Worker, arg}
     ]
@@ -27,5 +34,15 @@ defmodule CortexWeb.Application do
   def config_change(changed, _new, removed) do
     CortexWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  def get_brod_client_config() do
+    [
+      allow_topic_auto_creation: false,
+      auto_start_producers: true,
+      default_producer_config: [],
+      ssl: false,
+      sasl: :undefined,
+    ]
   end
 end

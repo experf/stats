@@ -2,6 +2,8 @@
 @import "./milligram.css";
 @import "./colors.scss";
 @import "./forms.scss";
+@import "./links.scss";
+@import "./tables.scss";
 
 @font-face {
   font-family: "din_alternate_lightregular";
@@ -94,10 +96,6 @@ h6 {
 }
 pre {
   padding: 1em;
-}
-
-th {
-  font-variant: small-caps;
 }
 
 a {

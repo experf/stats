@@ -8,7 +8,8 @@ class paths:
     UMBRELLA = REPO / "umbrella"
     CORTEX = UMBRELLA / "apps" / "cortex"
     CORTEX_WEB = UMBRELLA / "apps" / "cortex_web"
-
+    CORTEX_WEB_ASSETS = CORTEX_WEB / "assets"
+    WEBPACK_HARD_SOURCE_CACHE = CORTEX_WEB_ASSETS / "node_modules" / ".cache"
 
 class log:
     @classmethod

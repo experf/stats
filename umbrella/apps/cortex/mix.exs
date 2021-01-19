@@ -43,6 +43,7 @@ defmodule Cortex.MixProject do
       {:jason, "~> 1.0"},
       {:swoosh, "~> 1.1.2"},  # Send emails
       {:hackney, "~> 1.9"}, # HTTP client, Swoosh uses it
+      {:brod, "~> 3.15.0"}, # Kafka client
     ]
   end
 

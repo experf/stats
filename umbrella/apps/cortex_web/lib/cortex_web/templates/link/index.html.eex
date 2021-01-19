@@ -5,8 +5,11 @@
     <tr>
       <th>ID</th>
       <th>Name</th>
-      <th>Destination URL</th>
-      <th></th>
+      <th>URL</th>
+      <th>Destination</th>
+      <th>
+        <%= link "New Link", to: Routes.link_path(@conn, :new), class: "button" %>
+      </th>
     </tr>
   </thead>
   <tbody>
@@ -17,6 +20,9 @@
         </td>
         <td>
           <%= link.name %>
+        </td>
+        <td>
+          <%= link_click_link link %>
         </td>
         <td>
           <%= link  link.destination_url,
@@ -30,5 +36,3 @@
     <% end %>
   </tbody>
 </table>
-
-<span><%= link "New Link", to: Routes.link_path(@conn, :new) %></span>

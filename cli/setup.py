@@ -22,6 +22,7 @@ setuptools.setup(
         "rich>=7.0.0,<8",
         "argcomplete>=1.12.1,<2",
         "requests>=2.24.0,<3.0",
+        "kafka-python>=2.0.2,<3",
     ],
     scripts = [
         'bin/stats',
