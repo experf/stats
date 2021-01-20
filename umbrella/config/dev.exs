@@ -98,3 +98,9 @@ config :cortex_web, CortexWeb.LinkEndpoint,
       cd: Path.expand("../apps/cortex_web/assets", __DIR__)
     ]
   ]
+
+  import_if_exists = fn rel_path ->
+    if File.exists?("#{__DIR__}/#{rel_path}"), do: import_config(rel_path)
+  end
+
+  import_if_exists.("dev/#{System.get_env("USER")}.exs")
