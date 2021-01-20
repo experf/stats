@@ -1,8 +1,8 @@
 import json
 
-from kafka import KafkaConsumer, TopicPartition
+from kafka import KafkaConsumer
 
-from stats import io, log as logging
+from stats import log as logging
 
 LOG = logging.getLogger(__name__)
 
@@ -22,5 +22,5 @@ def run(_args):
         value_deserializer=json.loads,
         auto_offset_reset="earliest",
     )
-    for message in consumer:
-        LOG.info("EVENT", message=message)
+    for record in consumer:
+        LOG.info("Consumed record", **record._asdict())

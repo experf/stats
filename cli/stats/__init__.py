@@ -6,7 +6,7 @@ import argparse
 
 import argcomplete
 
-from . import log as logging, cortex, kafka
+from . import log as logging, cortex, kafka, docker
 from .io import ERR
 
 LOG = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ class ArgumentParser(argparse.ArgumentParser):
 def make_parser() -> ArgumentParser:
     parser = ArgumentParser()
     subparsers = parser.add_subparsers(help="Select a command")
-    for cmd in (cortex, kafka):
+    for cmd in (cortex, docker, kafka):
         cmd.add_to(subparsers)
     return parser
 
@@ -66,6 +66,8 @@ def run():
 
     try:
         args.func(args)
+    except KeyboardInterrupt:
+        pass
     except Exception as error:
         if (
             args.backtrace

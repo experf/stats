@@ -2,6 +2,9 @@ from pathlib import Path
 import os
 import logging
 
+
+NAME = "stats"
+
 class paths:
     REPO = Path(__file__).resolve().parents[2]
     DEV = REPO / "dev"

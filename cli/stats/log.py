@@ -1,6 +1,5 @@
 from __future__ import annotations
 import logging
-import sys
 from typing import *
 
 # Some way of complaining (ideally) _outside_ the logging system, to (try) to
