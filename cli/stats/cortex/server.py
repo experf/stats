@@ -52,13 +52,21 @@ def add_to(subparsers):
 
 def run(args):
     if args.rm_hs_cache:
-        LOG.info(
-            "[holup]"
-            "Removing `hard-source-webpack-plugin` cache directory..."
-            "[/holup]",
-            path=etc.fmt(cfg.paths.WEBPACK_HARD_SOURCE_CACHE),
-        )
-        rmtree(cfg.paths.WEBPACK_HARD_SOURCE_CACHE)
+        if cfg.paths.WEBPACK_HARD_SOURCE_CACHE.exists():
+            LOG.info(
+                "[holup]"
+                "Removing `hard-source-webpack-plugin` cache directory..."
+                "[/holup]",
+                path=etc.fmt(cfg.paths.WEBPACK_HARD_SOURCE_CACHE),
+            )
+            rmtree(cfg.paths.WEBPACK_HARD_SOURCE_CACHE)
+        else:
+            LOG.info(
+                "[yeah]"
+                "`hard-source-webpack-plugin` cache already gone"
+                "[/yeah]",
+                path=etc.fmt(cfg.paths.WEBPACK_HARD_SOURCE_CACHE),
+            )
 
     sh.replace(
         "mix",

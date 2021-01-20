@@ -10,10 +10,19 @@
         | <%= assigns[:title] %>
       <% end %>
     </title>
-    <link
-      rel="stylesheet"
-      href="<%= Routes.static_path(@conn, "/css/app.css") %>"
-    />
+
+    <%= if opt?(@conn, :style, "mg") do %>
+      <link
+        rel="stylesheet"
+        href="<%= Routes.static_path(@conn, "/css/mg.css") %>"
+      />
+    <% else %>
+      <link
+        rel="stylesheet"
+        href="<%= Routes.static_path(@conn, "/css/app.css") %>"
+      />
+    <% end %>
+
     <script
       defer
       type="text/javascript"
@@ -22,9 +31,20 @@
   </head>
   <body>
     <%= render "_header.html", assigns %>
+
     <main role="main" class="container">
-      <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-      <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+      <%= if has_flash?(@conn, :info) do %>
+        <p class="alert alert-info" role="alert">
+          <%= get_flash(@conn, :info) %>
+        </p>
+      <% end %>
+
+      <%= if has_flash?(@conn, :error) do %>
+        <p class="alert alert-danger" role="alert">
+          <%= get_flash(@conn, :error) %>
+        </p>
+      <% end %>
+
       <%= @inner_content %>
     </main>
   </body>

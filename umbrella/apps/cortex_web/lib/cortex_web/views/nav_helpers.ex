@@ -16,8 +16,8 @@ defmodule CortexWeb.NavHelpers do
       {[active: active], link_opts} -> {active, link_opts}
     end
     content_tag :li,
-      link(name, link_opts),
-      class: if active, do: "active"
+      link(name, link_opts |> Keyword.put(:class, "nav-link")),
+      class: if active, do: "nav-item active", else: "nav-item"
   end
 
   def nav_item(name) do

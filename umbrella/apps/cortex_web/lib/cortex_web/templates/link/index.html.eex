@@ -1,21 +1,21 @@
-<%# <h1>Listing Links</h1> %>
-
-<table>
+<table class="table">
   <thead>
     <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>URL</th>
-      <th>Destination</th>
-      <th>
-        <%= link "New Link", to: Routes.link_path(@conn, :new), class: "button" %>
+      <th scope="col">ID</th>
+      <th scope="col">Name</th>
+      <th scope="col">URL</th>
+      <th scope="col">Destination</th>
+      <th scope="col">
+        <%= link "New Link",
+          to: Routes.link_path(@conn, :new),
+          class: "btn btn-primary" %>
       </th>
     </tr>
   </thead>
   <tbody>
     <%= for link <- @links do %>
       <tr>
-        <td>
+        <td scope="row">
           <%= link link.id, to: Routes.link_path(@conn, :show, link) %>
         </td>
         <td>

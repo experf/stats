@@ -1,26 +1,29 @@
 <header>
   <section class="container">
-    <nav role="navigation">
+    <nav role="navigation" class="navbar navbar-expand-lg navbar-light bg-light">
 
-      <ul class="left">
-        <%= nav_item "Stats",
-          to: Routes.page_path(@conn, :index),
-          active: nav_match?(@conn, CortexWeb.PageController, :index) %>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <%= nav_item "Stats",
+            to: Routes.page_path(@conn, :index),
+            active: nav_match?(@conn, CortexWeb.PageController, :index) %>
 
-        <%= nav_item "Links",
-          to: Routes.link_path(@conn, :index),
-          active: nav_match?(@conn, CortexWeb.LinkController) %>
-      </ul>
+          <%= nav_item "Links",
+            to: Routes.link_path(@conn, :index),
+            active: nav_match?(@conn, CortexWeb.LinkController) %>
+        </ul>
+      </div>
 
-      <ul class="right">
+      <ul class="navbar-nav ml-auto">
         <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
           <%= nav_item "LiveDashboard",
-            to: Routes.live_dashboard_path(@conn, :home) %>
+            to: Routes.live_dashboard_path(@conn, :home),
+            target: "_blank" %>
         <% end %>
 
         <%= if @current_user do %>
           <%= if @current_user.confirmed_at do %>
-            <%= nav_item @current_user.email %>
+            <%= nav_item @current_user.email, to: "#" %>
 
             <%= nav_item "Settings",
               to: Routes.user_settings_path(@conn, :edit),

@@ -5,35 +5,52 @@
     </div>
   <% end %>
 
-  <%= label f, :id %>
-  <%= text_input f, :id, required: false %>
-  <%= error_tag f, :id %>
-  <p>
-    Auto-generated if left blank.
-  </p>
+  <div class="form-group row">
+    <%= label f, :id, "ID",
+      class: "col-sm-2 col-form-label" %>
+    <%= text_input f, :id, required: false, class: "form-control col-sm-10" %>
+    <%= error_tag f, :id %>
+    <small id="emailHelp" class="form-text text-muted">
+      Auto-generated if left blank.
+    </small>
+  </div>
 
-  <%= label f, :destination_url %>
-  <%= text_input f, :destination_url, required: true %>
-  <%= error_tag f, :destination_url %>
+  <div class="form-group row">
+    <%= label f, :destination_url, "Destination URL",
+      class: "col-sm-2 col-form-label" %>
+    <%= text_input f, :destination_url, required: true, class: "form-control col-sm-10" %>
+    <%= error_tag f, :destination_url %>
+  </div>
 
-  <%= label f, :name %>
-  <%= text_input f, :name, required: false %>
-  <%= error_tag f, :name %>
+  <div class="form-group row">
+    <%= label f, :name, "Name (optional)",
+      class: "col-sm-2 col-form-label" %>
+    <%= text_input f, :name, required: false, class: "form-control col-sm-10" %>
+    <%= error_tag f, :name %>
+  </div>
 
-  <%= label f, :redirect_method %>
-  <%= select f, :redirect_method, ["HTTP 302 Found": "http_302"]%>
-  <%= error_tag f, :redirect_method %>
+  <div class="form-group row">
+    <%= label f, :redirect_method,
+      class: "col-sm-2 col-form-label" %>
+    <%= select f, :redirect_method,
+      ["HTTP 302 Found": "http_302"],
+      class: "form-control col-sm-10" %>
+    <%= error_tag f, :redirect_method %>
+    <small id="emailHelp" class="form-text text-muted">
+      See
+      <a href="https://en.wikipedia.org/wiki/URL_redirection" target="_blank">
+        https://en.wikipedia.org/wiki/URL_redirection
+      </a>
+    </small>
+  </div>
 
-  <p>
-    <a href="https://en.wikipedia.org/wiki/URL_redirection" target="_blank">
-      https://en.wikipedia.org/wiki/URL_redirection
-    </a>
-  </p>
-
-  <%= label f, :notes %>
-  <%= textarea f, :notes %>
+  <div class="form-group row">
+    <%= label f, :notes, "Notes (optional)",
+      class: "col-sm-2 col-form-label" %>
+    <%= textarea f, :notes, class: "form-control col-sm-10" %>
+  </div>
 
   <div>
-    <%= submit "Save" %>
+    <%= submit "Save", class: "btn btn-primary" %>
   </div>
 <% end %>
