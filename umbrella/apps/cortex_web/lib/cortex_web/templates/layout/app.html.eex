@@ -11,17 +11,10 @@
       <% end %>
     </title>
 
-    <%= if opt?(@conn, :style, "mg") do %>
-      <link
-        rel="stylesheet"
-        href="<%= Routes.static_path(@conn, "/css/mg.css") %>"
-      />
-    <% else %>
-      <link
-        rel="stylesheet"
-        href="<%= Routes.static_path(@conn, "/css/app.css") %>"
-      />
-    <% end %>
+    <link
+      rel="stylesheet"
+      href="<%= Routes.static_path(@conn, "/css/app.css") %>"
+    />
 
     <script
       defer

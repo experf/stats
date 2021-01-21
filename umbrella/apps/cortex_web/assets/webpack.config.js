@@ -20,7 +20,6 @@ module.exports = (env, options) => {
       // DO NOT want this, Bootstrap has a ton of JS lying around in it...
       // 'app': glob.sync('./vendor/**/*.js').concat(['./js/app.js']),
       'app': ['./js/app.js'],
-      'mg': ['./js/mg.js'],
     },
     output: {
       filename: '[name].js',
