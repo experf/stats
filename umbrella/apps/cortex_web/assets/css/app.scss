@@ -1,3 +1,8 @@
 /* This file is for your main application css. */
+@import "../node_modules/jsoneditor/dist/jsoneditor.css";
 // @import "./milligram.css";
 @import './bootstrap.scss';
+
+.JSONEditor {
+  padding: 2rem 0;
+}

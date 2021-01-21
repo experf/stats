@@ -50,6 +50,10 @@
     <%= textarea f, :notes, class: "form-control col-sm-10" %>
   </div>
 
+  <div class="form-group">
+    <div class="JSONEditor" data-schema="/json/open-graph.json"></div>
+  </div>
+
   <div>
     <%= submit "Save", class: "btn btn-primary" %>
   </div>

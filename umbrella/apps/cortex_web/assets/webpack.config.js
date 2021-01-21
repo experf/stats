@@ -43,7 +43,25 @@ module.exports = (env, options) => {
             'css-loader',
             'sass-loader',
           ],
-        }
+        },
+        // Breaks JSONEditor buttons
+        // {
+        //   test: /\.(png|jpe?g|gif|svg)$/i,
+        //   use: [
+        //     {
+        //       loader: 'url-loader',
+        //       options: {
+        //         limit: 8192,
+        //       }
+        //     },
+        //   ],
+        // },
+        {
+          test: /\.(png|jpe?g|gif|svg)$/i,
+          use: [
+            'file-loader',
+          ],
+        },
       ]
     },
     plugins: [
