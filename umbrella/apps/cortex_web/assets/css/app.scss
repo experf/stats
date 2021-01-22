@@ -5,10 +5,8 @@ $jse-icons: "../vendor/jsoneditor/src/scss/img/jsoneditor-icons.svg";
 // @import "./milligram.css";
 @import './bootstrap.scss';
 
-.JSONEditor {
-  padding: 2rem 0;
-  
-  
+.nav-link {
+  white-space: nowrap;
 }
 
 div.jsoneditor-tree {
