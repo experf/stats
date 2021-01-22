@@ -53,7 +53,7 @@
   </div>
 
   <div class="mb-4">
-    <%= label f, :open_graph, "Open Graph" %>
+    <%= link "Open Graph", to: "https://ogp.me/", target: "_blank" %>
     <div class="JSONEditor pt-2"
       data-schema="/schemas/ogp.schema.json"
       data-templates="?"
