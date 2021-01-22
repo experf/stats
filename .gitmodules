@@ -1,3 +1,6 @@
 [submodule "umbrella/apps/cortex_web/assets/vendor/bootstrap"]
 	path = umbrella/apps/cortex_web/assets/vendor/bootstrap
 	url = https://github.com/nrser/bootstrap.git
+[submodule "umbrella/apps/cortex_web/assets/vendor/jsoneditor"]
+	path = umbrella/apps/cortex_web/assets/vendor/jsoneditor
+	url = https://github.com/nrser/jsoneditor.git

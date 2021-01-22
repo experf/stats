@@ -13,27 +13,51 @@ import "../css/app.scss"
 //     import socket from "./socket"
 //
 import "phoenix_html"
-import JSONEditor from "jsoneditor"
+import JSONEditor from "../vendor/jsoneditor/src/js/JSONEditor"
 
 // https://github.com/josdejong/jsoneditor/blob/develop/README.md#use
 
 function onLoad() {
-  console.log("JSONEditor", JSONEditor);
-
   document.querySelectorAll(".JSONEditor").forEach(container => {
-    console.log(container);
 
     const schema_url = container.getAttribute("data-schema");
     if (schema_url) {
       fetch(schema_url)
         .then(rsp => rsp.json())
         .then(schema => {
+          // https://github.com/josdejong/jsoneditor/blob/master/docs/api.md
+          //  getOptions(
+          //    text: string,
+          //    path: string[],
+          //    input: string,
+          //    editor: JSONEditor
+          //  ): (
+          //    null |
+          //    string[] |
+          //    {startFrom: number, options: string[]} |
+          //    Promise<any of those ↑>
+          //  )
+          const getOptions = (text, path, input, editor) => {
+            console.log("getOptions", {text, path, input});
+
+            if (path.length === 1) {
+              return Object.keys(schema.properties)
+                .filter(key => key.startsWith(text));
+            }
+
+            return null;
+          }
           new JSONEditor(
             container,
             {
-              schema: schema,
+              name: schema.title,
+              schema,
               mode: 'tree',
               modes: ['code', 'text', 'tree', 'preview'],
+              autocomplete: {
+                getOptions,
+                confirmKeys: [],
+              },
             },
             {}
           );

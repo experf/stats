@@ -1,8 +1,17 @@
 /* This file is for your main application css. */
-@import "../node_modules/jsoneditor/dist/jsoneditor.css";
+$jse-icons: "../vendor/jsoneditor/src/scss/img/jsoneditor-icons.svg";
+@import "../vendor/jsoneditor/src/scss/jsoneditor.scss";
+
 // @import "./milligram.css";
 @import './bootstrap.scss';
 
 .JSONEditor {
   padding: 2rem 0;
+  
+  
+}
+
+div.jsoneditor-tree {
+  // min-height: 20rem;
+  overflow: visible;
 }

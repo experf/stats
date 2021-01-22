@@ -1,6 +1,8 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Open Graph Protocol <meta> Data",
   "type": "object",
+  "additionalProperties": false,
   "properties": {
     "og:title": {
       "description": "The title of your object as it should appear within the graph, e.g., \"The Rock\".",
@@ -19,6 +21,5 @@
       "description": "The canonical URL of your object that will be used as its permanent ID in the graph, e.g., \"https://www.imdb.com/title/tt0117500/\".",
       "type": "string"
     }
-  },
-  "additionalProperties": false
+  }
 }
