@@ -1,0 +1,174 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Open Graph Protocol <meta> Data",
+  "$defs": {
+    "secure_url": {
+      "description": "An alternate url to use if the webpage requires HTTPS.",
+      "type": "string",
+      "format": "uri"
+    },
+    "mime_type": {
+      "description": "A MIME type for this file.",
+      "type": "string"
+    },
+    "width": {
+      "description": "The number of pixels wide.",
+      "type": "number",
+      "minimum": 1
+    },
+    "height": {
+      "description": "The number of pixels high.",
+      "type": "number",
+      "minimum": 1
+    },
+    "image:url": {
+      "description": "A URL for an image which should represent your object within the graph.",
+      "type": "string",
+      "format": "uri"
+    },
+    "image": {
+      "description": "An image which should represent your object within the graph.",
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "url": { "$ref": "#/$defs/image:url" },
+        "secure_url": { "$ref": "#/$defs/secure_url" },
+        "type": { "$ref": "#/$defs/mime_type" },
+        "width": { "$ref": "#/$defs/width" },
+        "height": { "$ref": "#/$defs/height" },
+        "alt": {
+          "description": "A description of what is in the image (not a caption). If the page specifies an og:image it should specify og:image:alt.",
+          "type": "string"
+        }
+      }
+    },
+    "audio:url": {
+      "description": "A URL to an audio file to accompany this object.",
+      "type": "string",
+      "format": "uri"
+    },
+    "audio": {
+      "description": "An audio file to accompany this object.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "url": { "$ref": "#/$defs/audio:url" },
+        "secure_url": { "$ref": "#/$defs/secure_url" },
+        "type": { "$ref": "#/$defs/mime_type" }
+      }
+    },
+    "video:url": {
+      "description": "A URL to a video file that complements this object.",
+      "type": "string",
+      "format": "uri"
+    },
+    "video": {
+      "description": "A video file that complements this object.",
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "url": { "$ref": "#/$defs/video:url" },
+        "secure_url": { "$ref": "#/$defs/secure_url" },
+        "type": { "$ref": "#/$defs/mime_type" },
+        "width": { "$ref": "#/$defs/width" },
+        "height": { "$ref": "#/$defs/height" }
+      }
+    },
+    "locale": {
+      "description": "The locale these tags are marked up in. Of the format language_TERRITORY. Default is en_US.",
+      "type": "string",
+      "default": "en_US"
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "og:title": {
+      "description": "The title of your object as it should appear within the graph, e.g., \"The Rock\".",
+      "type": "string"
+    },
+    "og:type": {
+      "description": "The type of your object, e.g., \"video.movie\". Depending on the type you specify, other properties may also be required.",
+      "type": "string",
+      "default": "website"
+    },
+    "og:url": {
+      "description": "The canonical URL of your object that will be used as its permanent ID in the graph, e.g., \"https://www.imdb.com/title/tt0117500/\".",
+      "type": "string",
+      "format": "uri"
+    },
+    "og:description": {
+      "description": "A one to two sentence description of your object.",
+      "type": "string"
+    },
+    "og:determiner": {
+      "description": "The word that appears before this object's title in a sentence. An enum of (a, an, the, \"\", auto). If auto is chosen, the consumer of your data should chose between \"a\" or \"an\". Default is \"\" (blank).",
+      "type": "string",
+      "enum": ["a", "an", "the", "", "auto"],
+      "default": ""
+    },
+    "og:locale": { "$ref": "#/$defs/locale" },
+    "og:locale:alternate": {
+      "description": "An array of other locales this page is available in.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/locale" }
+    },
+    "og:site_name": {
+      "description": "If your object is part of a larger web site, the name which should be displayed for the overall site. e.g., \"IMDb\".",
+      "type": "string"
+    },
+    "og:image": {
+      "anyOf": [
+        { "$ref": "#/$defs/image:url" },
+        { "$ref": "#/$defs/image" },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/image:url" },
+              { "$ref": "#/$defs/image" }
+            ]
+          }
+        }
+      ]
+    },
+    "og:audio": {
+      "description": "Audio file(s) to accompany this object.",
+      "anyOf": [
+        { "$ref": "#/$defs/audio:url" },
+        { "$ref": "#/$defs/audio" },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/audio:url" },
+              { "$ref": "#/$defs/audio" }
+            ]
+          }
+        }
+      ]
+    },
+    "og:video": {
+      "description": "Video file(s) that complement this object.",
+      "anyOf": [
+        { "$ref": "#/$defs/video:url" },
+        { "$ref": "#/$defs/video" },
+        {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/video:url" },
+              { "$ref": "#/$defs/video" }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

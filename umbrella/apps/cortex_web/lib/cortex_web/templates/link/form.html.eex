@@ -55,7 +55,7 @@
   <div class="mb-4">
     <%= link "Open Graph", to: "https://ogp.me/", target: "_blank" %>
     <div class="JSONEditor pt-2"
-      data-schema="/schemas/ogp.schema.json"
+      data-schema="/schemas/ogp.me.schema.json"
       data-templates="?"
     ></div>
   </div>

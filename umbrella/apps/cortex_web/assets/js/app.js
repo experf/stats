@@ -17,6 +17,10 @@ import JSONEditor from "../vendor/jsoneditor/src/js/JSONEditor"
 
 // https://github.com/josdejong/jsoneditor/blob/develop/README.md#use
 
+function loadSchema(uri) {
+  return fetch(uri).then(rsp => rsp.json())
+}
+
 function onLoad() {
   document.querySelectorAll(".JSONEditor").forEach(container => {
 
