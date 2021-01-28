@@ -60,8 +60,8 @@
       <%= github_file_link "josdejong/jsoneditor", "docs/shortcut_keys.md" %>
       page.
 
-      I also hacked in alternative to deal with lack of <code>insert</code>
-      on MacBook keyboards:
+      I also hacked in insert and append alternatives to deal with lack of
+      <code>insert</code> key on MacBook keyboards:
 
       <table>
         <tr><td>^⏎</td><td>Insert a new field with type auto</td></tr>
