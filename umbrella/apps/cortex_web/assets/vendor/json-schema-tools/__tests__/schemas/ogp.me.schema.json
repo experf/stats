@@ -1,6 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "title": "Open Graph Protocol Data",
+  "title": "Open Graph Protocol <meta> Data",
   "$defs": {
     "secure_url": {
       "description": "An alternate url to use if the webpage requires HTTPS.",
@@ -88,6 +87,7 @@
   },
   "type": "object",
   "additionalProperties": false,
+  "nullable": true,
   "properties": {
     "og:title": {
       "description": "The title of your object as it should appear within the graph, e.g., \"The Rock\".",

@@ -15,6 +15,8 @@ import "../css/app.scss"
 import "phoenix_html"
 import JSONEditor from "../vendor/jsoneditor/src/js/JSONEditor"
 
+import { getOptions } from "@/json_editor";
+
 // https://github.com/josdejong/jsoneditor/blob/develop/README.md#use
 
 function loadSchema(uri) {
@@ -41,16 +43,21 @@ function onLoad() {
           //    {startFrom: number, options: string[]} |
           //    Promise<any of those ↑>
           //  )
-          const getOptions = (text, path, input, editor) => {
-            console.log("getOptions", {text, path, input});
+          // const getOptions = (text, path, input, editor) => {
+          //   console.log("getOptions", {
+          //     text,
+          //     path,
+          //     input,
+          //     schema: editor.options.schema,
+          //   });
 
-            if (path.length === 1) {
-              return Object.keys(schema.properties)
-                .filter(key => key.startsWith(text));
-            }
+          //   if (path.length === 1) {
+          //     return Object.keys(schema.properties)
+          //       .filter(key => key.startsWith(text));
+          //   }
 
-            return null;
-          }
+          //   return null;
+          // }
           new JSONEditor(
             container,
             {
@@ -60,7 +67,6 @@ function onLoad() {
               modes: ['code', 'text', 'tree', 'preview'],
               autocomplete: {
                 getOptions,
-                confirmKeys: [],
               },
             },
             {}

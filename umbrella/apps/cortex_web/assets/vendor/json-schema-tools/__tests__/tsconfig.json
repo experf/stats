@@ -1,0 +1,19 @@
+// 📢 You need this to make VSCode's Intellisense work right without polluting
+//    the out dir with compiled test files (at least at the moment this is my
+//    best and only way).
+//    
+//    Adapted from:
+//    
+//    https://stackoverflow.com/a/50147477/1658272
+//    
+//    Basically, it says "use the package's `tsconfig.json`, but include the 
+//    test files".
+//    
+{
+  "extends": "../tsconfig.json",
+  "include": [
+    "../include/**/*.d.ts",
+    "./**/*.ts"
+  ],
+  "baseUrl": "..",
+}

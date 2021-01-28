@@ -19,8 +19,9 @@ module.exports = (env, options) => {
     entry: {
       // DO NOT want this, Bootstrap has a ton of JS lying around in it...
       // 'app': glob.sync('./vendor/**/*.js').concat(['./js/app.js']),
-      'app':
-        glob.sync('./vendor/jsoneditor/src/js/**/*.js')
+      'app': []
+        .concat(glob.sync('./vendor/jsoneditor/src/js/**/*.js'))
+        .concat(glob.sync('./vendor/json-schema-tools/dist/**/*.js'))
         .concat(['./js/app.js']),
     },
     output: {
@@ -32,10 +33,11 @@ module.exports = (env, options) => {
     module: {
       rules: [
         {
-          test: /\.js$/,
+          test: /\.(j|t)s?$/,
           exclude: /node_modules/,
           use: {
-            loader: 'babel-loader'
+            // loader: 'babel-loader'
+            loader: 'ts-loader',
           }
         },
         {
@@ -65,6 +67,15 @@ module.exports = (env, options) => {
           ],
         },
       ]
+    },
+    resolve: {
+      // extensions: [".ts", ".tsx", ".js", ".jsx"],
+      extensions: [".ts", ".js"],
+      alias: {
+        "jsoneditor": path.resolve(__dirname, "vendor", "jsoneditor"),
+        "json-schema-tools": path.resolve(__dirname, "vendor", "json-schema-tools"),
+        '@': path.resolve(__dirname, 'js'),
+      }
     },
     plugins: [
       new MiniCssExtractPlugin({ filename: '../css/[name].css' }),

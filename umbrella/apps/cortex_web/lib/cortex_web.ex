@@ -68,6 +68,7 @@ defmodule CortexWeb do
 
       import CortexWeb.ErrorHelpers
       import CortexWeb.NavHelpers
+      import CortexWeb.LinkHelpers
       import CortexWeb.Gettext
       alias CortexWeb.Router.Helpers, as: Routes
     end
