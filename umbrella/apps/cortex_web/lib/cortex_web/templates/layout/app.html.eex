@@ -25,7 +25,7 @@
   <body>
     <%= render "_header.html", assigns %>
 
-    <main role="main" class="container">
+    <main role="main" class="container <%= view_classes(@conn) %>">
       <%= if has_flash?(@conn, :info) do %>
         <p class="alert alert-info" role="alert">
           <%= get_flash(@conn, :info) %>
@@ -38,7 +38,9 @@
         </p>
       <% end %>
 
-      <%= @inner_content %>
+      <div class="content">
+        <%= @inner_content %>
+      </div>
     </main>
   </body>
 </html>

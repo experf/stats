@@ -11,7 +11,7 @@ defmodule CortexWeb.LinkController do
   end
 
   def new(conn, _params) do
-    changeset = Trackers.change_link(%Link{})
+    changeset = Trackers.change_link(%Link{}, conn.assigns.current_user)
     render(conn, "new.html", changeset: changeset)
   end
 
@@ -34,14 +34,14 @@ defmodule CortexWeb.LinkController do
 
   def edit(conn, %{"id" => id}) do
     link = Trackers.get_link!(id)
-    changeset = Trackers.change_link(link)
+    changeset = Trackers.change_link(link, conn.assigns.current_user)
     render(conn, "edit.html", link: link, changeset: changeset)
   end
 
   def update(conn, %{"id" => id, "link" => link_params}) do
     link = Trackers.get_link!(id)
 
-    case Trackers.update_link(link, link_params) do
+    case Trackers.update_link(link, conn.assigns.current_user, link_params) do
       {:ok, link} ->
         conn
         |> put_flash(:info, "Link updated successfully.")

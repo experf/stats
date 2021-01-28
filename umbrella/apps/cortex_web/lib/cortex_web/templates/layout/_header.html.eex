@@ -8,9 +8,11 @@
             to: Routes.page_path(@conn, :index),
             active: nav_match?(@conn, CortexWeb.PageController, :index) %>
 
-          <%= nav_item "Links",
-            to: Routes.link_path(@conn, :index),
-            active: nav_match?(@conn, CortexWeb.LinkController) %>
+          <%= if @current_user && @current_user.confirmed_at do %>
+            <%= nav_item "Links",
+              to: Routes.link_path(@conn, :index),
+              active: nav_match?(@conn, CortexWeb.LinkController) %>
+          <% end %>
         </ul>
       </div>
 
@@ -36,7 +38,7 @@
             method: :delete %>
 
         <% else %>
-          <%= nav_item "Register",
+          <%= nav_item "Activate Account",
             to: Routes.user_registration_path(@conn, :new) %>
 
           <%= nav_item "Log in",
