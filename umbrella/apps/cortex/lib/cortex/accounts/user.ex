@@ -39,10 +39,10 @@ defmodule Cortex.Accounts.User do
   defp validate_email(changeset) do
     changeset
     |> validate_required([:email])
-    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/,
+    |> validate_format(:email, ~r/^[^\s@]+@[^\s]+$/,
       message: "must have the @ sign and no spaces"
     )
-    |> validate_format(:email, ~r/^[^\s@]+@futureperfect\.studio$/,
+    |> validate_format(:email, ~r/@futureperfect\.studio$/i,
       message: "not a recognized internal email address"
     )
     |> validate_length(:email, max: 160)

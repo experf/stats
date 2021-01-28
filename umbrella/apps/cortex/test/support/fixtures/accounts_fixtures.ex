@@ -4,7 +4,8 @@ defmodule Cortex.AccountsFixtures do
   entities via the `Cortex.Accounts` context.
   """
 
-  def unique_user_email, do: "user#{System.unique_integer()}@example.com"
+  def unique_user_email,
+    do: "stats-test-user#{System.unique_integer()}@futureperfect.studio"
   def valid_user_password, do: "hello world!"
 
   def user_fixture(attrs \\ %{}) do

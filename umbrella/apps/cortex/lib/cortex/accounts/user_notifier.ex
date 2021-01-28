@@ -18,6 +18,11 @@ defmodule Cortex.Accounts.UserNotifier do
          # |> html_body("<h1>Hello #{user.name}</h1>")
          |> text_body(body)
          |> Mailer.deliver() do
+
+      {:ok, %{}} ->
+        # Testing only
+        {:ok, %{to: to, body: body}}
+
       # See source at `deps/swoosh/lib/swoosh/adapters/mailgun.ex`
       #
       {:ok, %{id: id}} ->

@@ -23,3 +23,7 @@ config :cortex_web, CortexWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+# https://hexdocs.pm/swoosh/Swoosh.Adapters.Test.html
+config :cortex, Cortex.Mailer,
+  adapter: Swoosh.Adapters.Test
