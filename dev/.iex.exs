@@ -4,4 +4,7 @@ import Ecto.Query
 
 alias Cortex.Accounts
 alias Cortex.Accounts.{User, UserToken}
+alias Cortex.Trackers
+alias Cortex.Trackers.{Link}
+alias Cortex.OpenGraph
 alias Cortex.Repo
