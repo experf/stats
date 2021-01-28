@@ -14,6 +14,10 @@ class paths:
     CORTEX_WEB_ASSETS = CORTEX_WEB / "assets"
     WEBPACK_HARD_SOURCE_CACHE = CORTEX_WEB_ASSETS / "node_modules" / ".cache"
 
+    @classmethod
+    def rel(cls, path: Path, to: Path=REPO) -> Path:
+        return path.relative_to(to)
+
 class log:
     @classmethod
     @property
