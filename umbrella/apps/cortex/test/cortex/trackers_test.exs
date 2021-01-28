@@ -1,20 +1,25 @@
 defmodule Cortex.TrackersTest do
   use Cortex.DataCase
 
+  import Cortex.AccountsFixtures
   alias Cortex.Trackers
 
   describe "links" do
     alias Cortex.Trackers.Link
 
-    @valid_attrs %{}
+    @valid_attrs %{
+      "destination_url" => "http://stats.test/link/destination_url"
+    }
     @update_attrs %{}
-    @invalid_attrs %{}
+    @invalid_attrs %{
+      "destination_url" => 123
+    }
 
     def link_fixture(attrs \\ %{}) do
       {:ok, link} =
         attrs
         |> Enum.into(@valid_attrs)
-        |> Trackers.create_link()
+        |> (fn attrs -> Trackers.create_link(user_fixture(), attrs) end).()
 
       link
     end
@@ -30,21 +35,28 @@ defmodule Cortex.TrackersTest do
     end
 
     test "create_link/1 with valid data creates a link" do
-      assert {:ok, %Link{} = link} = Trackers.create_link(@valid_attrs)
+      assert {:ok, %Link{} = _link} =
+               Trackers.create_link(user_fixture(), @valid_attrs)
     end
 
     test "create_link/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Trackers.create_link(@invalid_attrs)
+      assert {:error, %Ecto.Changeset{}} =
+               Trackers.create_link(user_fixture(), @invalid_attrs)
     end
 
     test "update_link/2 with valid data updates the link" do
       link = link_fixture()
-      assert {:ok, %Link{} = link} = Trackers.update_link(link, @update_attrs)
+
+      assert {:ok, %Link{} = _link} =
+               Trackers.update_link(link, user_fixture(), @update_attrs)
     end
 
     test "update_link/2 with invalid data returns error changeset" do
       link = link_fixture()
-      assert {:error, %Ecto.Changeset{}} = Trackers.update_link(link, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Trackers.update_link(link, user_fixture(), @invalid_attrs)
+
       assert link == Trackers.get_link!(link.id)
     end
 
@@ -56,7 +68,7 @@ defmodule Cortex.TrackersTest do
 
     test "change_link/1 returns a link changeset" do
       link = link_fixture()
-      assert %Ecto.Changeset{} = Trackers.change_link(link)
+      assert %Ecto.Changeset{} = Trackers.change_link(link, user_fixture())
     end
   end
 end

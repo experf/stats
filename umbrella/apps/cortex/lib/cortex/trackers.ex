@@ -85,9 +85,9 @@ defmodule Cortex.Trackers do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_link(%Link{} = link, attrs) do
+  def update_link(%Link{} = link, %User{} = user, attrs) do
     link
-    |> Link.changeset(attrs)
+    |> Link.changeset(user, attrs)
     |> Repo.update()
   end
 
@@ -116,7 +116,7 @@ defmodule Cortex.Trackers do
       %Ecto.Changeset{data: %Link{}}
 
   """
-  def change_link(%Link{} = link, attrs \\ %{}) do
-    Link.changeset(link, attrs)
+  def change_link(%Link{} = link, %User{} = user, attrs \\ %{}) do
+    Link.changeset(link, user, attrs)
   end
 end

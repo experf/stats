@@ -17,13 +17,17 @@ config :cortex_web,
   ecto_repos: [Cortex.Repo],
   generators: [context_app: :cortex]
 
-# Configures the endpoint
+# Configures the endpoints
+
 config :cortex_web, CortexWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "grHK+/3KfRvohPFG5CA1gOcqBuRRU71Ngc9bvZkIbZqNSg1j5bN6tDJTxmIst+Gq",
   render_errors: [view: CortexWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: Cortex.PubSub,
   live_view: [signing_salt: "8qUj7PUk"]
+
+config :cortex_web, CortexWeb.LinkEndpoint,
+  url: [host: "localhost"]
 
 # Configures Elixir's Logger
 config :logger, :console,
