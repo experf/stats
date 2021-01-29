@@ -3,6 +3,8 @@ defmodule CortexWeb.ErrorHelpers do
   Conveniences for translating and building error messages.
   """
 
+  require Logger
+
   use Phoenix.HTML
 
   @doc """
@@ -44,4 +46,38 @@ defmodule CortexWeb.ErrorHelpers do
       Gettext.dgettext(CortexWeb.Gettext, "errors", msg, opts)
     end
   end
+
+  def was_validated?(%Ecto.Changeset{} = changeset) do
+    if Enum.empty?(changeset.errors), do: "", else: "was-validated:invalid"
+  end
+
+  def has_error?(%Ecto.Changeset{} = changeset, field) do
+    changeset.errors |> Keyword.has_key?(field)
+  end
+
+  # def errors_for(%Ecto.Changeset{} = changeset) do
+  #   Enum.map changeset.errors,
+  #     fn {field, detail} ->
+  #       %{
+  #         message: render_error_detail(detail),
+  #         field: Absinthe.Utils.camelize(to_string(field), lower: true),
+  #       }
+  #     end
+  # end
+
+  # # @spec render_error_details({String.t, Keyword.t})
+  # defp render_error_detail({message, values}) do
+  #   Enum.reduce values, message, fn {key, value}, acc ->
+  #     String.replace(acc, "%{#{key}}", value_to_string(value))
+  #   end
+  # end
+
+  # defp value_to_string(value) when is_binary(value), do: value
+
+  # defp value_to_string(value) when is_atom(value), do: to_string(value)
+
+  # defp value_to_string(value) when is_list(value) do
+  #   Enum.map(value, fn entry -> value_to_string(entry) end)
+  #   |> Enum.join(", ")
+  # end
 end
