@@ -43,7 +43,7 @@ defmodule CortexWeb.LinkView do
         fn {key, value}, acc ->
           case key do
             "url" -> acc
-            key -> render_open_graph_meta_tag("og:image:#{key}", value)
+            key -> [render_open_graph_meta_tag("og:image:#{key}", value) | acc]
           end
         end
       )
@@ -65,7 +65,7 @@ defmodule CortexWeb.LinkView do
         fn {key, value}, acc ->
           case key do
             "url" -> acc
-            key -> render_open_graph_meta_tag("og:audio:#{key}", value)
+            key -> [render_open_graph_meta_tag("og:audio:#{key}", value) | acc]
           end
         end
       )
@@ -87,7 +87,7 @@ defmodule CortexWeb.LinkView do
         fn {key, value}, acc ->
           case key do
             "url" -> acc
-            key -> render_open_graph_meta_tag("og:video:#{key}", value)
+            key -> [render_open_graph_meta_tag("og:video:#{key}", value) | acc]
           end
         end
       )
