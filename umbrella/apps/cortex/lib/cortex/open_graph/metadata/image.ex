@@ -12,7 +12,7 @@ defmodule Cortex.OpenGraph.Metadata.Image do
     def encode(struct, opts) do
       case struct
            |> Map.from_struct()
-           |> Enum.reject(&Cortex.OpenGraph.Metadata.empty_pair?/1) do
+           |> Enum.reject(&Cortex.JSONSchema.empty_pair?/1) do
         [] ->
           Jason.encode(nil, opts)
 

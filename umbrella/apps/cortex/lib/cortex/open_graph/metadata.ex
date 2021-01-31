@@ -2,8 +2,13 @@ defmodule Cortex.OpenGraph.Metadata do
   use Ecto.Type
   require Logger
 
+  alias Cortex.JSONSchema
   alias Cortex.OpenGraph.Metadata
   alias Cortex.OpenGraph.Metadata.{Image, Audio, Video}
+
+  @schema Application.get_env(:cortex, __MODULE__)[:schema_json]
+          |> Jason.decode!(strings: :copy)
+          |> JsonXema.new()
 
   # https://hexdocs.pm/ecto/Ecto.Type.html
 
@@ -23,21 +28,9 @@ defmodule Cortex.OpenGraph.Metadata do
 
   def type, do: :map
 
-  @spec empty_value?(any) :: boolean
-  def empty_value?(x) when is_nil(x), do: true
-  def empty_value?(x) when is_binary(x), do: String.length(x) == 0
-  def empty_value?(x) when is_list(x) or is_map(x), do: Enum.count(x) == 0
-  def empty_value?(_), do: false
-
-  def empty_pair?({_, value}), do: empty_value?(value)
-
-  def filter(external_data) when is_map(external_data) do
-    external_data |> Map.to_list() |> Enum.reject(&empty_pair?/1)
-  end
-
   def cast_sub_struct(struct, external_data) when is_map(external_data) do
     data =
-      for {key_s, value} <- filter(external_data) do
+      for {key_s, value} <- JSONSchema.filter(external_data) do
         {String.to_existing_atom(key_s), value}
       end
 
@@ -49,7 +42,7 @@ defmodule Cortex.OpenGraph.Metadata do
   end
 
   def cast_sub_list(struct, external_data) when is_list(external_data) do
-    external_data |> Enum.map(&(cast_sub_struct(struct, &1)))
+    external_data |> Enum.map(&cast_sub_struct(struct, &1))
   end
 
   def cast_sub_list(struct, external_data)
@@ -58,28 +51,28 @@ defmodule Cortex.OpenGraph.Metadata do
   end
 
   def cast(external_data) when is_map(external_data) do
-    data =
-      for {key_s, value} <- filter(external_data) do
-        key = String.to_existing_atom(key_s)
-        value =
-          case key do
-            :"og:image"-> cast_sub_list(Image, value)
-            :"og:audio"-> cast_sub_list(Audio, value)
-            :"og:video"-> cast_sub_list(Video, value)
-            key -> key
-          end
+    with  :ok <- JsonXema.validate(@schema, external_data),
+          data <- (for {ext_key, ext_value} <- JSONSchema.filter(external_data) do
+            key = String.to_existing_atom(ext_key)
 
-        {key, value}
-      end
+            value =
+              case key do
+                :"og:image" -> cast_sub_list(Image, ext_value)
+                :"og:audio" -> cast_sub_list(Audio, ext_value)
+                :"og:video" -> cast_sub_list(Video, ext_value)
+                _ -> ext_value
+              end
 
-    {:ok, struct!(Metadata, data)}
+            {key, value}
+          end),
+      do: {:ok, struct!(__MODULE__, data)}
   end
 
-  def cast("" = _), do: %Metadata{}
+  def cast("" = _), do: %__MODULE__{}
 
   def cast(external_data) when is_binary(external_data) do
     case external_data do
-      "" -> %Metadata{}
+      "" -> %__MODULE__{}
       _ -> external_data |> Jason.decode!() |> cast()
     end
   end
@@ -92,7 +85,7 @@ defmodule Cortex.OpenGraph.Metadata do
         {String.to_existing_atom(key), val}
       end
 
-    {:ok, struct!(Metadata, data)}
+    {:ok, struct!(__MODULE__, data)}
   end
 
   def dump(%Metadata{} = metadata) do
@@ -100,7 +93,7 @@ defmodule Cortex.OpenGraph.Metadata do
       :ok,
       metadata
       |> Map.from_struct()
-      |> Enum.reject(&empty_pair?/1)
+      |> Enum.reject(&JSONSchema.empty_pair?/1)
       |> Enum.into(%{})
     }
   end
@@ -111,7 +104,7 @@ defmodule Cortex.OpenGraph.Metadata do
     def encode(metadata, opts) do
       case metadata
            |> Map.from_struct()
-           |> Enum.reject(&Metadata.empty_pair?/1) do
+           |> Enum.reject(&JSONSchema.empty_pair?/1) do
         [] ->
           Jason.encode(nil, opts)
 

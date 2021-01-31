@@ -37,6 +37,9 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
+config :cortex, Cortex.OpenGraph.Metadata,
+  schema_json: File.read!("#{__DIR__}/../apps/cortex_web/assets/static/schemas/ogp.me.schema.json")
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

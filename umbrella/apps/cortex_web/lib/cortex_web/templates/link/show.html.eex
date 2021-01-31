@@ -35,7 +35,7 @@
 
   <tr>
     <th>Open Graph Metadata</th>
-    <td><%= maybe @link.open_graph_metadata %></td>
+    <td><%= @link.open_graph_metadata %></td>
   </tr>
 
   <tr>

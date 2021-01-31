@@ -1,7 +1,7 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Open Graph Protocol Data",
-  "$defs": {
+  "definitions": {
     "secure_url": {
       "description": "An alternate url to use if the webpage requires HTTPS.",
       "type": "string",
@@ -34,11 +34,11 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "url": { "$ref": "#/$defs/image:url" },
-        "secure_url": { "$ref": "#/$defs/secure_url" },
-        "type": { "$ref": "#/$defs/mime_type" },
-        "width": { "$ref": "#/$defs/width" },
-        "height": { "$ref": "#/$defs/height" },
+        "url": { "$ref": "#/definitions/image:url" },
+        "secure_url": { "$ref": "#/definitions/secure_url" },
+        "type": { "$ref": "#/definitions/mime_type" },
+        "width": { "$ref": "#/definitions/width" },
+        "height": { "$ref": "#/definitions/height" },
         "alt": {
           "description": "A description of what is in the image (not a caption). If the page specifies an og:image it should specify og:image:alt.",
           "type": "string"
@@ -55,9 +55,9 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "url": { "$ref": "#/$defs/audio:url" },
-        "secure_url": { "$ref": "#/$defs/secure_url" },
-        "type": { "$ref": "#/$defs/mime_type" }
+        "url": { "$ref": "#/definitions/audio:url" },
+        "secure_url": { "$ref": "#/definitions/secure_url" },
+        "type": { "$ref": "#/definitions/mime_type" }
       }
     },
     "video:url": {
@@ -73,11 +73,11 @@
       ],
       "additionalProperties": false,
       "properties": {
-        "url": { "$ref": "#/$defs/video:url" },
-        "secure_url": { "$ref": "#/$defs/secure_url" },
-        "type": { "$ref": "#/$defs/mime_type" },
-        "width": { "$ref": "#/$defs/width" },
-        "height": { "$ref": "#/$defs/height" }
+        "url": { "$ref": "#/definitions/video:url" },
+        "secure_url": { "$ref": "#/definitions/secure_url" },
+        "type": { "$ref": "#/definitions/mime_type" },
+        "width": { "$ref": "#/definitions/width" },
+        "height": { "$ref": "#/definitions/height" }
       }
     },
     "locale": {
@@ -113,11 +113,11 @@
       "enum": ["a", "an", "the", "", "auto"],
       "default": ""
     },
-    "og:locale": { "$ref": "#/$defs/locale" },
+    "og:locale": { "$ref": "#/definitions/locale" },
     "og:locale:alternate": {
       "description": "An array of other locales this page is available in.",
       "type": "array",
-      "items": { "$ref": "#/$defs/locale" }
+      "items": { "$ref": "#/definitions/locale" }
     },
     "og:site_name": {
       "description": "If your object is part of a larger web site, the name which should be displayed for the overall site. e.g., \"IMDb\".",
@@ -125,14 +125,14 @@
     },
     "og:image": {
       "anyOf": [
-        { "$ref": "#/$defs/image:url" },
-        { "$ref": "#/$defs/image" },
+        { "$ref": "#/definitions/image:url" },
+        { "$ref": "#/definitions/image" },
         {
           "type": "array",
           "items": {
             "anyOf": [
-              { "$ref": "#/$defs/image:url" },
-              { "$ref": "#/$defs/image" }
+              { "$ref": "#/definitions/image:url" },
+              { "$ref": "#/definitions/image" }
             ]
           }
         }
@@ -141,14 +141,14 @@
     "og:audio": {
       "description": "Audio file(s) to accompany this object.",
       "anyOf": [
-        { "$ref": "#/$defs/audio:url" },
-        { "$ref": "#/$defs/audio" },
+        { "$ref": "#/definitions/audio:url" },
+        { "$ref": "#/definitions/audio" },
         {
           "type": "array",
           "items": {
             "anyOf": [
-              { "$ref": "#/$defs/audio:url" },
-              { "$ref": "#/$defs/audio" }
+              { "$ref": "#/definitions/audio:url" },
+              { "$ref": "#/definitions/audio" }
             ]
           }
         }
@@ -157,14 +157,14 @@
     "og:video": {
       "description": "Video file(s) that complement this object.",
       "anyOf": [
-        { "$ref": "#/$defs/video:url" },
-        { "$ref": "#/$defs/video" },
+        { "$ref": "#/definitions/video:url" },
+        { "$ref": "#/definitions/video" },
         {
           "type": "array",
           "items": {
             "anyOf": [
-              { "$ref": "#/$defs/video:url" },
-              { "$ref": "#/$defs/video" }
+              { "$ref": "#/definitions/video:url" },
+              { "$ref": "#/definitions/video" }
             ]
           }
         }
