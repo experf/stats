@@ -16,7 +16,9 @@
     <%= for link <- @links do %>
       <tr>
         <td scope="row">
-          <%= link link.id, to: Routes.link_path(@conn, :show, link) %>
+          <code>
+            <%= link link.id, to: Routes.link_path(@conn, :show, link) %>
+          </code>
         </td>
         <td>
           <%= link.name %>

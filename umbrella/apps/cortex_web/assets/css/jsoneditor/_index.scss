@@ -1,0 +1,37 @@
+$jse-icons: "../vendor/jsoneditor/src/scss/img/jsoneditor-icons.svg";
+
+// $jse-white: $stats-color-text;
+// $jse-grey:#999999 !default;
+// $jse-light-bg: #ebebeb !default;
+
+// // Top bar and editor border
+// $jse-blue: $mtn-navy; // $mtn-blue-note;
+
+// // Main text color
+// $jse-content-color: $stats-color-text;
+
+// $jse-popover-bg: $stats-color-bg-highlight;
+// // $jse-contextmenu-color: blue;
+
+// $jse-string: $mtn-lawn-green;
+// $jse-number: $mtn-strawberry;
+// $jse-boolean: $mtn-creme-orange;
+// $jse-null: $mtn-denim;
+// // $jse-color-value: $jse-content-color !default;
+// // $jse-invalid: $jse-content-color !default;
+// $jse-readonly: $mtn-wall;
+// $jse-empty: $stats-color-bg-highlight;
+// $jse-preview: $mtn-malachite-dark;
+// $jse-busy: $mtn-stealth;
+// $jse-busy-border-color: $mtn-stealth;
+
+@import "../../vendor/jsoneditor/src/scss/jsoneditor";
+
+.form-json-editor {
+  background-color: $mtn-white;
+}
+
+div.jsoneditor-tree {
+  // min-height: 20rem;
+  overflow: visible;
+}

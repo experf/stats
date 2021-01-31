@@ -23,6 +23,7 @@ setuptools.setup(
         "argcomplete>=1.12.1,<2",
         "requests>=2.24.0,<3.0",
         "kafka-python>=2.0.2,<3",
+        "beautifulsoup4>=4.9.3,<5",
     ],
     scripts = [
         'bin/stats',

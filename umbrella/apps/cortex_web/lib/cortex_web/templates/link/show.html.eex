@@ -1,4 +1,6 @@
-<h1>Show Link</h1>
+<h1>
+  Link <code><%= link @link.id, to: Routes.link_path(@conn, :show, @link) %></code>
+</h1>
 
 <ul>
 

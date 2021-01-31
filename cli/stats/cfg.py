@@ -8,8 +8,12 @@ NAME = "stats"
 class paths:
     REPO = Path(__file__).resolve().parents[2]
     DEV = REPO / "dev"
+
     UMBRELLA = REPO / "umbrella"
+    UMBRELLA_BUILD = UMBRELLA / "_build"
+
     CORTEX = UMBRELLA / "apps" / "cortex"
+
     CORTEX_WEB = UMBRELLA / "apps" / "cortex_web"
     CORTEX_WEB_ASSETS = CORTEX_WEB / "assets"
     WEBPACK_HARD_SOURCE_CACHE = CORTEX_WEB_ASSETS / "node_modules" / ".cache"

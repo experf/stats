@@ -9,6 +9,7 @@ defmodule Cortex.OpenGraph.Metadata do
 
   # https://hexdocs.pm/ecto/Ecto.Schema.html#embeds_one/3
 
+  @derive Jason.Encoder
   embedded_schema do
     field :"og:title", :string
     field :"og:type", :string

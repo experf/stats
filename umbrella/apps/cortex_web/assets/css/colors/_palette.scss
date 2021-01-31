@@ -1,0 +1,17 @@
+// General background color
+$stats-color-bg: $mtn-black;
+
+// Highlight an area against `$stats-color-bg`
+// 
+// Should make the area stand-out sufficiently while still providing strong
+// contrast to foreground elements (`$stats-color-text`, etc.).
+// 
+$stats-color-bg-highlight: $mtn-anthracite;
+
+// General text color
+$stats-color-text: $mtn-yosemite;
+
+$stats-color-link: $mtn-mt-everest;
+$stats-color-link-hover: $mtn-malachite;
+
+

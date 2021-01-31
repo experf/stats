@@ -16,7 +16,12 @@ defmodule CortexWeb.LinkController do
   end
 
   def create(conn, %{"link" => link_params}) do
-    case Trackers.create_link(conn.assigns.current_user, link_params) do
+    case Trackers.create_link(
+      conn.assigns.current_user,
+      link_params |> Map.update("open_graph_metadata", nil, fn json_str ->
+        json_str |> Jason.decode!()
+      end)
+    ) do
       {:ok, link} ->
         conn
         |> put_flash(:info, "Link created successfully.")

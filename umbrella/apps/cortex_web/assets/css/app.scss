@@ -1,19 +1,25 @@
 /* This file is for your main application css. */
-$jse-icons: "../vendor/jsoneditor/src/scss/img/jsoneditor-icons.svg";
-@import "../vendor/jsoneditor/src/scss/jsoneditor.scss";
 
-@import "./colors.scss";
-@import './bootstrap.scss';
+@import "./colors/index";
+@import "./jsoneditor/index";
+@import "./bootstrap/index";
 
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css");
 
-@import "./user_session/new.scss";
-
-div.jsoneditor-tree {
-  // min-height: 20rem;
-  overflow: visible;
-}
+@import "./views/index";
 
 body {
   margin-bottom: 8rem;
+}
+
+h1 {
+  code {
+    a {
+      color: $code-color;
+
+      &:hover {
+        color: $code-hover-color;
+      }
+    }
+  }
 }
