@@ -2,9 +2,52 @@
   Link <code><%= link @link.id, to: Routes.link_path(@conn, :show, @link) %></code>
 </h1>
 
-<ul>
+<table class="table table-striped table-borderless">
+  <tr>
+    <th>ID</th>
+    <td><code><%= @link.id %></code></td>
+  </td>
 
-</ul>
+  <tr>
+    <th>Name</th>
+    <td><%= maybe @link.name %></td>
+  </tr>
+
+  <tr>
+    <th>URL</th>
+    <td><%= click_link @link %></td>
+  </tr>
+
+  <tr>
+    <th>Destination URL</th>
+    <td><%= destination_link @link %></td>
+  </tr>
+
+  <tr>
+    <th>Redirect Method</th>
+    <td><%= @link.redirect_method %></td>
+  </tr>
+
+  <tr>
+    <th>Notes</th>
+    <td><%= maybe @link.notes %></td>
+  </tr>
+
+  <tr>
+    <th>Open Graph Metadata</th>
+    <td><%= maybe @link.open_graph_metadata %></td>
+  </tr>
+
+  <tr>
+    <th>Created</th>
+    <td><%= @link.inserted_at %> (<%= @link.inserted_by.email %>)</td>
+  </tr>
+
+  <tr>
+    <th>Updated</th>
+    <td><%= @link.updated_at %> (<%= @link.updated_by.email %>)</td>
+  </tr>
+</table>
 
 <span><%= link "Edit", to: Routes.link_path(@conn, :edit, @link) %></span>
 <span><%= link "Back", to: Routes.link_path(@conn, :index) %></span>

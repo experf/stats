@@ -1,28 +1,27 @@
 defmodule Cortex.OpenGraph.Metadata.Image do
-  use Ecto.Schema
-  import Ecto.Changeset
-  require Logger
+  defstruct [
+    :url,
+    :type,
+    :secure_url,
+    :width,
+    :height,
+    :alt,
+  ]
 
-  # https://hexdocs.pm/ecto/Ecto.Schema.html#embeds_one/3
+  defimpl Jason.Encoder do
+    def encode(struct, opts) do
+      case struct
+           |> Map.from_struct()
+           |> Enum.reject(&Cortex.OpenGraph.Metadata.empty_pair?/1) do
+        [] ->
+          Jason.encode(nil, opts)
 
-  embedded_schema do
-    field :url, :string
-    field :type, :string
-    field :secure_url, :string
-    field :width, :integer
-    field :height, :integer
-    field :alt, :string
-  end
-
-  def changeset(schema, params) do
-    Logger.debug("### Image START ###")
-    Logger.debug("###")
-    Logger.debug("schema: #{inspect(schema)}")
-    Logger.debug("###")
-    Logger.debug("params: #{inspect(params)}")
-    Logger.debug("### END ###")
-
-    schema
-    |> cast(params, [:url, :type, :secure_url, :width, :height, :alt])
+        list ->
+          list
+          |> Enum.map(fn {k, v} -> {Atom.to_string(k), v} end)
+          |> Enum.into(%{})
+          |> Jason.Encode.map(opts)
+      end
+    end
   end
 end

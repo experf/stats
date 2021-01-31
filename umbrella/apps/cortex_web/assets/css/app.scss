@@ -23,3 +23,13 @@ h1 {
     }
   }
 }
+
+.is-nil {
+  @extend code;
+  @extend .px-2;
+  white-space: nowrap;
+  color: rgba($code-color, 0.25);
+  background-color: $stats-color-bg-lowlight;
+  display: inline-block;
+  border-radius: $border-radius;
+}

@@ -12,3 +12,7 @@ $code-hover-color: $mtn-malachite;
 
 $navbar-dark-color: $mtn-sand;
 $navbar-dark-hover-color: $mtn-terra;
+
+$table-striped-bg: rgba($stats-color-link, 0.05);
+// $table-hover-bg: rgba($stats-color-link, 0.1);
+$table-hover-bg: $stats-color-bg-highlight;

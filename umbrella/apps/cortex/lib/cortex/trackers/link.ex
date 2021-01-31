@@ -15,11 +15,10 @@ defmodule Cortex.Trackers.Link do
     field :destination_url, :string
     field :redirect_method, :string, default: "http_302"
     field :notes, :string
+    field :open_graph_metadata, OpenGraph.Metadata
 
     belongs_to :inserted_by, Accounts.User
     belongs_to :updated_by, Accounts.User
-
-    embeds_one :open_graph_metadata, OpenGraph.Metadata, on_replace: :update
 
     timestamps()
   end
@@ -27,8 +26,7 @@ defmodule Cortex.Trackers.Link do
   @doc false
   def changeset(link, user, attrs) do
     link
-    |> cast(attrs, [:name, :destination_url, :redirect_method, :notes])
-    |> cast_embed(:open_graph_metadata)
+    |> cast(attrs, [:name, :destination_url, :redirect_method, :notes, :open_graph_metadata])
     |> validate_required([:destination_url, :redirect_method])
     |> put_change(:updated_by_id, user.id)
   end
@@ -42,8 +40,7 @@ defmodule Cortex.Trackers.Link do
   @doc false
   def create_changeset(link, %Accounts.User{} = user, attrs) do
     link
-    |> cast(attrs, [:id, :name, :destination_url, :redirect_method, :notes])
-    |> cast_embed(:open_graph_metadata)
+    |> cast(attrs, [:id, :name, :destination_url, :redirect_method, :notes, :open_graph_metadata])
     |> validate_required([:destination_url, :redirect_method])
     |> put_change(:inserted_by_id, user.id)
     |> put_change(:updated_by_id, user.id)

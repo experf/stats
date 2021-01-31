@@ -38,6 +38,10 @@ defmodule Cortex.Trackers do
   """
   def get_link!(id), do: Repo.get!(Link, id)
 
+  def get_link!(id, _opts) do
+    Repo.get!(Link, id) |> Repo.preload([:inserted_by, :updated_by])
+  end
+
   @doc """
   Creates a link.
 

@@ -21,15 +21,13 @@
           </code>
         </td>
         <td>
-          <%= link.name %>
+          <%= maybe link.name %>
         </td>
         <td>
-          <%= link_click_link link %>
+          <%= click_link link %>
         </td>
         <td>
-          <%= link  link.destination_url,
-                    to: link.destination_url,
-                    target: "_blank" %>
+          <%= destination_link link %>
         </td>
         <td>
           <span><%= link "Edit", to: Routes.link_path(@conn, :edit, link) %></span>

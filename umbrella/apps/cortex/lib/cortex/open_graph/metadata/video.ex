@@ -1,27 +1,26 @@
 defmodule Cortex.OpenGraph.Metadata.Video do
-  use Ecto.Schema
-  import Ecto.Changeset
-  require Logger
+  defstruct [
+    :url,
+    :type,
+    :secure_url,
+    :width,
+    :height,
+  ]
 
-  # https://hexdocs.pm/ecto/Ecto.Schema.html#embeds_one/3
+  defimpl Jason.Encoder do
+    def encode(struct, opts) do
+      case struct
+           |> Map.from_struct()
+           |> Enum.reject(&Cortex.OpenGraph.Metadata.empty_pair?/1) do
+        [] ->
+          Jason.encode(nil, opts)
 
-  embedded_schema do
-    field :url, :string
-    field :type, :string
-    field :secure_url, :string
-    field :width, :integer
-    field :height, :integer
-  end
-
-  def changeset(schema, params) do
-    Logger.debug("### Video START ###")
-    Logger.debug("###")
-    Logger.debug("schema: #{inspect(schema)}")
-    Logger.debug("###")
-    Logger.debug("params: #{inspect(params)}")
-    Logger.debug("### END ###")
-
-    schema
-    |> cast(params, [:url, :type, :secure_url, :width, :height])
+        list ->
+          list
+          |> Enum.map(fn {k, v} -> {Atom.to_string(k), v} end)
+          |> Enum.into(%{})
+          |> Jason.Encode.map(opts)
+      end
+    end
   end
 end

@@ -18,9 +18,7 @@ defmodule CortexWeb.LinkController do
   def create(conn, %{"link" => link_params}) do
     case Trackers.create_link(
       conn.assigns.current_user,
-      link_params |> Map.update("open_graph_metadata", nil, fn json_str ->
-        json_str |> Jason.decode!()
-      end)
+      link_params
     ) do
       {:ok, link} ->
         conn
@@ -33,7 +31,7 @@ defmodule CortexWeb.LinkController do
   end
 
   def show(conn, %{"id" => id}) do
-    link = Trackers.get_link!(id)
+    link = Trackers.get_link!(id, preload: true)
     render(conn, "show.html", link: link)
   end
 

@@ -4,7 +4,7 @@ defmodule CortexWeb.LinkView do
 
   alias Cortex.Trackers.Link
 
-  def link_click_url(%Link{} = link) do
+  def click_url(%Link{} = link) do
     CortexWeb.LinkRouter.Helpers.link_url(
       CortexWeb.LinkEndpoint,
       :click,
@@ -12,9 +12,13 @@ defmodule CortexWeb.LinkView do
     )
   end
 
-  def link_click_link(%Link{} = link) do
-    url = link_click_url(link)
+  def click_link(%Link{} = link) do
+    url = click_url(link)
     link url, to: url, target: "_blank", class: "external"
+  end
+
+  def destination_link(%Link{} = link) do
+    link link.destination_url, to: link.destination_url, target: "_blank"
   end
 
 end
