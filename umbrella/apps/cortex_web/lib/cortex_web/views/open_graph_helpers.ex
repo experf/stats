@@ -2,7 +2,6 @@ defmodule CortexWeb.OpenGraphHelpers do
   use Phoenix.HTML
 
   alias Cortex.OpenGraph
-  alias CortexWeb.EtcHelpers
 
   def open_graph_meta_tag(property, content) do
     tag(:meta, property: property, content: content)
@@ -32,7 +31,8 @@ defmodule CortexWeb.OpenGraphHelpers do
     ]
   end
 
-  def open_graph_meta_tags(x) when is_nil(x), do: [] # EtcHelpers.maybe(x)
+  # EtcHelpers.maybe(x)
+  def open_graph_meta_tags(x) when is_nil(x), do: []
 
   def open_graph_meta_tags(%OpenGraph.Metadata{} = metadata) do
     metadata
