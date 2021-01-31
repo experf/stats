@@ -20,12 +20,14 @@ defmodule CortexWeb.OpenGraphHelpers do
   defp reduce_sub_struct(key, value, acc)
        when is_atom(key) and is_map(value) do
     [
-      open_graph_meta_tag(Atom.to_string(key), value |> Map.get("url"))
+      open_graph_meta_tag(Atom.to_string(key), value |> Map.get(:url))
       | value
+        |> Map.from_struct()
         |> Enum.reduce(acc, fn {k, v}, acc ->
-          case k do
-            "url" -> acc
-            k -> [open_graph_meta_tag("#{key}:#{k}", v) | acc]
+          case {k, v} do
+            {_, v} when is_nil(v) -> acc
+            {:url, _} -> acc
+            {k, v} when is_atom(k) -> [open_graph_meta_tag("#{key}:#{k}", v) | acc]
           end
         end)
     ]
@@ -39,9 +41,6 @@ defmodule CortexWeb.OpenGraphHelpers do
     |> Map.from_struct()
     |> Enum.reduce([], fn {key, value}, acc ->
       case {key, value} do
-        {:__struct__, _} ->
-          acc
-
         {_, nil} ->
           acc
 

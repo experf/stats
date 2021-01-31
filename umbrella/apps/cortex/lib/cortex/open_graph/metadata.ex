@@ -10,6 +10,12 @@ defmodule Cortex.OpenGraph.Metadata do
           |> Jason.decode!(strings: :copy)
           |> JsonXema.new()
 
+  @sub_structs %{
+    :"og:image" => Image,
+    :"og:audio" => Audio,
+    :"og:video" => Video,
+  }
+
   # https://hexdocs.pm/ecto/Ecto.Type.html
 
   # @derive Jason.Encoder
@@ -51,21 +57,22 @@ defmodule Cortex.OpenGraph.Metadata do
   end
 
   def cast(external_data) when is_map(external_data) do
-    with  :ok <- JsonXema.validate(@schema, external_data),
-          data <- (for {ext_key, ext_value} <- JSONSchema.filter(external_data) do
-            key = String.to_existing_atom(ext_key)
+    with :ok <- JsonXema.validate(@schema, external_data),
+         data <-
+           (for {ext_key, ext_value} <- JSONSchema.filter(external_data) do
+              key = String.to_existing_atom(ext_key)
 
-            value =
-              case key do
-                :"og:image" -> cast_sub_list(Image, ext_value)
-                :"og:audio" -> cast_sub_list(Audio, ext_value)
-                :"og:video" -> cast_sub_list(Video, ext_value)
-                _ -> ext_value
-              end
+              value =
+                case key do
+                  :"og:image" -> cast_sub_list(Image, ext_value)
+                  :"og:audio" -> cast_sub_list(Audio, ext_value)
+                  :"og:video" -> cast_sub_list(Video, ext_value)
+                  _ -> ext_value
+                end
 
-            {key, value}
-          end),
-      do: {:ok, struct!(__MODULE__, data)}
+              {key, value}
+            end),
+         do: {:ok, struct!(__MODULE__, data)}
   end
 
   def cast("" = _), do: %__MODULE__{}
@@ -81,8 +88,22 @@ defmodule Cortex.OpenGraph.Metadata do
 
   def load(db_data) when is_map(db_data) do
     data =
-      for {key, val} <- db_data do
-        {String.to_existing_atom(key), val}
+      for {db_key, db_value} <- db_data do
+        key = String.to_existing_atom(db_key)
+        value =
+          case key do
+            key when key in [:"og:image", :"og:audio", :"og:video"] ->
+              db_value
+              |> Enum.map(fn attrs ->
+                struct!(
+                  @sub_structs[key],
+                  attrs
+                  |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
+                )
+              end)
+            _ -> db_value
+          end
+        {key, value}
       end
 
     {:ok, struct!(__MODULE__, data)}
