@@ -24,40 +24,48 @@ defmodule CortexWeb.LinkView do
   end
 
   def render_open_graph_meta_tag(property, content) do
-    tag(:meta, property: property, content: content)
+    case tag(:meta, property: property, content: content) do
+      {:safe, content} -> "#{content}\n"
+    end
   end
 
-  def render_open_graph_image(acc, nil = _), do: acc
+  def render_open_graph_image(x, acc) when is_nil(x), do: acc
 
-  def render_open_graph_image(acc, %OpenGraph.Metadata.Image{} = image) do
+  def render_open_graph_image(list, acc) when is_list(list) do
+    list |> Enum.reduce(acc, &render_open_graph_image/2)
+  end
+
+  def render_open_graph_image(image, acc) when is_map(image) do
     acc =
       image
-      |> Map.keys()
       |> Enum.reduce(
         acc,
-        fn acc, key ->
+        fn {key, value}, acc ->
           case key do
-            :url -> acc
-            key -> render_open_graph_meta_tag("og:image:#{key}", image[key])
+            "url" -> acc
+            key -> render_open_graph_meta_tag("og:image:#{key}", value)
           end
         end
       )
 
-    [render_open_graph_meta_tag("og:image", image.url) | acc]
+    [render_open_graph_meta_tag("og:image", image["url"]) | acc]
   end
 
-  def render_open_graph_audio(acc, nil = _), do: acc
+  def render_open_graph_audio(x, acc) when is_nil(x), do: acc
 
-  def render_open_graph_audio(acc, %OpenGraph.Metadata.Audio{} = audio) do
+  def render_open_graph_audio(list, acc) when is_list(list) do
+    list |> Enum.reduce(acc, &render_open_graph_audio/2)
+  end
+
+  def render_open_graph_audio(audio, acc) when is_map(audio) do
     acc =
       audio
-      |> Map.keys()
       |> Enum.reduce(
         acc,
-        fn acc, key ->
+        fn {key, value}, acc ->
           case key do
-            :url -> acc
-            key -> render_open_graph_meta_tag("og:audio:#{key}", audio[key])
+            "url" -> acc
+            key -> render_open_graph_meta_tag("og:audio:#{key}", value)
           end
         end
       )
@@ -65,18 +73,21 @@ defmodule CortexWeb.LinkView do
     [render_open_graph_meta_tag("og:audio", audio.url) | acc]
   end
 
-  def render_open_graph_video(acc, nil = _), do: acc
+  def render_open_graph_video(nil = _, acc), do: acc
 
-  def render_open_graph_video(acc, %OpenGraph.Metadata.Video{} = video) do
+  def render_open_graph_video(videos, acc) when is_list(videos) do
+    videos |> Enum.reduce(acc, &render_open_graph_video/2)
+  end
+
+  def render_open_graph_video(video, acc) when is_map(video) do
     acc =
       video
-      |> Map.keys()
       |> Enum.reduce(
         acc,
-        fn acc, key ->
+        fn {key, value}, acc ->
           case key do
-            :url -> acc
-            key -> render_open_graph_meta_tag("og:video:#{key}", video[key])
+            "url" -> acc
+            key -> render_open_graph_meta_tag("og:video:#{key}", value)
           end
         end
       )
@@ -84,9 +95,6 @@ defmodule CortexWeb.LinkView do
     [render_open_graph_meta_tag("og:video", video.url) | acc]
   end
 
-  def render_open_graph_images(acc, images) when is_list(images) do
-    images |> Enum.reduce(acc, &render_open_graph_image/2)
-  end
 
   def render_open_graph_metadata(x) when is_nil(x), do: EtcHelpers.maybe(x)
 
@@ -96,28 +104,30 @@ defmodule CortexWeb.LinkView do
 
   def render_open_graph_metadata(%OpenGraph.Metadata{} = metadata) do
     metadata
-    |> Map.keys()
+    |> Map.from_struct()
     |> Enum.reduce(
       [],
-      fn key, acc ->
-        case key do
-          :__struct__ ->
+      fn {key, value}, acc ->
+        case {key, value} do
+          {:__struct__, _} ->
             acc
 
-          :"og:image" ->
-            render_open_graph_image(acc, metadata |> Map.get(key))
+          {_, nil} -> acc
 
-          :"og:audio" ->
-            render_open_graph_audio(acc, metadata |> Map.get(key))
+          {:"og:image", value} ->
+            render_open_graph_image(value, acc)
 
-          :"og:video" ->
-            render_open_graph_video(acc, metadata |> Map.get(key))
+          {:"og:audio", value} ->
+            render_open_graph_audio(value, acc)
 
-          key ->
+          {:"og:video", value} ->
+            render_open_graph_video(value, acc)
+
+          {key, value} ->
             [
               render_open_graph_meta_tag(
                 Atom.to_string(key),
-                to_string(Map.get(metadata, key))
+                to_string(value)
               )
               | acc
             ]
