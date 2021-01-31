@@ -3,8 +3,6 @@ defmodule CortexWeb.LinkView do
   use Phoenix.HTML
 
   alias Cortex.Trackers.Link
-  alias Cortex.OpenGraph
-  alias CortexWeb.OpenGraphHelpers
 
   def click_url(%Link{} = link) do
     CortexWeb.LinkRouter.Helpers.link_url(
