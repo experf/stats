@@ -35,7 +35,7 @@
 
   <tr>
     <th>Open Graph Metadata</th>
-    <td><%= render_open_graph_metadata @link.open_graph_metadata %></td>
+    <td><%= open_graph_meta_tags_dump @link.open_graph_metadata %></td>
   </tr>
 
   <tr>
