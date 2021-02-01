@@ -24,9 +24,11 @@ defmodule Cortex.Trackers.Link.OpenGraphMetadataTest do
 
       assert {:ok, %Link{} = link} = Trackers.create_link(user_fixture(), attrs)
 
+      assert %OpenGraph.Metadata{} = link.open_graph_metadata
       assert link.open_graph_metadata."og:title" == "What Up"
       assert is_list(link.open_graph_metadata."og:image")
-      assert is_map(link.open_graph_metadata."og:image" |> List.first())
+      assert %OpenGraph.Metadata.Image{} =
+        link.open_graph_metadata."og:image" |> List.first()
 
       assert link.open_graph_metadata."og:image"
              |> List.first()

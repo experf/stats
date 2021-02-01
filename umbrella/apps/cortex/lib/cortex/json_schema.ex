@@ -1,4 +1,13 @@
 defmodule Cortex.JSONSchema do
+  defmacro is_empty(ext_value) do
+    quote do
+      is_nil(unquote(ext_value)) or
+        unquote(ext_value) == "" or
+        unquote(ext_value) == [] or
+        unquote(ext_value) == %{}
+    end
+  end
+
   @spec empty_value?(any) :: boolean
   def empty_value?(x) when is_nil(x), do: true
   def empty_value?(x) when is_binary(x), do: String.length(x) == 0
@@ -7,8 +16,4 @@ defmodule Cortex.JSONSchema do
 
   @spec empty_pair?({any, any}) :: boolean
   def empty_pair?({_, value}), do: empty_value?(value)
-
-  def filter(external_data) when is_map(external_data) do
-    external_data |> Map.to_list() |> Enum.reject(&empty_pair?/1)
-  end
 end

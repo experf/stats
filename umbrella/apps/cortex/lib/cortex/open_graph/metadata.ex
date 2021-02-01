@@ -1,6 +1,7 @@
 defmodule Cortex.OpenGraph.Metadata do
   use Ecto.Type
   require Logger
+  import Cortex.JSONSchema
 
   alias Cortex.JSONSchema
   alias Cortex.OpenGraph.Metadata.{Image, Audio, Video}
@@ -15,8 +16,7 @@ defmodule Cortex.OpenGraph.Metadata do
     :"og:video" => Video
   }
 
-  @sub_module_keys Map.keys(@sub_structs)
-  @sub_module_key_strings Enum.map(@sub_module_keys, &Atom.to_string/1)
+  @sub_struct_keys Map.keys(@sub_structs)
 
   # https://hexdocs.pm/ecto/Ecto.Type.html
 
@@ -33,13 +33,28 @@ defmodule Cortex.OpenGraph.Metadata do
     :"og:video"
   ]
 
+  # Functions
+  # ============================================================================
+
   def type, do: :map
 
-  defp cast_reduce({_, ext_value}, kwds) when is_nil(ext_value), do: kwds
+  def validate(value) do
+    case JsonXema.validate(@schema, value) do
+      {:error, %JsonXema.ValidationError{} = error} ->
+        {:error, [schema_validation: error]}
 
-  defp cast_reduce({ext_key, ext_value}, kwds)
-       when ext_key in @sub_module_key_strings do
-    key = String.to_existing_atom(ext_key)
+      :ok -> :ok
+    end
+  end
+
+  # Casting -- Converting External Input to Runtime Structure
+  # ----------------------------------------------------------------------------
+
+  def cast_attr({ext_key, ext_value}) when is_binary(ext_key),
+    do: cast_attr({String.to_existing_atom(ext_key), ext_value})
+
+  def cast_attr({key, ext_value})
+      when is_atom(key) and key in @sub_struct_keys do
     struct = @sub_structs[key]
 
     value =
@@ -51,26 +66,30 @@ defmodule Cortex.OpenGraph.Metadata do
           [struct.cast!(any)]
       end
 
-    [{key, value} | kwds]
+    {key, value}
   end
 
-  defp cast_reduce({ext_key, ext_value}, kwds) do
-    [{String.to_existing_atom(ext_key), ext_value} | kwds]
-  end
+  def cast_attr({key, _} = attr) when is_atom(key),
+    do: attr
 
   @spec cast(any) :: :error | {:error, keyword()} | {:ok, %__MODULE__{}}
 
   def cast(attrs) when is_map(attrs) do
-    case JsonXema.validate(@schema, attrs) do
-      {:error, %JsonXema.ValidationError{} = error} ->
-        {:error, [schema_validation: error]}
+    case validate(attrs) do
+      {:error, _} = error ->
+        error
 
       :ok ->
-        {:ok, struct!(__MODULE__, attrs |> Enum.reduce([], &cast_reduce/2))}
+        kwds =
+          for {_, value} = attr when not is_empty(value) <- attrs,
+              do: cast_attr(attr)
+
+        {:ok, struct!(__MODULE__, kwds)}
     end
   end
 
-  def cast("" = _), do: {:ok, %__MODULE__{}}
+  def cast(json) when json == "",
+    do: {:ok, %__MODULE__{}}
 
   def cast(json) when is_binary(json) do
     case json do
@@ -79,44 +98,56 @@ defmodule Cortex.OpenGraph.Metadata do
     end
   end
 
-  def cast(_), do: :error
+  def cast(_),
+    do: :error
 
-  defp load_reduce({db_key, db_value}, kwds)
-       when db_key in @sub_module_key_strings do
-    key = String.to_existing_atom(db_key)
+  # Loading -- Converting Ecto Types to Runtime Structure
+  # --------------------------------------------------------------------------
+
+  def load_attr({ecto_key, ecto_value}) when is_binary(ecto_key),
+    do: cast_attr({ecto_key |> String.to_existing_atom(), ecto_value})
+
+  def load_attr({key, ecto_value})
+      when key in @sub_struct_keys do
     struct = @sub_structs[key]
-    value = db_value |> Enum.map(&struct.load!/1)
-    [{key, value} | kwds]
+    {key, ecto_value |> Enum.map(&struct.load!/1)}
   end
 
-  defp load_reduce({db_key, db_value}, kwds) when is_binary(db_key) do
-    [{String.to_existing_atom(db_key), db_value} | kwds]
+  def load_attr({key, _} = attr) when is_atom(key),
+    do: attr
+
+  def load!(ecto_data) when is_map(ecto_data) do
+    __MODULE__ |> struct!(for attr <- ecto_data, do: load_attr(attr))
   end
 
-  def load(db_data) when is_map(db_data) do
-    {:ok, struct!(__MODULE__, db_data |> Enum.reduce([], &load_reduce/2))}
-  end
+  def load(ecto_data) when is_map(ecto_data),
+    do: {:ok, ecto_data |> load!()}
 
-  defp dump_reduce({_, value}, kwds) when is_nil(value), do: kwds
+  # Dumping -- Converting Runtime Structure to Ecto Types
+  # --------------------------------------------------------------------------
 
-  defp dump_reduce({key, value}, kwds) when key in @sub_module_keys do
+  def dump_attr({key, value}) when key in @sub_struct_keys do
     struct = @sub_structs[key]
-    [{key, value |> Enum.map(&struct.dump!/1)} | kwds]
+    {key, value |> Enum.map(&struct.dump!/1)}
   end
 
-  defp dump_reduce({key, value}, kwds), do: [{key, value} | kwds]
+  def dump_attr(kv), do: kv
 
-  def dump(%__MODULE__{} = metadata) do
-    {
-      :ok,
-      metadata
-      |> Map.from_struct()
-      |> Enum.reduce([], &dump_reduce/2)
-      |> Enum.into(%{})
-    }
+  def dump!(%__MODULE__{} = struct) do
+    for(
+      {_, v} = kv when not is_empty(v) <- struct |> Map.from_struct(),
+      do: dump_attr(kv)
+    )
+    |> Enum.into(%{})
   end
+
+  def dump(%__MODULE__{} = struct),
+    do: {:ok, struct |> dump!()}
 
   def dump(_), do: :error
+
+  # JSON Serialization
+  # --------------------------------------------------------------------------
 
   defimpl Jason.Encoder, for: [__MODULE__, Image, Audio, Video] do
     def encode(metadata, opts) do
