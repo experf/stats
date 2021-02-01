@@ -24,7 +24,10 @@ defmodule CortexWeb.FormHelpers do
         hidden_input(
           form_data,
           field,
-          [class: "#{@form_json_editor_class}-input"]
+          [
+            value: input_value(form_data, field) |> Jason.encode!(),
+            class: "#{@form_json_editor_class}-input",
+          ]
           |> add_valid_class(form_data, field)
         ),
         error_tag(form_data, field),

@@ -21,13 +21,17 @@ config :cortex_web,
 
 config :cortex_web, CortexWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "grHK+/3KfRvohPFG5CA1gOcqBuRRU71Ngc9bvZkIbZqNSg1j5bN6tDJTxmIst+Gq",
-  render_errors: [view: CortexWeb.ErrorView, accepts: ~w(html json), layout: false],
+  secret_key_base:
+    "grHK+/3KfRvohPFG5CA1gOcqBuRRU71Ngc9bvZkIbZqNSg1j5bN6tDJTxmIst+Gq",
+  render_errors: [
+    view: CortexWeb.ErrorView,
+    accepts: ~w(html json),
+    layout: false
+  ],
   pubsub_server: Cortex.PubSub,
   live_view: [signing_salt: "8qUj7PUk"]
 
-config :cortex_web, CortexWeb.LinkEndpoint,
-  url: [host: "localhost"]
+config :cortex_web, CortexWeb.LinkEndpoint, url: [host: "localhost"]
 
 # Configures Elixir's Logger
 config :logger, :console,
@@ -38,7 +42,16 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 
 config :cortex, Cortex.OpenGraph.Metadata,
-  schema_json: File.read!("#{__DIR__}/../apps/cortex_web/assets/static/schemas/ogp.me.schema.json")
+  schema_json:
+    File.read!(
+      "#{__DIR__}/../apps/cortex_web/assets/static/schemas/ogp.me.schema.json"
+    )
+
+config :cortex, Cortex.Trackers.Link,
+  open_graph_metadata_schema:
+    File.read!(
+      "#{__DIR__}/../apps/cortex_web/assets/static/schemas/ogp.me.schema.json"
+    )
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
