@@ -28,7 +28,7 @@ h1 {
   @extend code;
   @extend .px-2;
   white-space: nowrap;
-  color: rgba($code-color, 0.25);
+  color: rgba($code-color, 0.5);
   background-color: $stats-color-bg-lowlight;
   display: inline-block;
   border-radius: $border-radius;

@@ -3,7 +3,6 @@ defmodule Cortex.OpenGraph.Metadata do
   require Logger
 
   alias Cortex.JSONSchema
-  alias Cortex.OpenGraph.Metadata
   alias Cortex.OpenGraph.Metadata.{Image, Audio, Video}
 
   @schema Application.get_env(:cortex, __MODULE__)[:schema_json]
@@ -59,7 +58,7 @@ defmodule Cortex.OpenGraph.Metadata do
     [{String.to_existing_atom(ext_key), ext_value} | kwds]
   end
 
-  @spec cast(any) :: :error | {:error, keyword()} | {:ok, %Metadata{}}
+  @spec cast(any) :: :error | {:error, keyword()} | {:ok, %__MODULE__{}}
 
   def cast(attrs) when is_map(attrs) do
     case JsonXema.validate(@schema, attrs) do
@@ -73,48 +72,47 @@ defmodule Cortex.OpenGraph.Metadata do
 
   def cast("" = _), do: {:ok, %__MODULE__{}}
 
-  def cast(ext_data) when is_binary(ext_data) do
-    case ext_data do
+  def cast(json) when is_binary(json) do
+    case json do
       "" -> {:ok, %__MODULE__{}}
-      _ -> ext_data |> Jason.decode!() |> cast()
+      _ -> json |> Jason.decode!() |> cast()
     end
   end
 
   def cast(_), do: :error
 
-  def load(db_data) when is_map(db_data) do
-    data =
-      for {db_key, db_value} <- db_data do
-        key = String.to_existing_atom(db_key)
-
-        value =
-          case key do
-            key when key in [:"og:image", :"og:audio", :"og:video"] ->
-              db_value
-              |> Enum.map(fn attrs ->
-                struct!(
-                  @sub_structs[key],
-                  attrs
-                  |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
-                )
-              end)
-
-            _ ->
-              db_value
-          end
-
-        {key, value}
-      end
-
-    {:ok, struct!(__MODULE__, data)}
+  defp load_reduce({db_key, db_value}, kwds)
+      when db_key in @sub_module_key_strings do
+    key = String.to_existing_atom(db_key)
+    struct = @sub_structs[key]
+    value = db_value |> Enum.map(&struct.load!/1)
+    [{key, value} | kwds]
   end
 
-  def dump(%Metadata{} = metadata) do
+  defp load_reduce({db_key, db_value}, kwds) when is_binary(db_key) do
+    [{String.to_existing_atom(db_key), db_value} | kwds]
+  end
+
+  def load(db_data) when is_map(db_data) do
+    {:ok, struct!(__MODULE__, db_data |> Enum.reduce([], &load_reduce/2))}
+  end
+
+
+  defp dump_reduce({_, value}, kwds) when is_nil(value), do: kwds
+
+  defp dump_reduce({key, value}, kwds) when key in @sub_module_keys do
+    struct = @sub_structs[key]
+    [{key, struct.dump!(value)} | kwds]
+  end
+
+  defp dump_reduce({key, value}, kwds), do: [{key, value} | kwds]
+
+  def dump(%__MODULE__{} = metadata) do
     {
       :ok,
       metadata
       |> Map.from_struct()
-      |> Enum.reject(&JSONSchema.empty_pair?/1)
+      |> Enum.reduce([], &dump_reduce/2)
       |> Enum.into(%{})
     }
   end

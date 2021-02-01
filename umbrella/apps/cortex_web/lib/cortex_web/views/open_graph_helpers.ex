@@ -53,6 +53,10 @@ defmodule CortexWeb.OpenGraphHelpers do
     end)
   end
 
+  def open_graph_meta_tags_dump(metadata) when is_nil(metadata) do
+    content_tag :span, "null", class: "is-nil"
+  end
+
   def open_graph_meta_tags_dump(%OpenGraph.Metadata{} = metadata) do
     metadata
     |> open_graph_meta_tags()
