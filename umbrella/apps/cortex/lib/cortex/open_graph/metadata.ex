@@ -82,7 +82,7 @@ defmodule Cortex.OpenGraph.Metadata do
   def cast(_), do: :error
 
   defp load_reduce({db_key, db_value}, kwds)
-      when db_key in @sub_module_key_strings do
+       when db_key in @sub_module_key_strings do
     key = String.to_existing_atom(db_key)
     struct = @sub_structs[key]
     value = db_value |> Enum.map(&struct.load!/1)
@@ -97,12 +97,11 @@ defmodule Cortex.OpenGraph.Metadata do
     {:ok, struct!(__MODULE__, db_data |> Enum.reduce([], &load_reduce/2))}
   end
 
-
   defp dump_reduce({_, value}, kwds) when is_nil(value), do: kwds
 
   defp dump_reduce({key, value}, kwds) when key in @sub_module_keys do
     struct = @sub_structs[key]
-    [{key, struct.dump!(value)} | kwds]
+    [{key, value |> Enum.map(&struct.dump!/1)} | kwds]
   end
 
   defp dump_reduce({key, value}, kwds), do: [{key, value} | kwds]
