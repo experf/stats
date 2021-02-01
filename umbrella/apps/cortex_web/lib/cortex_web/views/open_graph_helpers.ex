@@ -25,15 +25,19 @@ defmodule CortexWeb.OpenGraphHelpers do
         |> Map.from_struct()
         |> Enum.reduce(acc, fn {k, v}, acc ->
           case {k, v} do
-            {_, v} when is_nil(v) -> acc
-            {:url, _} -> acc
-            {k, v} when is_atom(k) -> [open_graph_meta_tag("#{key}:#{k}", v) | acc]
+            {_, v} when is_nil(v) ->
+              acc
+
+            {:url, _} ->
+              acc
+
+            {k, v} when is_atom(k) ->
+              [open_graph_meta_tag("#{key}:#{k}", v) | acc]
           end
         end)
     ]
   end
 
-  # EtcHelpers.maybe(x)
   def open_graph_meta_tags(x) when is_nil(x), do: []
 
   def open_graph_meta_tags(%OpenGraph.Metadata{} = metadata) do
@@ -54,7 +58,7 @@ defmodule CortexWeb.OpenGraphHelpers do
   end
 
   def open_graph_meta_tags_dump(metadata) when is_nil(metadata) do
-    content_tag :span, "null", class: "is-nil"
+    content_tag(:span, "null", class: "is-nil")
   end
 
   def open_graph_meta_tags_dump(%OpenGraph.Metadata{} = metadata) do

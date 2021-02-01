@@ -118,7 +118,7 @@ defmodule Cortex.OpenGraph.Metadata do
 
   def dump(_), do: :error
 
-  defimpl Jason.Encoder do
+  defimpl Jason.Encoder, for: [__MODULE__, Image, Audio, Video] do
     def encode(metadata, opts) do
       case metadata
            |> Map.from_struct()
