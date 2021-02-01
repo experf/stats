@@ -13,12 +13,14 @@ defmodule Cortex.OpenGraph.Metadata do
   @sub_structs %{
     :"og:image" => Image,
     :"og:audio" => Audio,
-    :"og:video" => Video,
+    :"og:video" => Video
   }
+
+  @sub_module_keys Map.keys(@sub_structs)
+  @sub_module_key_strings Enum.map(@sub_module_keys, &Atom.to_string/1)
 
   # https://hexdocs.pm/ecto/Ecto.Type.html
 
-  # @derive Jason.Encoder
   defstruct [
     :"og:title",
     :"og:type",
@@ -34,53 +36,47 @@ defmodule Cortex.OpenGraph.Metadata do
 
   def type, do: :map
 
-  def cast_sub_struct(struct, external_data) when is_map(external_data) do
-    data =
-      for {key_s, value} <- JSONSchema.filter(external_data) do
-        {String.to_existing_atom(key_s), value}
+  defp cast_reduce({_, ext_value}, kwds) when is_nil(ext_value), do: kwds
+
+  defp cast_reduce({ext_key, ext_value}, kwds)
+       when ext_key in @sub_module_key_strings do
+    key = String.to_existing_atom(ext_key)
+    struct = @sub_structs[key]
+
+    value =
+      case ext_value do
+        list when is_list(list) ->
+          list |> Enum.map(&struct.cast!/1)
+
+        any ->
+          [struct.cast!(any)]
       end
 
-    struct!(struct, data)
+    [{key, value} | kwds]
   end
 
-  def cast_sub_struct(struct, external_data) when is_binary(external_data) do
-    struct!(struct, %{url: external_data})
+  defp cast_reduce({ext_key, ext_value}, kwds) do
+    [{String.to_existing_atom(ext_key), ext_value} | kwds]
   end
 
-  def cast_sub_list(struct, external_data) when is_list(external_data) do
-    external_data |> Enum.map(&cast_sub_struct(struct, &1))
+  @spec cast(any) :: :error | {:error, keyword()} | {:ok, %Metadata{}}
+
+  def cast(attrs) when is_map(attrs) do
+    case JsonXema.validate(@schema, attrs) do
+      {:error, %JsonXema.ValidationError{} = error} ->
+        {:error, [schema_validation: error]}
+
+      :ok ->
+        {:ok, struct!(__MODULE__, attrs |> Enum.reduce([], &cast_reduce/2))}
+    end
   end
 
-  def cast_sub_list(struct, external_data)
-      when is_map(external_data) or is_binary(external_data) do
-    [cast_sub_struct(struct, external_data)]
-  end
+  def cast("" = _), do: {:ok, %__MODULE__{}}
 
-  def cast(external_data) when is_map(external_data) do
-    with :ok <- JsonXema.validate(@schema, external_data),
-         data <-
-           (for {ext_key, ext_value} <- JSONSchema.filter(external_data) do
-              key = String.to_existing_atom(ext_key)
-
-              value =
-                case key do
-                  :"og:image" -> cast_sub_list(Image, ext_value)
-                  :"og:audio" -> cast_sub_list(Audio, ext_value)
-                  :"og:video" -> cast_sub_list(Video, ext_value)
-                  _ -> ext_value
-                end
-
-              {key, value}
-            end),
-         do: {:ok, struct!(__MODULE__, data)}
-  end
-
-  def cast("" = _), do: %__MODULE__{}
-
-  def cast(external_data) when is_binary(external_data) do
-    case external_data do
-      "" -> %__MODULE__{}
-      _ -> external_data |> Jason.decode!() |> cast()
+  def cast(ext_data) when is_binary(ext_data) do
+    case ext_data do
+      "" -> {:ok, %__MODULE__{}}
+      _ -> ext_data |> Jason.decode!() |> cast()
     end
   end
 
@@ -90,6 +86,7 @@ defmodule Cortex.OpenGraph.Metadata do
     data =
       for {db_key, db_value} <- db_data do
         key = String.to_existing_atom(db_key)
+
         value =
           case key do
             key when key in [:"og:image", :"og:audio", :"og:video"] ->
@@ -101,8 +98,11 @@ defmodule Cortex.OpenGraph.Metadata do
                   |> Enum.map(fn {k, v} -> {String.to_atom(k), v} end)
                 )
               end)
-            _ -> db_value
+
+            _ ->
+              db_value
           end
+
         {key, value}
       end
 
