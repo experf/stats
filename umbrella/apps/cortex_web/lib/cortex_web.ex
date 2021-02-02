@@ -66,7 +66,7 @@ defmodule CortexWeb do
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
-      import CortexWeb.EtcHelpers
+      import CortexWeb.FormatHelpers
       import CortexWeb.ErrorHelpers
       import CortexWeb.NavHelpers
       import CortexWeb.LinkHelpers

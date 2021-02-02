@@ -34,8 +34,19 @@
   </tr>
 
   <tr>
-    <th>Open Graph Metadata</th>
-    <td><%= open_graph_meta_tags_dump @link.open_graph_metadata %></td>
+    <th colspan="2">Open Graph Metadata</th>
+  </tr>
+  <tr>
+    <td colspan="2">
+      <table class="table table-borderless table-hover">
+        <%= for {property, value} <- open_graph_metadata_to_list(@link) do %>
+          <tr>
+            <th><code><%= property %></code></th>
+            <td><%= fmt value %></th>
+          </tr>
+        <% end %>
+      </table>
+    </td>
   </tr>
 
   <tr>

@@ -1,46 +1,59 @@
 defmodule CortexWeb.OpenGraphHelpers do
+  require Logger
   use Phoenix.HTML
   import Cortex.Types.JSONSchemaMap
 
-  # alias Cortex.OpenGraph
-
-  def open_graph_meta_tag(property, content) do
-    tag(:meta, property: property, content: content)
-  end
-
-  def reduce({_key, value}, acc) when is_empty(value),
-    do: acc
-
-  def reduce({key, value}, acc) when is_list(value),
-    do:
-      Enum.reduce(value, acc, fn entry, acc ->
-        reduce({key, entry}, acc)
-      end)
-
-  def reduce({key, value}, acc) when is_map(value),
-    do:
-      Enum.reduce(value, acc, fn {k, v}, acc ->
-        reduce({"#{key}:#{k}", v}, acc)
-      end)
-
-  def reduce({key, value}, acc),
-    do: [open_graph_meta_tag(key, value) | acc]
-
-  def open_graph_meta_tags(x) when is_nil(x), do: []
-
-  def open_graph_meta_tags(metadata) when is_map(metadata) do
-    metadata |> Enum.reduce([], &reduce/2)
-  end
+  alias CortexWeb.FormatHelpers
 
   def open_graph_meta_tags_dump(metadata) when is_nil(metadata) do
-    content_tag(:span, "null", class: "is-nil")
+    FormatHelpers.null_tag()
   end
 
   def open_graph_meta_tags_dump(metadata) when is_map(metadata) do
-    metadata
-    |> open_graph_meta_tags()
-    |> Enum.map(&safe_to_string/1)
-    |> Enum.join("\n")
-    |> (fn dump -> content_tag(:pre, dump) end).()
+    dump = metadata
+    |> open_graph_metadata_to_list()
+    |> inspect(pretty: true)
+
+    Logger.debug("DUMP #{dump}")
+    content_tag :pre, dump
   end
+
+  def flatten([head | tail]), do: flatten(head) ++ flatten(tail)
+  def flatten([]), do: []
+  def flatten(element), do: [element]
+
+  def open_graph_metadata_to_list({_key, value}) when is_empty(value),
+    do: []
+
+  def open_graph_metadata_to_list({key, value}) when is_list(value),
+    do:
+      Enum.map(value, fn entry ->
+        open_graph_metadata_to_list({key, entry})
+      end)
+
+  def open_graph_metadata_to_list({key, value}) when is_map(value),
+    do:
+      value
+      |> Enum.map(fn {k, v} ->
+        case k do
+          "url" -> {key, v}
+          _ -> {"#{key}:#{k}", v}
+        end
+      end)
+      |> Enum.sort()
+      |> Enum.map(fn {k, v} -> open_graph_metadata_to_list({k, v}) end)
+
+  def open_graph_metadata_to_list(%{open_graph_metadata: metadata}),
+    do: open_graph_metadata_to_list(metadata)
+
+  def open_graph_metadata_to_list(metadata) when is_map(metadata) do
+    metadata
+    |> Map.to_list()
+    |> Enum.sort()
+    |> Enum.map(&open_graph_metadata_to_list/1)
+    |> flatten()
+  end
+
+  def open_graph_metadata_to_list(kv),
+    do: kv
 end

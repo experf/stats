@@ -24,11 +24,13 @@ h1 {
   }
 }
 
-.is-nil {
+.is-null {
   @extend code;
   @extend .px-2;
+  @extend .fw-bold;
   white-space: nowrap;
-  color: rgba($code-color, 0.5);
+  // color: rgba($code-color, 0.75);
+  color: $mtn-stealth;
   background-color: $stats-color-bg-lowlight;
   display: inline-block;
   border-radius: $border-radius;
