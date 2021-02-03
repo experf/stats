@@ -6,7 +6,7 @@ import argparse
 
 import argcomplete
 
-from . import log as logging, cortex, kafka, docker
+from . import log as logging, cortex, kafka, docker, dev
 from .io import ERR
 
 LOG = logging.getLogger(__name__)
@@ -39,7 +39,7 @@ class ArgumentParser(argparse.ArgumentParser):
 def make_parser() -> ArgumentParser:
     parser = ArgumentParser()
     subparsers = parser.add_subparsers(help="Select a command")
-    for cmd in (cortex, docker, kafka):
+    for cmd in (cortex, docker, kafka, dev):
         cmd.add_to(subparsers)
     return parser
 
