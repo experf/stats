@@ -4,7 +4,7 @@ defmodule Cortex.Events do
   @topic "events"
 
   def produce(props) when is_map(props) do
-    Logger.debug("EVENT #{inspect props}")
+    Logger.debug("Producing event", props |> Map.to_list())
     value = Jason.encode!(props)
     case :brod_client.get_partitions_count(:cortex, @topic) do
       {:ok, partitions_cnt} ->
