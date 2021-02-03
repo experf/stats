@@ -10,13 +10,14 @@ defmodule Cortex.Logging.DevFormatter do
 
   @metadata_drop [
     :erl_level,
+    :ansi_color,
     :application,
     :domain,
     :gl,
     :mfa,
     :pid,
     :time,
-    :request_id
+    :request_id,
   ]
 
   # Colors (seems acuate):
@@ -123,6 +124,9 @@ defmodule Cortex.Logging.DevFormatter do
   def format_message(message) when is_binary(message),
     do: [@pad, indent(message), "\n"]
 
+  def format_message(message),
+    do: [@pad, message, "\n"]
+
   def format_metadata([]), do: []
 
   def format_metadata(metadata) when is_list(metadata) do
@@ -153,6 +157,8 @@ defmodule Cortex.Logging.DevFormatter do
     end)
   end
 
+  def format_metadata(_), do: ["BAD METADATA\n"]
+
   def format(level, message, _timestamp, metadata) do
     {header_kwds, metadata} =
       metadata
@@ -166,5 +172,7 @@ defmodule Cortex.Logging.DevFormatter do
       format_metadata(metadata),
       "\n"
     ])
+  rescue
+    _ -> "OH NO!\n"
   end
 end
