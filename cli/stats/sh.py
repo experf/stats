@@ -145,11 +145,11 @@ def replace(
         os.chdir(chdir)
     if env is None:
         if isabs(exe):
-            os.execv(proc_name, cmd)
+            os.execv(exe, cmd)
         else:
             os.execvp(proc_name, cmd)
     else:
         if isabs(exe):
-            os.execve(proc_name, cmd, env)
+            os.execve(exe, cmd, env)
         else:
             os.execvpe(proc_name, cmd, env)
