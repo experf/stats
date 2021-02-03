@@ -10,12 +10,8 @@ defmodule CortexWeb.OpenGraphHelpers do
   end
 
   def open_graph_meta_tags_dump(metadata) when is_map(metadata) do
-    dump = metadata
-    |> open_graph_metadata_to_list()
-    |> inspect(pretty: true)
-
-    Logger.debug("DUMP #{dump}")
-    content_tag :pre, dump
+    list = metadata |> open_graph_metadata_to_list()
+    content_tag(:pre, list |> inspect(pretty: true))
   end
 
   def flatten([head | tail]), do: flatten(head) ++ flatten(tail)
