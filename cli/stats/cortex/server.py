@@ -1,4 +1,5 @@
 from shutil import rmtree
+import os
 
 from stats import sh, cfg, log as logging, etc
 
@@ -81,4 +82,8 @@ def run(args):
         "phx.server",
         chdir=cfg.paths.REPO / "umbrella",
         opts_style=" ",
+        env={
+            **os.environ,
+            "STATS_CLI_CWD": os.getcwd(),
+        }
     )
