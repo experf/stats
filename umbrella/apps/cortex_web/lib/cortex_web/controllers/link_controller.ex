@@ -1,4 +1,6 @@
 defmodule CortexWeb.LinkController do
+  require Logger
+
   use CortexWeb, :controller
 
   alias Cortex.Trackers
@@ -62,6 +64,20 @@ defmodule CortexWeb.LinkController do
     conn
     |> put_flash(:info, "Link deleted successfully.")
     |> redirect(to: Routes.link_path(conn, :index))
+  end
+
+  def hit(conn, params) do
+    user_agent = case get_req_header(conn, "user-agent") do
+      [] -> nil
+      [ua] -> ua
+      [ua | _] -> ua
+    end
+
+    if user_agent |> String.match?(~r/LinkedInBot/) do
+      text conn, "Hey LinkedInBot!"
+    else
+      click(conn, params)
+    end
   end
 
   def click(conn, %{"id" => id}) do

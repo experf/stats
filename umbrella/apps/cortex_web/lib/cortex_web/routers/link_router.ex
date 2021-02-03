@@ -7,6 +7,6 @@ defmodule CortexWeb.LinkRouter do
 
   scope "/", CortexWeb do
     pipe_through [:browser]
-    get "/:id", LinkController, :click
+    get "/:id", LinkController, :hit
   end
 end
