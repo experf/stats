@@ -1,4 +1,4 @@
-defmodule CortexWeb.Endpoint do
+defmodule CortexWeb.AppEndpoint do
   use Phoenix.Endpoint, otp_app: :cortex_web
 
   # The session will be stored in the cookie and signed,
@@ -50,5 +50,5 @@ defmodule CortexWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
-  plug CortexWeb.Router
+  plug CortexWeb.AppRouter
 end

@@ -19,7 +19,7 @@ config :cortex_web,
 
 # Configures the endpoints
 
-config :cortex_web, CortexWeb.Endpoint,
+config :cortex_web, CortexWeb.AppEndpoint,
   url: [host: "localhost"],
   secret_key_base:
     "grHK+/3KfRvohPFG5CA1gOcqBuRRU71Ngc9bvZkIbZqNSg1j5bN6tDJTxmIst+Gq",

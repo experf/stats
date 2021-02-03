@@ -1,4 +1,4 @@
-defmodule CortexWeb.Router do
+defmodule CortexWeb.AppRouter do
   use CortexWeb, :router
 
   import CortexWeb.UserAuth

@@ -23,7 +23,7 @@ defmodule CortexWeb do
 
       import Plug.Conn
       import CortexWeb.Gettext
-      alias CortexWeb.Router.Helpers, as: Routes
+      alias CortexWeb.AppRouter.Helpers, as: Routes
     end
   end
 
@@ -73,7 +73,7 @@ defmodule CortexWeb do
       import CortexWeb.FormHelpers
       import CortexWeb.OpenGraphHelpers
       import CortexWeb.Gettext
-      alias CortexWeb.Router.Helpers, as: Routes
+      alias CortexWeb.AppRouter.Helpers, as: Routes
     end
   end
 

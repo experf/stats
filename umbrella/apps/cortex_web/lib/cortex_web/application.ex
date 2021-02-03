@@ -17,7 +17,7 @@ defmodule CortexWeb.Application do
       # Start the Telemetry supervisor
       CortexWeb.Telemetry,
       # Start the Endpoint (http/https)
-      CortexWeb.Endpoint,
+      CortexWeb.AppEndpoint,
       CortexWeb.LinkEndpoint,
       # Start a worker by calling: CortexWeb.Worker.start_link(arg)
       # {CortexWeb.Worker, arg}
@@ -32,7 +32,7 @@ defmodule CortexWeb.Application do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    CortexWeb.Endpoint.config_change(changed, removed)
+    CortexWeb.AppEndpoint.config_change(changed, removed)
     :ok
   end
 

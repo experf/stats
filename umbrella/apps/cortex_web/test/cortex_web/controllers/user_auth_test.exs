@@ -10,7 +10,7 @@ defmodule CortexWeb.UserAuthTest do
   setup %{conn: conn} do
     conn =
       conn
-      |> Map.replace!(:secret_key_base, CortexWeb.Endpoint.config(:secret_key_base))
+      |> Map.replace!(:secret_key_base, CortexWeb.AppEndpoint.config(:secret_key_base))
       |> init_test_session(%{})
 
     %{user: user_fixture(), conn: conn}
@@ -65,7 +65,7 @@ defmodule CortexWeb.UserAuthTest do
 
     test "broadcasts to the given live_socket_id", %{conn: conn} do
       live_socket_id = "users_sessions:abcdef-token"
-      CortexWeb.Endpoint.subscribe(live_socket_id)
+      CortexWeb.AppEndpoint.subscribe(live_socket_id)
 
       conn
       |> put_session(:live_socket_id, live_socket_id)

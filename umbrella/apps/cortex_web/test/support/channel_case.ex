@@ -24,7 +24,7 @@ defmodule CortexWeb.ChannelCase do
       import CortexWeb.ChannelCase
 
       # The default endpoint for testing
-      @endpoint CortexWeb.Endpoint
+      @endpoint CortexWeb.AppEndpoint
     end
   end
 

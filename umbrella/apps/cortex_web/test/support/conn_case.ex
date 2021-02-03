@@ -24,10 +24,10 @@ defmodule CortexWeb.ConnCase do
       import Phoenix.ConnTest
       import CortexWeb.ConnCase
 
-      alias CortexWeb.Router.Helpers, as: Routes
+      alias CortexWeb.AppRouter.Helpers, as: Routes
 
       # The default endpoint for testing
-      @endpoint CortexWeb.Endpoint
+      @endpoint CortexWeb.AppEndpoint
     end
   end
 

@@ -3,7 +3,7 @@ defmodule CortexWeb.UserAuth do
   import Phoenix.Controller
 
   alias Cortex.Accounts
-  alias CortexWeb.Router.Helpers, as: Routes
+  alias CortexWeb.AppRouter.Helpers, as: Routes
 
   # Make the remember me cookie valid for 60 days.
   # If you want bump or reduce this value, also change
@@ -75,7 +75,7 @@ defmodule CortexWeb.UserAuth do
     user_token && Accounts.delete_session_token(user_token)
 
     if live_socket_id = get_session(conn, :live_socket_id) do
-      CortexWeb.Endpoint.broadcast(live_socket_id, "disconnect", %{})
+      CortexWeb.AppEndpoint.broadcast(live_socket_id, "disconnect", %{})
     end
 
     conn
