@@ -4,3 +4,7 @@
 [submodule "umbrella/apps/cortex_web/assets/vendor/jsoneditor"]
 	path = umbrella/apps/cortex_web/assets/vendor/jsoneditor
 	url = https://github.com/nrser/jsoneditor.git
+[submodule "crawler-user-agents"]
+	path = umbrella/apps/cortex_web/priv/crawler-user-agents
+	url = https://github.com/nrser/crawler-user-agents.git
+	branch = nrser/stats
