@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <%= open_graph_meta_tags @link %>
+    <title><%= @title %></title>
+  </head>
+  <body>
+    Hey bot.
+  </body>
+</html>

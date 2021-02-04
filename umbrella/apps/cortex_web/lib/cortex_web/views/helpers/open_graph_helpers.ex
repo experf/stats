@@ -52,4 +52,15 @@ defmodule CortexWeb.OpenGraphHelpers do
 
   def open_graph_metadata_to_list(kv),
     do: kv
+
+  def open_graph_meta_tags(%{open_graph_metadata: metadata}),
+    do: open_graph_meta_tags(metadata)
+
+  def open_graph_meta_tags(metadata) when is_map(metadata) do
+    metadata
+    |> open_graph_metadata_to_list()
+    |> Enum.map(fn {property, value} ->
+      tag(:meta, property: property, content: value)
+    end)
+  end
 end

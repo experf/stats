@@ -7,7 +7,7 @@ defmodule CortexWeb.LinkView do
   def click_url(%Link{} = link) do
     CortexWeb.LinkRouter.Helpers.link_url(
       CortexWeb.LinkEndpoint,
-      :hit,
+      :click,
       link.id
     )
   end

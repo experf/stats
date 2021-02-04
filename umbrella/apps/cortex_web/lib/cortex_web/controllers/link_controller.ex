@@ -66,18 +66,16 @@ defmodule CortexWeb.LinkController do
     |> redirect(to: Routes.link_path(conn, :index))
   end
 
-  def hit(conn, params) do
-    user_agent = case get_req_header(conn, "user-agent") do
-      [] -> nil
-      [ua] -> ua
-      [ua | _] -> ua
-    end
+  def click(%{assigns: %{bots: _bots}} = conn, %{"id" => id}) do
+    link = Trackers.get_link!(id)
 
-    if user_agent |> String.match?(~r/LinkedInBot/) do
-      text conn, "Hey LinkedInBot!"
-    else
-      click(conn, params)
-    end
+    title =
+      case link.open_graph_metadata do
+        %{"og:title" => title} -> title
+        _ -> link.name
+      end
+
+    render conn, "bot.html", link: link, title: title
   end
 
   def click(conn, %{"id" => id}) do

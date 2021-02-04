@@ -93,8 +93,10 @@ defmodule Cortex.Logging.DevFormatter do
         "\n"
       ]
 
-  def format_header(_),
-    do: ["(BAD HEADER)\n"]
+  def format_header([]), do: [:light_black, "???", :reset, "\n"]
+
+  def format_header(header),
+    do: ["(BAD HEADER)", inspect(header, pretty: true), "\n"]
 
   def format_function(module, function),
     do: [
@@ -125,7 +127,7 @@ defmodule Cortex.Logging.DevFormatter do
     do: [@pad, indent(message), "\n"]
 
   def format_message(message),
-    do: [@pad, message, "\n"]
+    do: [message, "\n"]
 
   def format_metadata([]), do: []
 

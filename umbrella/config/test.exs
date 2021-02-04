@@ -27,3 +27,7 @@ config :logger, level: :warn
 # https://hexdocs.pm/swoosh/Swoosh.Adapters.Test.html
 config :cortex, Cortex.Mailer,
   adapter: Swoosh.Adapters.Test
+
+config :logger, :console,
+  format: {Cortex.Logging.DevFormatter, :format},
+  metadata: :all
