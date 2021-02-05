@@ -9,6 +9,10 @@ defmodule Cortex.Types.JSONSchemaMap do
   # https://hexdocs.pm/ecto/Ecto.ParameterizedType.html#content
   use Ecto.ParameterizedType
 
+  @spec is_empty(any) ::
+          {:or,
+           [{:context, Cortex.Types.JSONSchemaMap} | {:import, Kernel}, ...],
+           [{:==, [...], [...]} | {:or, [...], [...]}, ...]}
   defmacro is_empty(value) do
     quote do
       is_nil(unquote(value)) or
@@ -52,7 +56,7 @@ defmodule Cortex.Types.JSONSchemaMap do
   [postgrex]: https://hexdocs.pm/postgrex/
 
   """
-  def type(_), do: :map
+  def type(_params), do: :map
 
   def cast(data, %{json_schema: json_schema}) when is_map(data) do
     case JsonXema.validate(json_schema, data) do
@@ -74,17 +78,24 @@ defmodule Cortex.Types.JSONSchemaMap do
     end
   end
 
-  def cast(_, _), do: :error
+  def cast(_data, _params), do: :error
 
   def load(data, _loader, %{json_schema: json_schema}) do
     case JsonXema.validate(json_schema, data) do
       {:error, %JsonXema.ValidationError{} = error} ->
-        {:error, [validation: error]}
+        Logger.error(
+          "Failed to load JSONSchemaMap",
+          data: data,
+          error: error
+        )
+        :error
 
       :ok ->
         {:ok, data}
     end
   end
+
+  def load(_data, _loader, _params), do: :error
 
   def dump(data, _dumper, _params) do
     {:ok, data}
