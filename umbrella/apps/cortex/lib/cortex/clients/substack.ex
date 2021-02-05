@@ -100,6 +100,8 @@ defmodule Cortex.Clients.Substack do
   end
 
   def subscriber_events(%__MODULE__{} = client, email) when is_binary(email) do
+    Logger.debug("Getting substack subscriber events", email: email)
+
     limit = 20
 
     url = client |> url("/api/v1/subscriber/#{URI.encode(email)}/events")
