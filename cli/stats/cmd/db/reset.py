@@ -21,14 +21,14 @@ def add_to(subparsers):
     parser.set_defaults(func=run)
 
 
-def run(args):
+def run(serve=False, **_kwds):
     LOG.info("[holup]Resetting Cortex database...[/holup]")
 
     sh.run("mix", "ecto.reset", chdir=cfg.paths.CORTEX)
 
     LOG.info("[yeah]Database reset.[/yeah]")
 
-    if args.serve:
+    if serve:
         LOG.info("[holup]Starting Phoenix server...[/holup]")
 
         sh.replace("mix", "phx.server", chdir=cfg.paths.UMBRELLA)

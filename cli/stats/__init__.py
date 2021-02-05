@@ -6,7 +6,7 @@ import argparse
 
 import argcomplete
 
-from . import log as logging, cortex, kafka, docker, dev, mix
+from . import log as logging, cmd
 from .io import ERR
 
 LOG = logging.getLogger(__name__)
@@ -35,12 +35,13 @@ class ArgumentParser(argparse.ArgumentParser):
             help="Print backtraces on error",
         )
 
+    def set_func(self, func):
+        self.set_defaults(func=func)
 
 def make_parser() -> ArgumentParser:
     parser = ArgumentParser()
     subparsers = parser.add_subparsers(help="Select a command")
-    for cmd in (cortex, dev, docker, kafka, mix):
-        cmd.add_to(subparsers)
+    cmd.add_to(subparsers)
     return parser
 
 
@@ -53,6 +54,10 @@ def log_level_for(verbosity: Optional[int]) -> int:
 
 def run():
     logging.setup()
+
+    log = LOG.getChild("run")
+    log.debug("[todo]Handling command...[/todo]", argv=sys.argv)
+
     parser = make_parser()
     argcomplete.autocomplete(parser)
     args = parser.parse_args()
@@ -60,12 +65,10 @@ def run():
 
     logging.set_pkg_level(log_level)
 
-    log = LOG.getChild("run")
-
     # pylint: disable=broad-except
 
     try:
-        args.func(args)
+        args.func(**args.__dict__)
     except KeyboardInterrupt:
         pass
     except Exception as error:

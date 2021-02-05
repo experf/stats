@@ -10,6 +10,7 @@ THEME = Theme(
         "bad": "bold red",
         "uhoh": "bold red",
         "holup": "bold yellow",
+        "todo": "bold yellow",
     }
 )
 

@@ -1,4 +1,5 @@
 from stats import log as logging
+from stats.io import OUT
 
 from . import scratch, names
 
@@ -10,7 +11,17 @@ def add_to(subparsers):
         "dev",
         help="Stuff used developing this CLI and the rest of the app",
     )
+    # parser.add_argument(
+    #     "argv",
+    #     nargs="...",
+    #     help="Extra args!",
+    # )
+    # parser.set_defaults(func=run)
+
     subparsers = parser.add_subparsers()
 
     for cmd in (names, scratch):
         cmd.add_to(subparsers)
+
+def run(argv=tuple(), **_kwds):
+    LOG.info("DEV DEV DEV!", argv=argv)

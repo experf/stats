@@ -1,6 +1,6 @@
-import os
+import sys
 
-from stats import log as logging, cfg, sh
+from stats import log as logging
 
 LOG = logging.getLogger(__name__)
 
@@ -16,11 +16,5 @@ def add_to(subparsers):
     parser.set_defaults(func=run)
 
 
-def run(_args):
-    sh.replace(
-        "/usr/bin/env",
-        env={
-            # **os.environ,
-            "BLAH": "123",
-        }
-    )
+def run(**_kwds):
+    LOG.info("SCRATCH!!!!", argv=sys.argv)

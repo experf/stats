@@ -9,7 +9,7 @@ def add_to(subparsers):
     parser.set_defaults(func=run)
 
 
-def run(_args):
+def run(**_kwds):
     repo_config = sh.get(
         "mix", "config.repo", fmt="json", chdir=cfg.paths.UMBRELLA
     )
