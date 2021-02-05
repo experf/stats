@@ -45,6 +45,7 @@ defmodule Cortex.MixProject do
       {:hackney, "~> 1.9"}, # HTTP client, Swoosh uses it
       {:brod, "~> 3.15.0"}, # Kafka client
       {:json_xema, "~> 0.6"}, # JSON Schema validation
+      {:httpoison, "~> 1.8.0"}, # HTTP client
     ]
   end
 
