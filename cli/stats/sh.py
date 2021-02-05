@@ -5,8 +5,10 @@ from os.path import isabs, basename
 import subprocess
 from pathlib import Path
 import json
+from shutil import rmtree
 
 from .io import OUT, ERR
+from .etc import fmt
 
 LOG = logging.getLogger(__name__)
 
@@ -153,3 +155,13 @@ def replace(
             os.execve(exe, cmd, env)
         else:
             os.execvpe(proc_name, cmd, env)
+
+def file_absent(path: Path, name: Optional[str]=None):
+    log = LOG.getChild("file_absent")
+    if name is None:
+        name = fmt(path)
+    if path.exists():
+        log.info(f"[holup]Removing {name}...[/holup]", path=path)
+        rmtree(path)
+    else:
+        log.info(f"[yeah]{name} already absent.[/yeah]", path=path)

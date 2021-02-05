@@ -56,34 +56,16 @@ def add_to(subparsers):
 
 def run(clean=False, iex=False, rm_hs_cache=False, **_kwds):
     if rm_hs_cache:
-        if cfg.paths.WEBPACK_HARD_SOURCE_CACHE.exists():
-            LOG.info(
-                "[holup]"
-                "Removing `hard-source-webpack-plugin` cache directory..."
-                "[/holup]",
-                path=etc.fmt(cfg.paths.WEBPACK_HARD_SOURCE_CACHE),
-            )
-            rmtree(cfg.paths.WEBPACK_HARD_SOURCE_CACHE)
-        else:
-            LOG.info(
-                "[yeah]"
-                "`hard-source-webpack-plugin` cache already gone"
-                "[/yeah]",
-                path=etc.fmt(cfg.paths.WEBPACK_HARD_SOURCE_CACHE),
-            )
+        sh.file_absent(
+            cfg.paths.WEBPACK_HARD_SOURCE_CACHE,
+            name="`hard-source-webpack-plugin` cache directory"
+        )
 
     if clean:
-        if cfg.paths.UMBRELLA_BUILD.exists():
-            LOG.info(
-                "[holup]" "Removing umbrella build directory..." "[/holup]",
-                path=etc.fmt(cfg.paths.UMBRELLA_BUILD),
-            )
-            rmtree(cfg.paths.UMBRELLA_BUILD)
-        else:
-            LOG.info(
-                "[yeah]" "Umbrella build directory already gone" "[/yeah]",
-                path=etc.fmt(cfg.paths.UMBRELLA_BUILD),
-            )
+        sh.file_absent(
+            cfg.paths.UMBRELLA_BUILD,
+            name="umbrella build directory"
+        )
 
     if iex:
         sh.replace(

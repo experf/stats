@@ -16,12 +16,11 @@ TKey        = TypeVar('TKey')
 TValue      = TypeVar('TValue')
 TAlias      = TypeVar('TAlias')
 
-Nope = NewType('Nope', Union[None, Literal[False]])
+Nope = NewType('Nope', Union[None, Literal[False]]) # type: ignore
 
 # pylint: disable=bare-except
 
 def fmt_path(path: Path) -> str:
-    LOG.debug("HERE", rel=Path(path).relative_to(cfg.paths.REPO))
     try:
         return f"//{Path(path).relative_to(cfg.paths.REPO)}"
     except:

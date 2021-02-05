@@ -1,5 +1,5 @@
 from stats import log as logging
-from . import consume
+from . import consume, reset
 
 LOG = logging.getLogger(__name__)
 
@@ -11,5 +11,5 @@ def add_to(subparsers):
 
     subparsers = parser.add_subparsers()
 
-    for cmd in (consume,):
+    for cmd in (consume, reset):
         cmd.add_to(subparsers)
