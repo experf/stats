@@ -9,15 +9,30 @@ alias Cortex.Trackers.{Link}
 alias Cortex.OpenGraph
 alias Cortex.Repo
 
-alias Cortex.Clients.Substack
+alias Cortex.Clients
+alias Cortex.Scrapers
 
-defmodule M do
-  def ss() do
+defmodule SS do
+  def app(),
+    do: "milk"
+
+  def client() do
     subdomain = System.get_env("STATS_OSMOSE_SUBDOMAIN")
     sid = System.get_env("STATS_OSMOSE_SID")
 
-    %Substack{subdomain: subdomain, sid: sid}
+    %Clients.Substack{subdomain: subdomain, sid: sid}
   end
 
-  def email(), do: "xander@futureperfect.studio"
+  def email(),
+    do: "xander@futureperfect.studio"
+
+  def load_xander(),
+    do: Scrapers.Substack.scrape_subscriber_events(
+      client(),
+      app(),
+      email()
+    )
+
+  def load_all(),
+    do: Scrapers.Substack.scrape(client(), app())
 end

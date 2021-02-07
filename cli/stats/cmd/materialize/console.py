@@ -15,4 +15,8 @@ def run(**_kwds):
         "Connecting to Materialize...",
         url=cfg.materialize.postgres.url,
     )
-    sh.replace("psql", cfg.materialize.postgres.url)
+    sh.replace(
+        "psql",
+        {"pset": "expanded=auto"},
+        cfg.materialize.postgres.url
+    )

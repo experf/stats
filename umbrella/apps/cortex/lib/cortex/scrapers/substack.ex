@@ -18,7 +18,7 @@ defmodule Cortex.Scrapers.Substack do
      %{
        app: app,
        type: "substack.subscriber.event",
-       event: event
+       src: event
      }}
   end
 
@@ -59,10 +59,9 @@ defmodule Cortex.Scrapers.Substack do
 
     case Clients.Substack.subscriber_list(client) do
       {:ok, subscriber_list} ->
-        # subscriber_list = subscriber_list |> Enum.take(1)
         divisor = 32
         chunk_size = ceil(Enum.count(subscriber_list) / divisor)
-        timeout_ms = chunk_size * 10 * 1000
+        timeout_ms = chunk_size * 20 * 1000
 
         subscriber_list
         |> Enum.chunk_every(chunk_size)

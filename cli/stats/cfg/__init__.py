@@ -1,7 +1,7 @@
 from typing import *
 import os
 import logging
-from . import materialize, paths
+from . import materialize, paths, kafka
 
 NAME = "stats"
 

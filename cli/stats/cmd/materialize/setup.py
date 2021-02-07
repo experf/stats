@@ -27,7 +27,7 @@ def run(**_kwds):
         cfg.materialize.postgres.url,
         text=True,
         input=(
-            "CREATE MATERIALIZED VIEW IF NOT EXISTS events AS\n"
+            "CREATE OR REPLACE MATERIALIZED VIEW events AS\n"
             "  SELECT CAST(data AS jsonb) AS data\n"
             "  FROM (\n"
             "    SELECT convert_from(data, 'utf8') AS data\n"

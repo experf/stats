@@ -1,6 +1,8 @@
 defmodule Cortex.Clients.Substack do
   require Logger
 
+  @options [timeout: 25_000, recv_timeout: 25_000]
+
   @enforce_keys [:subdomain, :sid]
   defstruct [
     :subdomain,
@@ -63,7 +65,7 @@ defmodule Cortex.Clients.Substack do
     with {:ok, body} <-
            args |> Jason.encode(),
          {:ok, %HTTPoison.Response{} = response} <-
-           HTTPoison.post(url, body, headers),
+           HTTPoison.post(url, body, headers, @options),
          {:ok, %{^response_key => records}} when is_list(records) <-
            response.body |> Jason.decode() do
       case Enum.count(records) do
@@ -116,4 +118,24 @@ defmodule Cortex.Clients.Substack do
 
   def subscriber_events(%__MODULE__{} = client, %{"email" => email}),
     do: subscriber_events(client, email)
+
+  # def subscriber_events(%__MODULE__{} = client, subscribers)
+  #     when is_list(subscribers) do
+
+  # end
+
+  # def subscriber_events(%__MODULE__{} = client, :all) do
+  #   with {:ok, subscriber_list} = subscriber_list(client) do
+  #     divisor = 8
+  #     chunk_size = ceil(Enum.count(subscriber_list) / divisor)
+  #     timeout_ms = chunk_size * 20 * 1000
+
+  #     subscriber_list
+  #     |> Enum.chunk_every(chunk_size)
+  #     |> Enum.map(fn chunk ->
+  #       Task.async(fn -> scrape_subscriber_events(client, app, chunk) end)
+  #     end)
+  #     |> Enum.map(fn task -> Task.await(task, timeout_ms) end)
+  #   end
+  # end
 end
