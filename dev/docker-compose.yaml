@@ -30,3 +30,10 @@ services:
       - ./data/kafka1/data:/var/lib/kafka/data
     depends_on:
       - zookeeper
+  # docker run -p 6875:6875 materialize/materialized:v0.5.2 --workers 1
+  materialized:
+    image: materialize/materialized:v0.5.2
+    hostname: materialized
+    ports:
+      - "6875:6875"
+    command: --workers 1

@@ -18,4 +18,6 @@ defmodule M do
 
     %Substack{subdomain: subdomain, sid: sid}
   end
+
+  def email(), do: "xander@futureperfect.studio"
 end

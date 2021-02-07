@@ -191,15 +191,24 @@ class RichHandler(logging.Handler):
         if hasattr(record, "data") and record.data:
             table = Table.grid(padding=(0, 1))
             table.expand = True
-            table.add_column()
+            table.add_column(style=Style(color="blue", italic=True))
+            table.add_column(style=Style(color="#4ec9b0", italic=True))
             table.add_column()
             for key, value in record.data.items():
-                rich_key = Text(key, Style(color="blue", italic=True))
                 if is_rich_renderable(value):
+                    rich_value_type = None
                     rich_value = value
                 else:
-                    rich_value = Pretty(value)
-                table.add_row(rich_key, rich_value)
+                    value_type = type(value)
+                    if hasattr(value_type, "__name__"):
+                        rich_value_type = value_type.__name__
+                    else:
+                        rich_value_type = Pretty(value_type)
+                    if isinstance(value, str):
+                        rich_value = value
+                    else:
+                        rich_value = Pretty(value)
+                table.add_row(key, rich_value_type, rich_value)
             output.add_row(None, table)
 
         if record.exc_info:
