@@ -133,7 +133,7 @@ defmodule Cortex.Clients.Substack do
   #     subscriber_list
   #     |> Enum.chunk_every(chunk_size)
   #     |> Enum.map(fn chunk ->
-  #       Task.async(fn -> scrape_subscriber_events(client, app, chunk) end)
+  #       Task.async(fn -> subscriber_events(client, app, chunk) end)
   #     end)
   #     |> Enum.map(fn task -> Task.await(task, timeout_ms) end)
   #   end

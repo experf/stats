@@ -4,4 +4,5 @@ CREATE OR REPLACE MATERIALIZED VIEW substack_subscriber_events AS
     data -> 'src' ->> 'post_url' as post_url,
     data -> 'src' ->> 'text' as action,
     data -> 'src' ->> 'url' as action_url
-  FROM events;
+  FROM events
+  WHERE data ->> 'type' = 'substack.subscriber.event';
