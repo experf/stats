@@ -46,6 +46,7 @@ defmodule Cortex.MixProject do
       {:brod, "~> 3.15.0"}, # Kafka client
       {:json_xema, "~> 0.6"}, # JSON Schema validation
       {:httpoison, "~> 1.8.0"}, # HTTP client
+      {:subscrape, in_umbrella: true},
     ]
   end
 

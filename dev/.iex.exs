@@ -17,22 +17,22 @@ defmodule SS do
     do: "milk"
 
   def client() do
-    subdomain = System.get_env("STATS_OSMOSE_SUBDOMAIN")
-    sid = System.get_env("STATS_OSMOSE_SID")
+    subdomain = System.get_env("STATS_MILK_SUBDOMAIN")
+    sid = System.get_env("STATS_MILK_SID")
 
-    %Clients.Substack{subdomain: subdomain, sid: sid}
+    %Subscrape{subdomain: subdomain, sid: sid}
   end
 
-  def email(),
-    do: "xander@futureperfect.studio"
+  def xander_email(), do: "xander@futureperfect.studio"
+  def neil_email(), do: "neil@neilsouza.com"
 
-  def load_xander(),
-    do: Scrapers.Substack.scrape_subscriber_events(
-      client(),
-      app(),
-      email()
-    )
+  # def load_xander(),
+  #   do: Scrapers.Substack.scrape_subscriber_events(
+  #     client(),
+  #     app(),
+  #     email()
+  #   )
 
-  def load_all(),
-    do: Scrapers.Substack.scrape(client(), app())
+  # def load_all(),
+  #   do: Scrapers.Substack.scrape(client(), app())
 end

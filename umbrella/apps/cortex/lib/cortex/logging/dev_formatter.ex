@@ -13,10 +13,12 @@ defmodule Cortex.Logging.DevFormatter do
     :ansi_color,
     :application,
     :domain,
+    :error_logger,
     :gl,
     :mfa,
     :pid,
     :time,
+    :report_cb,
     :request_id,
   ]
 

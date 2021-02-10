@@ -101,7 +101,10 @@ defmodule Cortex.Clients.Substack do
     collect(client, url, args, headers, limit, "after", "subscribers")
   end
 
-  def subscriber_events(%__MODULE__{} = client, email) when is_binary(email) do
+  def subscriber_events(client, email, _opts \\ [])
+
+  def subscriber_events(%__MODULE__{} = client, email, _opts)
+      when is_binary(email) do
     Logger.debug("Getting substack subscriber events", email: email)
 
     limit = 20
@@ -116,26 +119,40 @@ defmodule Cortex.Clients.Substack do
     collect(client, url, args, headers, limit, "before", "events")
   end
 
-  def subscriber_events(%__MODULE__{} = client, %{"email" => email}),
-    do: subscriber_events(client, email)
+  def subscriber_events(%__MODULE__{} = client, %{"email" => email}, opts),
+    do: subscriber_events(client, email, opts)
 
-  # def subscriber_events(%__MODULE__{} = client, subscribers)
-  #     when is_list(subscribers) do
+  def subscriber_events(%__MODULE__{} = client, subscribers, opts)
+      when is_list(subscribers) do
+    results =
+      for subscriber <- subscribers do
+        email =
+          case subscriber do
+            %{"email" => email} when is_binary(email) -> email
+            email when is_binary(email) -> email
+          end
 
-  # end
+        {email, subscriber_events(client, email, opts)}
+      end
 
-  # def subscriber_events(%__MODULE__{} = client, :all) do
-  #   with {:ok, subscriber_list} = subscriber_list(client) do
-  #     divisor = 8
-  #     chunk_size = ceil(Enum.count(subscriber_list) / divisor)
-  #     timeout_ms = chunk_size * 20 * 1000
+    {events, errors} =
+      results |> Enum.split_with(fn {_, {status, _}} -> status == :ok end)
 
-  #     subscriber_list
-  #     |> Enum.chunk_every(chunk_size)
-  #     |> Enum.map(fn chunk ->
-  #       Task.async(fn -> subscriber_events(client, app, chunk) end)
-  #     end)
-  #     |> Enum.map(fn task -> Task.await(task, timeout_ms) end)
-  #   end
-  # end
+    case errors do
+      [] ->
+        {:error, errors |> Enum.map(&remove_status/1)}
+
+      _ ->
+        {:ok, events |> Enum.map(&remove_status/1)}
+    end
+  end
+
+  def subscriber_events(%__MODULE__{} = client, :all, opts) do
+    with {:ok, subscriber_list} = subscriber_list(client),
+      do: subscriber_events(client, subscriber_list, opts)
+  end
+
+  defp remove_status(list) do
+    list |> Enum.map(fn {email, {_, value}} -> {email, value} end)
+  end
 end
