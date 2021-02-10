@@ -190,7 +190,7 @@ defmodule Subscrape.HTTP do
           opts: opts
         )
 
-        b |> Jason.decode!()
+        {:ok, b |> Jason.decode!()}
 
       :miss ->
         case try_request(client, url, args, opts) do

@@ -103,8 +103,11 @@ config :cortex_web, CortexWeb.LinkEndpoint,
     ]
   ]
 
-  import_if_exists = fn rel_path ->
-    if File.exists?("#{__DIR__}/#{rel_path}"), do: import_config(rel_path)
-  end
+config :subscrape, Subscrape,
+  cache_root: Path.expand("../../tmp/cache/subscrape", __DIR__)
 
-  import_if_exists.("dev/#{System.get_env("USER")}.exs")
+import_if_exists = fn rel_path ->
+  if File.exists?("#{__DIR__}/#{rel_path}"), do: import_config(rel_path)
+end
+
+import_if_exists.("dev/#{System.get_env("USER")}.exs")

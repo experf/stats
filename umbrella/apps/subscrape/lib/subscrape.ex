@@ -10,7 +10,8 @@ defmodule Subscrape do
           sid: binary,
           user_agent: binary,
           subscriber_list_limit: integer,
-          subscriber_events_limit: integer
+          subscriber_events_limit: integer,
+          cache_root: nil | binary,
         }
 
   @enforce_keys [:subdomain, :sid]
@@ -25,10 +26,8 @@ defmodule Subscrape do
     # Web defaults to 20, but this seems to work. Even as high as 150 fails.
     subscriber_events_limit: 100,
     max_retry_attempts: 3,
+    cache_root: Application.get_env(:subscrape, __MODULE__, [])[:cache_root],
   ]
-
-  # Helpers Functions
-  # ==========================================================================
 
   def opt!(%__MODULE__{} = self, opts, key)
        when is_list(opts) and is_atom(key) do
@@ -36,9 +35,5 @@ defmodule Subscrape do
       {:ok, value} -> value
       :error -> self |> Map.fetch!(key)
     end
-  end
-
-  defp remove_status(list) do
-    list |> Enum.map(fn {email, {_, value}} -> {email, value} end)
   end
 end
