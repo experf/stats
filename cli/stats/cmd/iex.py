@@ -24,6 +24,6 @@ def run(args=tuple(), **_opts):
             "dot-iex": cfg.paths.DEV / ".iex.exs",
         },
         "-S", "mix", *args,
-        chdir=cfg.paths.REPO / "umbrella",
+        chdir=cfg.paths.UMBRELLA,
         opts_style=" ",
     )

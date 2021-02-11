@@ -5,7 +5,7 @@ DEV = REPO / "dev"
 
 CLI = REPO / "cli"
 
-UMBRELLA = REPO / "umbrella"
+UMBRELLA = REPO
 UMBRELLA_BUILD = UMBRELLA / "_build"
 
 CORTEX = UMBRELLA / "apps" / "cortex"

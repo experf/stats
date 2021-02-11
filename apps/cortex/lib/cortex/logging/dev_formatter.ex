@@ -35,7 +35,7 @@ defmodule Cortex.Logging.DevFormatter do
   `File.cwd!/0`.
 
   In order to make cmd+click work in iTerm2 needs to be aware that the `stats`
-  CLI allows running from any repo subdirectory by `chdir` to `//umbrella`
+  CLI allows running from any repo subdirectory by `chdir` to the repo root
   before `exec`ing, but iTerm doesn't know about this.
 
   To allow work-around, `stats` adds a `$STATS_CLI_CWD` env var containing the

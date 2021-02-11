@@ -1,4 +1,4 @@
-defmodule Stats.Umbrella.MixProject do
+defmodule Stats.MixProject do
   use Mix.Project
 
   def project do
