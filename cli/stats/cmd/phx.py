@@ -28,24 +28,25 @@ def add_to(subparsers):
         "-i",
         "--iex",
         action="store_true",
+        default=False,
         help=(
             "Run the server inside the `iex` REPL. Same as \n"
             "`stats iex phx.server` but you get additional options here."
         ),
     )
     parser.add_argument(
-        "--rm-hs-cache",
+        "--no-rm-hs-cache",
         action="store_true",
         help=(
-            "Remove the `hard-source-webpack-plugin` cache before starting \n"
+            "*DON'T* Remove the `hard-source-webpack-plugin` cache before starting \n"
             "the server.\n"
             "\n"
-            "If auto-reload breaks and you see output at startup like:\n"
+            "Auto-reload keeps breaking with output at startup like:\n"
             "\n"
             "    [hardsource:6435fcbe] Cache is corrupted.\n"
             "    Error: ENOENT: no such file or directory, [...]\n"
             "\n"
-            "then this might fix your problem.\n"
+            "so we are smashing the hard-source cache on start-up.\n"
             "\n"
             "SEE https://github.com/nrser/stats/issues/2"
         ),
@@ -54,8 +55,8 @@ def add_to(subparsers):
     parser.set_defaults(func=run)
 
 
-def run(clean=False, iex=False, rm_hs_cache=False, **_kwds):
-    if rm_hs_cache:
+def run(clean=False, iex=False, no_rm_hs_cache=False, **_kwds):
+    if no_rm_hs_cache is False:
         sh.file_absent(
             cfg.paths.WEBPACK_HARD_SOURCE_CACHE,
             name="`hard-source-webpack-plugin` cache directory"

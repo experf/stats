@@ -8,21 +8,14 @@ def add_to(subparsers):
         help="Run `mix` in `//umbrella` from ANYWHERE (in the tree)!",
     )
     parser.add_argument(
-        "-c",
-        "--cortex",
-        action="store_true",
-        help=(
-            f"Run in the `cortex` app ({cfg.paths.rel(cfg.paths.CORTEX)})"
-        )
-    )
-    parser.add_argument(
-        "-w",
-        "--cortex_web",
-        action="store_true",
-        help=(
-            "Run in the `cortex_web` app "
-            f"({cfg.paths.rel(cfg.paths.CORTEX_WEB)})"
-        )
+        "-a",
+        "--app",
+        choices=[
+            f.name
+            for f in (cfg.paths.UMBRELLA / "apps").iterdir()
+            if f.is_dir() and (f / "mix.exs").is_file()
+        ],
+        help="Run in a specific app directory",
     )
     parser.add_argument(
         "args",
@@ -31,12 +24,10 @@ def add_to(subparsers):
     )
     parser.set_defaults(func=run)
 
-def run(args=tuple(), cortex=False, cortex_web=False, **_kwds):
-    if cortex is True:
-        chdir = cfg.paths.CORTEX
-    elif cortex_web is True:
-        chdir = cfg.paths.CORTEX_WEB
-    else:
+def run(args=tuple(), app=None, **_kwds):
+    if app is None:
         chdir = cfg.paths.UMBRELLA
+    else:
+        chdir = cfg.paths.UMBRELLA / "apps" / app
 
     sh.replace("mix", *args, chdir=chdir)

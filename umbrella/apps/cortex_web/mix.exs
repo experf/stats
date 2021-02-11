@@ -48,7 +48,10 @@ defmodule CortexWeb.MixProject do
       {:cortex, in_umbrella: true},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:phx_gen_auth, "~> 0.6", only: [:dev], runtime: false}
+      {:phx_gen_auth, "~> 0.6", only: [:dev], runtime: false},
+      # So we can server `index.html` files at directory paths like usual in
+      # `/docs/`
+      {:plug_static_index_html, "~> 1.0"},
     ]
   end
 

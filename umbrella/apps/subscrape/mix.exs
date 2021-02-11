@@ -30,6 +30,7 @@ defmodule Subscrape.MixProject do
       # {:sibling_app_in_umbrella, in_umbrella: true}
       {:jason, "~> 1.0"}, # JSON en/decoder
       {:httpoison, "~> 1.8.0"}, # HTTP client
+      {:ex_doc, "~> 0.23", only: :dev, runtime: false}, # Docs generation
     ]
   end
 end

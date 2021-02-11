@@ -15,8 +15,6 @@ defmodule Subscrape.HTTP do
     socks5_pass ssl follow_redirect max_redirect params max_body_length
   )a
 
-  # use HTTPoison.Base
-
   def authority(%Subscrape{} = client), do: "#{client.subdomain}.substack.com"
 
   def url(%Subscrape{} = client), do: url(client, nil, nil)

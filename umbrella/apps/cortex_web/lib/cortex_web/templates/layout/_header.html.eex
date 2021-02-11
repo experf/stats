@@ -12,6 +12,10 @@
             <%= nav_item "Links",
               to: Routes.link_path(@conn, :index),
               active: nav_match?(@conn, CortexWeb.LinkController) %>
+
+            <%= nav_item "Docs",
+              to: "/docs/",
+              target: "_blank" %>
           <% end %>
         </ul>
       </div>

@@ -3,6 +3,8 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 DEV = REPO / "dev"
 
+CLI = REPO / "cli"
+
 UMBRELLA = REPO / "umbrella"
 UMBRELLA_BUILD = UMBRELLA / "_build"
 

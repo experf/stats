@@ -10,6 +10,21 @@ defmodule Stats.Umbrella.MixProject do
       aliases: aliases(),
       # https://elixirforum.com/t/the-inspect-protocol-has-already-been-consolidated-for-ecto-schema-with-redacted-field/34992/8
       consolidate_protocols: Mix.env() != :dev && Mix.env() != :test,
+
+      # Docs (via `ExDocs`)
+      #
+      # SEE https://hexdocs.pm/ex_doc/Mix.Tasks.Docs.html#module-configuration
+      #
+      name: "Cortex Stats Server",
+      source_url: "https://github.com/nrser/stats",
+      homepage_url: "https://github.com/nrser/stats",
+      docs: [
+        main: "readme", # The main page in the docs
+        # logo: "path/to/logo.png",
+        extras: [
+          "README.md"
+        ]
+      ]
     ]
   end
 

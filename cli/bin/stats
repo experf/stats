@@ -1,5 +1,5 @@
-#!/usr/bin/env python
+#!/Users/nrser/.pyenv/versions/3.9.1/envs/experf-stats/bin/python
 # PYTHON_ARGCOMPLETE_OK
 
-from stats import run
+from stats import run # pylint: disable=import-self
 run()

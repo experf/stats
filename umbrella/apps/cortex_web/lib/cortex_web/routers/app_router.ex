@@ -16,6 +16,29 @@ defmodule CortexWeb.AppRouter do
     plug :accepts, ["json"]
   end
 
+  pipeline :docs_browser do
+    plug :accepts, ["html"]
+    plug :fetch_session
+    # plug :fetch_flash
+    # plug :protect_from_forgery
+    # plug :put_secure_browser_headers
+    plug :fetch_current_user
+  end
+
+  pipeline :docs_static do
+    # Server `index.html` files at directory paths in `/docs`
+    #
+    # https://hexdocs.pm/plug_static_index_html/readme.html
+    #
+    plug Plug.Static.IndexHtml, at: "/docs"
+
+    plug Plug.Static,
+      at: "/",
+      from: :cortex_web,
+      gzip: false,
+      only: ~w(docs)
+  end
+
   # scope "/", CortexWeb do
   #   pipe_through :browser
 
@@ -43,8 +66,6 @@ defmodule CortexWeb.AppRouter do
     end
   end
 
-  ## Authentication routes
-
   scope "/", CortexWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
@@ -65,7 +86,8 @@ defmodule CortexWeb.AppRouter do
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
-    get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+    get "/users/settings/confirm_email/:token",
+      UserSettingsController, :confirm_email
 
     resources "/links", LinkController, except: [:delete]
   end
@@ -77,5 +99,14 @@ defmodule CortexWeb.AppRouter do
     get "/users/confirm", UserConfirmationController, :new
     post "/users/confirm", UserConfirmationController, :create
     get "/users/confirm/:token", UserConfirmationController, :confirm
+  end
+
+  scope "/", CortexWeb do
+    pipe_through [:docs_browser, :require_authenticated_user, :docs_static]
+
+    # Stupid HACK to get `/docs` → `/docs/`, the later of which is served.
+    match :*, "/docs", DocsController, :redirect_to_dir
+
+    match :*, "/*whatev", DocsController, :not_found
   end
 end

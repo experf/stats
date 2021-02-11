@@ -5,8 +5,9 @@ import logging
 import argparse
 
 import argcomplete
+from rich.markdown import Markdown
 
-from . import log as logging, cmd
+from . import log as logging, cmd, cfg
 from .io import ERR
 
 LOG = logging.getLogger(__name__)
@@ -14,7 +15,9 @@ LOG = logging.getLogger(__name__)
 
 class ArgumentParser(argparse.ArgumentParser):
     def __init__(self, *args, **kwds):
-        super().__init__(*args, formatter_class=argparse.RawTextHelpFormatter, **kwds)
+        super().__init__(
+            *args, formatter_class=argparse.RawTextHelpFormatter, **kwds
+        )
 
         self.add_argument(
             "-v",
@@ -38,8 +41,12 @@ class ArgumentParser(argparse.ArgumentParser):
     def set_func(self, func):
         self.set_defaults(func=func)
 
+
 def make_parser() -> ArgumentParser:
-    parser = ArgumentParser()
+    with (cfg.paths.CLI / "README.md").open("r") as file:
+        description = file.read()
+
+    parser = ArgumentParser(description=description)
     subparsers = parser.add_subparsers(help="Select a command")
     cmd.add_to(subparsers)
     return parser
@@ -56,7 +63,7 @@ def run():
     logging.setup()
 
     log = LOG.getChild("run")
-    log.debug("[todo]Handling command...[/todo]", argv=sys.argv)
+    log.debug("[holup]Handling command...[/holup]", argv=sys.argv)
 
     parser = make_parser()
     argcomplete.autocomplete(parser)
