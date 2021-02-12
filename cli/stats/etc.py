@@ -1,30 +1,45 @@
-from typing import *
+from typing import (
+    TypeVar,
+    Union,
+    Literal,
+    NewType,
+    Any,
+    Callable,
+    Iterable,
+    overload,
+    Optional,
+    Container,
+)
 from pathlib import Path
 
 from stats import cfg, log as logging
 
 LOG = logging.getLogger(__name__)
 
-K = TypeVar('K')
-T = TypeVar('T')
-V = TypeVar('V')
+K = TypeVar("K")
+T = TypeVar("T")
+V = TypeVar("V")
 
-TItem       = TypeVar('TItem')
-TNotFound   = TypeVar('TNotFound')
-TResult     = TypeVar('TResult')
-TKey        = TypeVar('TKey')
-TValue      = TypeVar('TValue')
-TAlias      = TypeVar('TAlias')
+TItem = TypeVar("TItem")
+TNotFound = TypeVar("TNotFound")
+TResult = TypeVar("TResult")
+TKey = TypeVar("TKey")
+TValue = TypeVar("TValue")
+TAlias = TypeVar("TAlias")
 
-Nope = NewType('Nope', Union[None, Literal[False]]) # type: ignore
+TNothing = TypeVar("TNothing")
+
+Nope = NewType("Nope", Union[None, Literal[False]])  # type: ignore
 
 # pylint: disable=bare-except
+
 
 def fmt_path(path: Path) -> str:
     try:
         return f"//{Path(path).relative_to(cfg.paths.REPO)}"
     except:
         return str(path)
+
 
 def fmt(x):
     if isinstance(x, Path):
@@ -33,7 +48,7 @@ def fmt(x):
 
 
 def is_nope(x: Any) -> bool:
-    '''
+    """
     >>> is_nope(None)
     True
 
@@ -42,15 +57,28 @@ def is_nope(x: Any) -> bool:
 
     >>> any(is_nope(x) for x in ('', [], {}, 0, 0.0))
     False
-    '''
+    """
     return x is None or x is False
 
+
+@overload
 def find(
     predicate: Callable[[TItem], Any],
-    itr: Iterator[TItem],
-    not_found: TNotFound=None
-) -> Union[T, TNotFound]:
-    '''Return the first item in an iterator `itr` for which `predicate`
+    itr: Iterable[TItem],
+    not_found: TNotFound,
+) -> Union[TItem, TNotFound]:
+    pass
+
+
+@overload
+def find(
+    predicate: Callable[[TItem], Any], itr: Iterable[TItem]
+) -> Optional[TItem]:
+    pass
+
+
+def find(predicate, itr, not_found=None):
+    """Return the first item in an iterator `itr` for which `predicate`
     returns anything other than `False` or `None`.
 
     >>> find(lambda x: x % 2 == 0, (1, 2, 3, 4))
@@ -71,19 +99,51 @@ def find(
 
     >>> find(lambda lst: len(lst) == 0, ([1, 2], [], [3, 4, 5]))
     []
-    '''
+    """
     for item in itr:
         if not is_nope(predicate(item)):
             return item
     return not_found
 
+@overload
 def find_map(
     fn: Callable[[TItem], Union[TResult, Nope]],
-    itr: Iterator[TItem],
-    not_found: TNotFound=None,
-    nothing=(None, False),
+    itr: Iterable[TItem],
+) -> Optional[TResult]:
+    pass
+
+@overload
+def find_map(
+    fn: Callable[[TItem], Union[TResult, Nope]],
+    itr: Iterable[TItem],
+    not_found: TNotFound,
 ) -> Union[TResult, TNotFound]:
-    '''
+    pass
+
+@overload
+def find_map(
+    fn: Callable[[TItem], Union[TResult, TNothing]],
+    itr: Iterable[TItem],
+    nothing: Container[TNothing],
+) -> Optional[TResult]:
+    pass
+
+@overload
+def find_map(
+    fn: Callable[[TItem], Union[TResult, TNothing]],
+    itr: Iterable[TItem],
+    not_found: TNotFound,
+    nothing: Container[TNothing],
+) -> Union[TResult, TNotFound]:
+    pass
+
+def find_map(
+    fn,
+    itr,
+    not_found=None,
+    nothing=(None, False),
+):
+    """
     Like `find()`, but returns first value returned by `predicate` that is not
     `False` or `None`.
 
@@ -92,7 +152,7 @@ def find_map(
     ...     ({'x': 1}, {'y': 2}, {'z': 3}),
     ... )
     3
-    '''
+    """
     for item in itr:
         result = fn(item)
         if result not in nothing:

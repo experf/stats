@@ -10,7 +10,10 @@ def add_to(subparsers):
 
 def run(**_kwds):
     repo_config = sh.get(
-        "mix", "config.repo", fmt="json", chdir=cfg.paths.UMBRELLA
+        "mix", "config.get", {"output": "json"},
+        ":cortex", "Cortex.Repo",
+        format="json",
+        chdir=cfg.paths.UMBRELLA
     )
 
     sh.replace(

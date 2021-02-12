@@ -1,5 +1,6 @@
 from . import (
     db,
+    deps,
     dev,
     docker_compose,
     docs,
@@ -15,6 +16,7 @@ from . import (
 def add_to(subparsers):
     for cmd in (
         db,
+        deps,
         dev,
         docker_compose,
         docs,

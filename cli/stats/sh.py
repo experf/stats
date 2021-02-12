@@ -12,15 +12,19 @@ from .etc import fmt
 
 LOG = logging.getLogger(__name__)
 
-TOptValue = Union[bool, str, int, float]
-TOpts = Dict[str, Union[TOptValue, List[TOptValue]]]
+TOpts = Mapping[Any, Any]
 TOptsStyle = Literal["=", " "]
 
-DEFAULT_OPTS_STYLE = "="
+DEFAULT_OPTS_STYLE: TOptsStyle = "="
 DEFAULT_OPTS_SORT = True
 
 
-def iter_opt(flag, value, style, is_short):
+def iter_opt(
+    flag: str,
+    value: Any,
+    style: TOptsStyle,
+    is_short: bool,
+) -> Generator[str, None, None]:
     if is_short or style == " ":
         yield flag
         yield str(value)
@@ -29,22 +33,23 @@ def iter_opt(flag, value, style, is_short):
 
 
 def flat_opts(
-    opts: Optional[TOpts],
+    opts: TOpts,
     *,
     style: TOptsStyle = DEFAULT_OPTS_STYLE,
     sort: bool = DEFAULT_OPTS_SORT,
-):
+) -> Generator[str, None, None]:
     if opts is None:
         return
     if sort:
         items = sorted(opts.items())
     else:
-        items = opts.items()
+        items = list(opts.items())
     for name, value in items:
         if value is None:
             continue
-        is_short = len(name) == 1
-        flag = f"-{name}" if is_short else f"--{name}"
+        name_s = str(name)
+        is_short = len(name_s) == 1
+        flag = f"-{name_s}" if is_short else f"--{name_s}"
         if isinstance(value, (list, tuple)):
             for item in value:
                 yield from iter_opt(flag, item, style, is_short)
@@ -83,13 +88,14 @@ def flatten_args(
     return list(flat_args(args, opts_style=opts_style, opts_sort=opts_sort))
 
 
-def get(*args, chdir=None, fmt=None, encoding="utf-8", **opts) -> Any:
+def get(*args, chdir=None, format=None, encoding="utf-8", **opts) -> Any:
+    log = LOG.getChild("get")
     if isinstance(chdir, Path):
         chdir = str(chdir)
 
     cmd = flatten_args(args)
 
-    LOG.getChild("get").debug(
+    log.debug(
         "Getting system command output...",
         cmd=cmd,
         chdir=chdir,
@@ -102,9 +108,12 @@ def get(*args, chdir=None, fmt=None, encoding="utf-8", **opts) -> Any:
         cmd, encoding=encoding, cwd=chdir, **opts
     )
 
-    if fmt == "json":
+    if format is None:
+        return output
+    elif format == "json":
         return json.loads(output)
     else:
+        log.warn("Unknown `format`", format=format, expected=[None, "json"])
         return output
 
 
@@ -165,3 +174,21 @@ def file_absent(path: Path, name: Optional[str]=None):
         rmtree(path)
     else:
         log.info(f"[yeah]{name} already absent.[/yeah]", path=path)
+
+
+def dir_present(path: Path, desc: Optional[str]=None):
+    log = LOG.getChild("dir_present")
+    if desc is None:
+        desc = fmt(path)
+    if path.exists():
+        if path.is_dir():
+            log.debug(
+                f"[yeah]{desc} directory already exists.[/yeah]", path=path
+            )
+        else:
+            raise RuntimeError(f"{path} exists and is NOT a directory")
+    else:
+        log.info(
+            f"[holup]Creating {desc} directory...[/holup]", path=path
+        )
+        os.makedirs(path)

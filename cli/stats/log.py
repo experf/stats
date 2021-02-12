@@ -1,6 +1,10 @@
 from __future__ import annotations
 import logging
-from typing import *
+from typing import (
+    Any,
+    Optional,
+    Mapping,
+)
 
 # Some way of complaining (ideally) _outside_ the logging system, to (try) to
 # avoid recursive self-destruction (yeah, I did see something about telling the
@@ -70,7 +74,7 @@ def getLogger(*args, **kwds):
     return LogGetter(*args, **kwds)
 
 
-class KwdsLogger(logging.getLoggerClass()):
+class KwdsLogger(logging.Logger):
     def _log(
         self,
         level,
@@ -126,12 +130,15 @@ class RichHandler(logging.Handler):
         setattr(cls, "__singleton", instance)
         return instance
 
+    consoles: Mapping[str, Console]
+    level_map: Mapping[int, str]
+
     def __init__(
         self,
         level: int = logging.NOTSET,
         *,
         consoles: Optional[Mapping[str, Console]] = None,
-        level_map: Optional[Mapping[str, str]] = None,
+        level_map: Optional[Mapping[int, str]] = None,
     ):
         super().__init__(level=level)
 

@@ -15,7 +15,7 @@ defmodule Stats.MixProject do
       #
       # SEE https://hexdocs.pm/ex_doc/Mix.Tasks.Docs.html#module-configuration
       #
-      name: "Cortex Stats Server",
+      name: "stats",
       source_url: "https://github.com/nrser/stats",
       homepage_url: "https://github.com/nrser/stats",
       docs: [
