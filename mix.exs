@@ -1,6 +1,8 @@
 defmodule Stats.MixProject do
   use Mix.Project
 
+  @dev_notes_paths Path.wildcard("#{__DIR__}/dev/notes/**/*.md")
+
   def project do
     [
       apps_path: "apps",
@@ -19,13 +21,43 @@ defmodule Stats.MixProject do
       source_url: "https://github.com/nrser/stats",
       homepage_url: "https://github.com/nrser/stats",
       docs: [
-        main: "readme", # The main page in the docs
+        main: "welcome", # The main page in the docs
         # logo: "path/to/logo.png",
-        extras: [
-          "README.md"
-        ]
+        extra_section: "DOCUMENTS",
+        extras: ["docs/welcome.md" | dev_notes_extra_docs()],
+        formatters: ["html"],
+        groups_for_extras: [
+          "Dev Notes": @dev_notes_paths,
+        ],
+        nest_modules_by_prefix: [
+          Cortex,
+          CortexWeb,
+          Subscrape,
+        ],
+        output: "apps/cortex_web/priv/static/docs",
+        source_ref: "main",
       ]
     ]
+  end
+
+  defp dev_notes_extra_docs() do
+    for path <- @dev_notes_paths do
+      basename = Path.basename(path, ".md")
+
+      case Regex.run(~r/^\d{4}\-\d{2}\-\d{2}/, basename) do
+        nil -> path
+        [date] ->
+          title =
+            File.read!(path)
+            |> String.split("\n", parts: 2)
+            |> List.first()
+            |> String.replace(~r/\s+Notes$/, "")
+          {
+            String.to_atom(path),
+            [filename: basename, title: "#{date} #{title}"]
+          }
+      end
+    end
   end
 
   # Dependencies can be Hex packages:
