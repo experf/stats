@@ -6,14 +6,14 @@ LOG = logging.getLogger(__name__)
 
 
 def add_to(subparsers):
-    parser = subparsers.add_parser(
+    _parser = subparsers.add_parser(
         "scratch",
+        target=run,
         help=(
             "Trying shit out. Don't run w/o reading the source unless "
             "you _really_ like suprises."
         ),
     )
-    parser.set_run(run)
 
 
 def run():

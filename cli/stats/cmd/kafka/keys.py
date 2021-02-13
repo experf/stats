@@ -12,6 +12,7 @@ LOG = logging.getLogger(__name__)
 def add_to(subparsers):
     parser = subparsers.add_parser(
         "keys",
+        target=run,
         # help="Consume a Kafka topic",
     )
     parser.add_argument(
@@ -19,7 +20,6 @@ def add_to(subparsers):
         "--event-type",
         help="`type` of event",
     )
-    parser.set_run(run)
 
 
 def iter_key_paths(dct: Dict, /, key_path=tuple()):

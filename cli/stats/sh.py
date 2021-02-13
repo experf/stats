@@ -7,8 +7,7 @@ from pathlib import Path
 import json
 from shutil import rmtree
 
-from .io import OUT, ERR
-from .etc import fmt
+from .io import OUT, ERR, fmt
 
 LOG = logging.getLogger(__name__)
 

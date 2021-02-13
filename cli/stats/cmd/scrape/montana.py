@@ -13,9 +13,9 @@ BLACK_URL = "https://www.montana-cans.com/en/spray-cans/montana-spray-paint/blac
 def add_to(subparsers):
     parser = subparsers.add_parser(
         "montana",
+        target=run,
         help="Scrape colors off montana-cans.com for (S)CSS (ab)use",
     )
-    parser.set_run(run)
 
 
 def run():

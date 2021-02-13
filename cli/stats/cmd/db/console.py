@@ -1,11 +1,11 @@
 from stats import sh, cfg
 
 def add_to(subparsers):
-    parser = subparsers.add_parser(
+    _parser = subparsers.add_parser(
         "console",
+        target=run,
         help="Start the `psql` console connected to the Contex database",
     )
-    parser.set_run(run)
 
 
 def run():

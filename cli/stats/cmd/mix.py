@@ -5,6 +5,7 @@ LOG = logging.getLogger(__name__)
 def add_to(subparsers):
     parser = subparsers.add_parser(
         "mix",
+        target=run,
         help="Run `mix` in `//umbrella` from ANYWHERE (in the tree)!",
     )
     parser.add_argument(
@@ -22,7 +23,6 @@ def add_to(subparsers):
         nargs="...",
         help="Arguments to pass to `mix`"
     )
-    parser.set_run(run)
 
 def run(args=tuple(), app=None):
     if app is None:

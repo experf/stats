@@ -12,12 +12,13 @@ LOG = logging.getLogger(__name__)
 
 
 class ArgumentParser(argparse.ArgumentParser):
-    def __init__(self, *args, **kwds):
+    def __init__(self, *args, target=None, **kwds):
         super().__init__(
             *args, formatter_class=argparse.RawTextHelpFormatter, **kwds
         )
 
-        self.run = run
+        if target is not None:
+            self.set_target(target)
 
         self.add_argument(
             "-v",
@@ -38,8 +39,8 @@ class ArgumentParser(argparse.ArgumentParser):
             help="Print backtraces on error",
         )
 
-    def set_run(self, func):
-        self.set_defaults(__run__=func)
+    def set_target(self, target):
+        self.set_defaults(__target__=target)
 
     def action_dests(self):
         return [
@@ -86,8 +87,8 @@ def run():
         for key in parser.action_dests():
             if key in kwds:
                 del kwds[key]
-        del kwds["__run__"]
-        args.__run__(**kwds)
+        del kwds["__target__"]
+        args.__target__(**kwds)
     except KeyboardInterrupt:
         pass
     except Exception as error:

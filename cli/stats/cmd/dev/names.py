@@ -5,8 +5,7 @@ from rich.style import Style
 from rich.text import Text
 
 from stats import log as logging, cfg
-from stats.io import OUT
-from stats.etc import fmt
+from stats.io import OUT, fmt
 
 LOG = logging.getLogger(__name__)
 
@@ -17,6 +16,7 @@ DEFAULT_LENGTH = 8
 def add_to(subparsers):
     parser = subparsers.add_parser(
         "names",
+        target=run,
         help=(f"Filter short names from {fmt(CSV_PATH)}"),
     )
     parser.add_argument(
@@ -26,7 +26,6 @@ def add_to(subparsers):
         type=int,
         help=("Name length limit to filter by"),
     )
-    parser.set_run(run)
 
 
 def run(args):

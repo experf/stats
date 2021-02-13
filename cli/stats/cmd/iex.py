@@ -3,6 +3,7 @@ from stats import sh, cfg
 def add_to(subparsers):
     parser = subparsers.add_parser(
         "iex",
+        target=run,
         aliases=["console"],
         help="Elixir REPL, run in the mix environment",
     )
@@ -14,7 +15,6 @@ def add_to(subparsers):
             "Phoenix server in the `iex` console."
         ),
     )
-    parser.set_run(run)
 
 def run(args=tuple()):
     sh.replace(

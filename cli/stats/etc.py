@@ -34,19 +34,6 @@ Nope = NewType("Nope", Union[None, Literal[False]])  # type: ignore
 # pylint: disable=bare-except
 
 
-def fmt_path(path: Path) -> str:
-    try:
-        return f"//{Path(path).relative_to(cfg.paths.REPO)}"
-    except:
-        return str(path)
-
-
-def fmt(x):
-    if isinstance(x, Path):
-        return fmt_path(x)
-    return str(x)
-
-
 def is_nope(x: Any) -> bool:
     """
     >>> is_nope(None)
