@@ -11,7 +11,7 @@ GOLD_URL = "https://www.montana-cans.com/en/spray-cans/montana-spray-paint/gold-
 BLACK_URL = "https://www.montana-cans.com/en/spray-cans/montana-spray-paint/black-50ml-600ml-graffiti-paint/montana-black-400ml"
 
 def add_to(subparsers):
-    parser = subparsers.add_parser(
+    subparsers.add_parser(
         "montana",
         target=run,
         help="Scrape colors off montana-cans.com for (S)CSS (ab)use",
