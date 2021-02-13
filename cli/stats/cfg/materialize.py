@@ -1,7 +1,8 @@
+from . import paths as _paths
 
-__all__ = ["postgres"]
-
-class Postgres:
+class _Paths:
+    scripts = _paths.DEV / "sql" / "materialize"
+class _Postgres:
     username = "materialized"
     host = "localhost"
     port = 6875
@@ -14,4 +15,5 @@ class Postgres:
             f"/{self.database}"
         )
 
-postgres = Postgres()
+paths = _Paths()
+postgres = _Postgres()

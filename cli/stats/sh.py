@@ -87,6 +87,7 @@ def flatten_args(
     return list(flat_args(args, opts_style=opts_style, opts_sort=opts_sort))
 
 
+# pylint: disable=redefined-builtin
 def get(*args, chdir=None, format=None, encoding="utf-8", **opts) -> Any:
     log = LOG.getChild("get")
     if isinstance(chdir, Path):
@@ -100,12 +101,10 @@ def get(*args, chdir=None, format=None, encoding="utf-8", **opts) -> Any:
         chdir=chdir,
         fmt=fmt,
         encoding=encoding,
-        **opts
+        **opts,
     )
     # https://docs.python.org/3.8/library/subprocess.html#subprocess.run
-    output = subprocess.check_output(
-        cmd, encoding=encoding, cwd=chdir, **opts
-    )
+    output = subprocess.check_output(cmd, encoding=encoding, cwd=chdir, **opts)
 
     if format is None:
         return output
@@ -116,7 +115,9 @@ def get(*args, chdir=None, format=None, encoding="utf-8", **opts) -> Any:
         return output
 
 
-def run(*args, chdir=None, check=True, encoding="utf-8", **opts) -> None:
+def run(
+    *args, chdir=None, check=True, encoding="utf-8", input=None, **opts
+) -> None:
     if isinstance(chdir, Path):
         chdir = str(chdir)
     cmd = flatten_args(args)
@@ -126,10 +127,23 @@ def run(*args, chdir=None, check=True, encoding="utf-8", **opts) -> None:
         cmd=cmd,
         chdir=chdir,
         encoding=encoding,
-        **opts
+        **opts,
     )
 
-    subprocess.run(cmd, check=check, cwd=chdir, encoding=encoding, **opts)
+    if isinstance(input, Path):
+        with input.open("r", encoding="utf-8") as file:
+            subprocess.run(
+                cmd,
+                check=check,
+                cwd=chdir,
+                encoding=encoding,
+                input=file.read(),
+                **opts,
+            )
+    else:
+        subprocess.run(
+            cmd, check=check, cwd=chdir, encoding=encoding, input=input, **opts
+        )
 
 
 def replace(
@@ -164,7 +178,8 @@ def replace(
         else:
             os.execvpe(proc_name, cmd, env)
 
-def file_absent(path: Path, name: Optional[str]=None):
+
+def file_absent(path: Path, name: Optional[str] = None):
     log = LOG.getChild("file_absent")
     if name is None:
         name = fmt(path)
@@ -175,7 +190,7 @@ def file_absent(path: Path, name: Optional[str]=None):
         log.info(f"[yeah]{name} already absent.[/yeah]", path=path)
 
 
-def dir_present(path: Path, desc: Optional[str]=None):
+def dir_present(path: Path, desc: Optional[str] = None):
     log = LOG.getChild("dir_present")
     if desc is None:
         desc = fmt(path)
@@ -187,7 +202,5 @@ def dir_present(path: Path, desc: Optional[str]=None):
         else:
             raise RuntimeError(f"{path} exists and is NOT a directory")
     else:
-        log.info(
-            f"[holup]Creating {desc} directory...[/holup]", path=path
-        )
+        log.info(f"[holup]Creating {desc} directory...[/holup]", path=path)
         os.makedirs(path)

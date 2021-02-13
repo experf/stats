@@ -3,7 +3,9 @@ defmodule Cortex.Events do
 
   @topic "events"
 
-  def produce({unix_ms, props})
+  # SEE https://github.com/klarna/brod
+
+  def produce(props, unix_ms)
       when is_integer(unix_ms) and is_map(props) do
     Logger.debug("Producing event", props |> Map.to_list())
     value = %{ts: unix_ms, value: Jason.encode!(props)}
@@ -18,6 +20,22 @@ defmodule Cortex.Events do
         error
     end
   end
+
+  # def produce(%{ts: ts, value: value})
+  #     when is_integer(ts) and is_map(value) do
+  #   Logger.debug("Producing event", value |> Map.to_list())
+  #   value_s = value |> Jason.encode!()
+
+  #   case :brod_client.get_partitions_count(:cortex, @topic) do
+  #     {:ok, partitions_cnt} ->
+  #       partitions = 0..(partitions_cnt - 1) |> Enum.shuffle()
+  #       try_produce(@topic, partitions, "", %{ts: ts, value: value_s}, nil)
+
+  #     {:error, _} = error ->
+  #       Logger.error("#{inspect(error)}")
+  #       error
+  #   end
+  # end
 
   def produce(props) when is_map(props) do
     Logger.debug("Producing event", props |> Map.to_list())

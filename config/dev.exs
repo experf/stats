@@ -72,6 +72,7 @@ config :cortex_web, CortexWeb.AppEndpoint,
 config :logger,
   compile_time_purge_matching: [
     [module: Subscrape.HTTP, level_lower_than: :info],
+    [module: Subscrape.Subscriber, level_lower_than: :info],
   ]
 
 config :logger, :console,

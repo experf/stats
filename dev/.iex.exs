@@ -9,7 +9,6 @@ alias Cortex.Trackers.{Link}
 alias Cortex.OpenGraph
 alias Cortex.Repo
 
-alias Cortex.Clients
 alias Cortex.Scrapers
 
 defmodule SS do
@@ -25,6 +24,16 @@ defmodule SS do
 
   def xander_email(), do: "xander@futureperfect.studio"
   def neil_email(), do: "neil@neilsouza.com"
+
+  defmodule Events do
+    def all() do
+      with {:ok, events} <- SS.config() |> Subscrape.Subscriber.events(:all) do
+        events
+        |> Enum.map(fn {_, evs} -> evs end)
+        |> Enum.concat()
+      end
+    end
+  end
 
   # def load_xander(),
   #   do: Scrapers.Substack.scrape_subscriber_events(
