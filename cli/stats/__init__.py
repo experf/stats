@@ -6,10 +6,9 @@ import argparse
 import argcomplete
 from rich.markdown import Markdown
 
-from . import log as logging, cmd, cfg
+from . import log as logging, cmd, cfg, dyn
 
 LOG = logging.getLogger(__name__)
-
 
 class ArgumentParser(argparse.ArgumentParser):
     def __init__(self, *args, target=None, **kwds):
@@ -21,10 +20,9 @@ class ArgumentParser(argparse.ArgumentParser):
             self.set_target(target)
 
         self.add_argument(
-            "-v",
-            "--verbose",
-            action="count",
-            help="Make noise.",
+            "--backtrace",
+            action="store_true",
+            help="Print backtraces on error",
         )
 
         # self.add_argument(
@@ -34,9 +32,10 @@ class ArgumentParser(argparse.ArgumentParser):
         # )
 
         self.add_argument(
-            "--backtrace",
-            action="store_true",
-            help="Print backtraces on error",
+            "-v",
+            "--verbose",
+            action="count",
+            help="Make noise.",
         )
 
     def set_target(self, target):
@@ -49,6 +48,13 @@ class ArgumentParser(argparse.ArgumentParser):
             in self._actions
             if action.dest != argparse.SUPPRESS
         ]
+
+    def add_children(self, module__name__, module__path__):
+        subparsers = self.add_subparsers()
+
+        for module in dyn.children_modules(module__name__, module__path__):
+            if hasattr(module, "add_to"):
+                module.add_to(subparsers)
 
 def make_parser() -> ArgumentParser:
     with (cfg.paths.CLI / "README.md").open("r") as file:

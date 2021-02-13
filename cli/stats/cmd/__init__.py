@@ -1,28 +1,14 @@
-from . import (
-    db,
-    deps,
-    dev,
-    docker_compose,
-    iex,
-    kafka,
-    materialize,
-    mix,
-    phx,
-    scrape,
-)
+import pkgutil
+import importlib.util
+import sys
+
+from stats import log as logging, dyn
+
+
+LOG = logging.getLogger(__name__)
 
 
 def add_to(subparsers):
-    for cmd in (
-        db,
-        deps,
-        dev,
-        docker_compose,
-        iex,
-        kafka,
-        materialize,
-        mix,
-        phx,
-        scrape,
-    ):
-        cmd.add_to(subparsers)
+    for module in dyn.children_modules(__name__, __path__):
+        if hasattr(module, "add_to"):
+            module.add_to(subparsers)

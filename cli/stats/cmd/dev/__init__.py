@@ -1,7 +1,4 @@
 from stats import log as logging
-from stats.io import OUT
-
-from . import scratch, names
 
 LOG = logging.getLogger(__name__)
 
@@ -25,10 +22,8 @@ def add_to(subparsers):
     # )
     # parser.set_run(run)
 
-    subparsers = parser.add_subparsers()
+    parser.add_children(__name__, __path__)
 
-    for cmd in (names, scratch):
-        cmd.add_to(subparsers)
 
 def run(argv=tuple()):
     LOG.info("DEV DEV DEV!", argv=argv)

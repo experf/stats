@@ -1,5 +1,4 @@
 from stats import log as logging
-from . import consume, keys, reset
 
 LOG = logging.getLogger(__name__)
 
@@ -9,7 +8,5 @@ def add_to(subparsers):
         help="Apache Kafka -- event data storage",
     )
 
-    subparsers = parser.add_subparsers()
+    parser.add_children(__name__, __path__)
 
-    for cmd in (consume, keys, reset):
-        cmd.add_to(subparsers)

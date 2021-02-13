@@ -13,7 +13,7 @@ def add_to(subparsers):
     parser = subparsers.add_parser(
         "keys",
         target=run,
-        # help="Consume a Kafka topic",
+        help="Some scratch-work around printing all keys from events",
     )
     parser.add_argument(
         "-t",
