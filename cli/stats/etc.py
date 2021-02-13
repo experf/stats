@@ -10,9 +10,8 @@ from typing import (
     Optional,
     Container,
 )
-from pathlib import Path
 
-from stats import cfg, log as logging
+from stats import log as logging
 
 LOG = logging.getLogger(__name__)
 
@@ -30,8 +29,6 @@ TAlias = TypeVar("TAlias")
 TNothing = TypeVar("TNothing")
 
 Nope = NewType("Nope", Union[None, Literal[False]])  # type: ignore
-
-# pylint: disable=bare-except
 
 
 def is_nope(x: Any) -> bool:
