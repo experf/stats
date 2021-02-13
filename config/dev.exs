@@ -1,7 +1,7 @@
 use Mix.Config
 
 # Load `//dev/.env` if it exists
-dev_env_path = Path.expand("../../dev/.env", __DIR__)
+dev_env_path = Path.expand("../dev/.env", __DIR__)
 if File.exists?(dev_env_path), do: Dotenv.load!(dev_env_path)
 
 # Configure your database
@@ -69,12 +69,15 @@ config :cortex_web, CortexWeb.AppEndpoint,
     ]
   ]
 
-# Do not include metadata nor timestamps in development logs
+config :logger,
+  compile_time_purge_matching: [
+    [module: Subscrape.HTTP, level_lower_than: :info],
+  ]
+
 config :logger, :console,
-  # format: "[$level] $message $metadata\n",
   format: {Cortex.Logging.DevFormatter, :format},
-  # metadata: [:file, :line, :data]
-  metadata: :all
+  metadata: :all # Filter in `Cortex.Logging.DevFormatter`
+
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
@@ -104,7 +107,7 @@ config :cortex_web, CortexWeb.LinkEndpoint,
   ]
 
 config :subscrape, Subscrape,
-  cache_root: Path.expand("../../tmp/cache/subscrape", __DIR__)
+  cache_root: Path.expand("../tmp/cache/subscrape", __DIR__)
 
 import_if_exists = fn rel_path ->
   if File.exists?("#{__DIR__}/#{rel_path}"), do: import_config(rel_path)
