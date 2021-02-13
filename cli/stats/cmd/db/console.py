@@ -5,10 +5,10 @@ def add_to(subparsers):
         "console",
         help="Start the `psql` console connected to the Contex database",
     )
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
 
-def run(**_kwds):
+def run():
     repo_config = sh.get(
         "mix", "config.get", {"output": "json"},
         ":cortex", "Cortex.Repo",

@@ -21,10 +21,10 @@ def add_to(subparsers):
         nargs="...",
         help="Extra args and opts to pass to `docker-compose`",
     )
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
 
-def run(args=tuple(), **_kwds):
+def run(args=tuple()):
     sh.run(
         "docker-compose",
         "--project-name", cfg.NAME,

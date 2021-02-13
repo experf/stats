@@ -19,7 +19,7 @@ def add_to(subparsers):
         "--event-type",
         help="`type` of event",
     )
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
 
 def iter_key_paths(dct: Dict, /, key_path=tuple()):
@@ -31,7 +31,7 @@ def iter_key_paths(dct: Dict, /, key_path=tuple()):
             yield ".".join(new_key_path)
 
 
-def run(event_type, **_kwds):
+def run(event_type):
     consumer = KafkaConsumer(
         cfg.kafka.topic,
         bootstrap_servers=cfg.kafka.servers,

@@ -16,12 +16,12 @@ def add_to(subparsers):
     #     nargs="...",
     #     help="Extra args!",
     # )
-    # parser.set_defaults(func=run)
+    # parser.set_run(run)
 
     subparsers = parser.add_subparsers()
 
     for cmd in (names, scratch):
         cmd.add_to(subparsers)
 
-def run(argv=tuple(), **_kwds):
+def run(argv=tuple()):
     LOG.info("DEV DEV DEV!", argv=argv)

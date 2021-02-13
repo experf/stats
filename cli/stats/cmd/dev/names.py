@@ -26,7 +26,7 @@ def add_to(subparsers):
         type=int,
         help=("Name length limit to filter by"),
     )
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
 
 def run(args):

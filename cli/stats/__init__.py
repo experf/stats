@@ -7,7 +7,6 @@ import argcomplete
 from rich.markdown import Markdown
 
 from . import log as logging, cmd, cfg
-from .io import ERR
 
 LOG = logging.getLogger(__name__)
 
@@ -17,6 +16,8 @@ class ArgumentParser(argparse.ArgumentParser):
         super().__init__(
             *args, formatter_class=argparse.RawTextHelpFormatter, **kwds
         )
+
+        self.run = run
 
         self.add_argument(
             "-v",
@@ -37,9 +38,16 @@ class ArgumentParser(argparse.ArgumentParser):
             help="Print backtraces on error",
         )
 
-    def set_func(self, func):
-        self.set_defaults(func=func)
+    def set_run(self, func):
+        self.set_defaults(__run__=func)
 
+    def action_dests(self):
+        return [
+            action.dest
+            for action
+            in self._actions
+            if action.dest != argparse.SUPPRESS
+        ]
 
 def make_parser() -> ArgumentParser:
     with (cfg.paths.CLI / "README.md").open("r") as file:
@@ -74,7 +82,12 @@ def run():
     # pylint: disable=broad-except
 
     try:
-        args.func(**args.__dict__)
+        kwds = {**args.__dict__}
+        for key in parser.action_dests():
+            if key in kwds:
+                del kwds[key]
+        del kwds["__run__"]
+        args.__run__(**kwds)
     except KeyboardInterrupt:
         pass
     except Exception as error:

@@ -22,9 +22,9 @@ def add_to(subparsers):
         nargs="...",
         help="Arguments to pass to `mix`"
     )
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
-def run(args=tuple(), app=None, **_kwds):
+def run(args=tuple(), app=None):
     if app is None:
         chdir = cfg.paths.UMBRELLA
     else:

@@ -12,10 +12,10 @@ def add_to(subparsers):
         help="Clear Kafka data",
     )
 
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
 
-def run(**_kwds):
+def run():
     LOG.info("[holup]Resetting Kafka data...[/holup]")
 
     docker_compose.run(["down"])

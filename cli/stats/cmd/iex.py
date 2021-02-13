@@ -14,9 +14,9 @@ def add_to(subparsers):
             "Phoenix server in the `iex` console."
         ),
     )
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
-def run(args=tuple(), **_opts):
+def run(args=tuple()):
     sh.replace(
         "iex",
         {

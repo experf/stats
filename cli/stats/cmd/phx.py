@@ -52,10 +52,10 @@ def add_to(subparsers):
         ),
     )
 
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
 
-def run(clean=False, iex=False, no_rm_hs_cache=False, **_kwds):
+def run(clean=False, iex=False, no_rm_hs_cache=False):
     if no_rm_hs_cache is False:
         sh.file_absent(
             cfg.paths.WEBPACK_HARD_SOURCE_CACHE,

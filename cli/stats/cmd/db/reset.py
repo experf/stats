@@ -18,10 +18,10 @@ def add_to(subparsers):
         action="store_true",
     )
 
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
 
-def run(serve=False, **_kwds):
+def run(serve=False):
     LOG.info("[holup]Resetting Cortex database...[/holup]")
 
     sh.run("mix", "ecto.reset", chdir=cfg.paths.CORTEX)

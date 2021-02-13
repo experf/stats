@@ -15,10 +15,10 @@ def add_to(subparsers):
         "montana",
         help="Scrape colors off montana-cans.com for (S)CSS (ab)use",
     )
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
 
-def run(_args):
+def run():
     page = requests.get(GOLD_URL)
     soup = BeautifulSoup(page.content, "html.parser")
 

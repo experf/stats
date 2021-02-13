@@ -13,8 +13,8 @@ def add_to(subparsers):
             "you _really_ like suprises."
         ),
     )
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
 
-def run(**_kwds):
+def run():
     LOG.info("SCRATCH!!!!", argv=sys.argv)

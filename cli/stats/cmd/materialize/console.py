@@ -7,10 +7,10 @@ def add_to(subparsers):
         "console",
         help="Start the `psql` console connected to the Materialized database",
     )
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
 
-def run(**_kwds):
+def run():
     LOG.info(
         "Connecting to Materialize...",
         url=cfg.materialize.postgres.url,

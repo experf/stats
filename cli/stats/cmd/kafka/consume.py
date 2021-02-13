@@ -18,10 +18,10 @@ def add_to(subparsers):
         default="events",
         help="Kafka topic to consume",
     )
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
 
-def run(topic, **_kwds):
+def run(topic):
     consumer = KafkaConsumer(
         topic,
         bootstrap_servers=["localhost:9091"],

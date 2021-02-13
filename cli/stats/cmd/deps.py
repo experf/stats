@@ -7,9 +7,9 @@ def add_to(subparsers):
         "deps",
         help="Get and compile Elixir deps with `mix`",
     )
-    parser.set_func(run)
+    parser.set_run(run)
 
-def run(**_kwds):
+def run():
     sh.run(
         "mix",
         "do",

@@ -7,10 +7,10 @@ def add_to(subparsers):
         "setup",
         help="Setup Materialized sources and views",
     )
-    parser.set_defaults(func=run)
+    parser.set_run(run)
 
 
-def run(**_kwds):
+def run():
     sh.run(
         "psql",
         cfg.materialize.postgres.url,
