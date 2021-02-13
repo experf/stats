@@ -1,6 +1,6 @@
 defmodule Subscrape do
   @moduledoc """
-  Documentation for `Subscrape`.
+  Read data from the Substack API.
   """
 
   require Logger
@@ -34,7 +34,9 @@ defmodule Subscrape do
       3.  Filter by `XHR` requests and select a request that is hitting a url
           like:
 
-              https://𝑠𝑢𝑏𝑑𝑜𝑚𝑎𝑖𝑛.substack.com/api/v1/…
+          ```bash
+          https://𝑠𝑢𝑏𝑑𝑜𝑚𝑎𝑖𝑛.substack.com/api/v1/…
+          ```
 
       4.  Right click on the request row and select
 
@@ -61,6 +63,27 @@ defmodule Subscrape do
           ```
 
           That's your `sid`.
+
+  -   `:user_agent` — What to put in the `User-Agent` header in `HTTP` requests.
+
+      This defaults to one I got from a `Copy from cURL` some point way back.
+      Not sure if it matters, haven't played with it.
+
+  -   `:subscriber_list_limit` — Value to use for the `limit` option in
+      `Subscrape.Subscriber.list/2` when called without one. Controls the
+      maximum amount of event records per "page" we request.
+
+      Defaults to `100`, which is the highest value Substack's API seems to
+      accept.
+
+  -   `:subscriber_events_limit` — Same as `:subscriber_list_limit`, but for
+      the `Subscrape.Subscriber.events/2` call. Also defaults to `100`.
+
+  -   `:max_retry_attempts` — Number of times to retry a failed `HTTP` request
+      (which is usually due to timeout). Defaults to `3`.
+
+  -   `:cache_root` — Where to keep a cache of response data. This is useful in
+      development as Substack's API has rate limiting.
   """
   @enforce_keys [:subdomain, :sid]
   defstruct [
@@ -71,7 +94,6 @@ defmodule Subscrape do
         "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 " <>
         "Safari/537.36",
     subscriber_list_limit: 100,
-    # Web defaults to 20, but this seems to work. Even as high as 150 fails.
     subscriber_events_limit: 100,
     max_retry_attempts: 3,
     cache_root: Application.get_env(:subscrape, __MODULE__, [])[:cache_root],

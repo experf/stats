@@ -4,7 +4,6 @@ defmodule Subscrape.HTTP do
   """
 
   require Logger
-  require Subscrape.Helpers
 
   alias Subscrape.Cache
   alias Subscrape.Endpoint
@@ -15,61 +14,44 @@ defmodule Subscrape.HTTP do
     socks5_pass ssl follow_redirect max_redirect params max_body_length
   )a
 
-  def authority(%Subscrape{} = client), do: "#{client.subdomain}.substack.com"
+  @doc ~S"""
+  The domain, given the `:subdomain` of the config.
+  """
+  def authority(%Subscrape{} = config),
+    do: "#{config.subdomain}.substack.com"
 
-  def url(%Subscrape{} = client), do: url(client, nil, nil)
+  def url(%Subscrape{} = config, path \\ nil, query \\ nil),
+    do: uri(config, path, query) |> URI.to_string()
 
-  def url(%Subscrape{} = client, path) when is_binary(path),
-    do: url(client, path, nil)
-
-  def url(%Subscrape{} = client, %Endpoint{} = endpoint) do
-    url(client, EEx.eval_string(endpoint.format, []))
-  end
-
-  def url(%Subscrape{} = client, {%Endpoint{} = endpoint, kwds}) do
-    encoded_kwds =
-      kwds
-      |> Enum.map(fn {k, v} ->
-        {k, v |> to_string() |> URI.encode_www_form()}
-      end)
-
-    path = endpoint.format |> EEx.eval_string(encoded_kwds)
-
-    url(client, path)
-  end
-
-  def url(%Subscrape{} = client, {template, kwds}) do
-    encoded_kwds =
-      kwds
-      |> Enum.map(fn {k, v} ->
-        {k, v |> to_string() |> URI.encode_www_form()}
-      end)
-
-    path = template |> EEx.eval_string(encoded_kwds)
-
-    url(client, path)
-  end
-
-  def url(%Subscrape{} = client, path, query)
-      when is_binary(path) and (is_list(query) or is_map(query)),
-      do: url(client, path, query |> URI.encode_query())
-
-  def url(%Subscrape{} = client, path, query) do
-    uri(client, path, query) |> URI.to_string()
-  end
-
-  def uri(%Subscrape{} = client, path, query) do
+  def uri(%Subscrape{} = config, path, query) do
     %URI{
       scheme: "https",
-      authority: client |> authority(),
-      path: path,
-      query: query
+      authority: config |> authority(),
+      path: path |> encode_path(),
+      query: query |> encode_query()
     }
   end
 
-  def headers(%Subscrape{} = client) do
+  defp encode_path(path) do
+    case path do
+      nil -> nil
+      str when is_binary(str) -> str
+      %Endpoint{} = ep -> ep |> Endpoint.to_path()
+      {%Endpoint{} = ep, kwds} -> ep |> Endpoint.to_path(kwds)
+    end
+  end
+
+  defp encode_query(query) do
+    case query do
+      nil -> nil
+      str when is_binary(str) -> str
+      enum when is_list(enum) or is_map(enum) -> URI.encode_query(enum)
+    end
+  end
+
+  def headers(%Subscrape{} = config) do
     [
-      {"authority", client |> authority()},
+      {"authority", config |> authority()},
       {"pragma", "no-cache"},
       {"cache-control", "no-cache"},
       {"user-agent",
@@ -78,45 +60,46 @@ defmodule Subscrape.HTTP do
          "Safari/537.36"},
       {"content-type", "application/json"},
       {"accept", "*/*"},
-      {"origin", client |> url()},
+      {"origin", config |> url()},
       {"sec-fetch-site", "same-origin"},
       {"sec-fetch-mode", "cors"},
       {"sec-fetch-dest", "empty"},
       {"accept-language", "en-US,en;q=0.9"},
-      {"cookie", "substack.sid=#{client.sid}"}
+      {"cookie", "substack.sid=#{config.sid}"}
     ]
   end
 
-  def collect(client, endpoint, args, opts \\ [])
+  def collect(config, endpoint, args, opts \\ [])
 
-  def collect(%Subscrape{} = client, %Endpoint{} = endpoint, args, opts),
-    do: collect(client, {endpoint, []}, args, opts)
+  def collect(%Subscrape{} = config, %Endpoint{} = endpoint, args, opts),
+    do: collect(config, {endpoint, []}, args, opts)
 
   def collect(
-        %Subscrape{} = client,
+        %Subscrape{} = config,
         {
           %Endpoint{
             extract_key: extract_key,
-            page_key: page_key
+            page_arg: page_arg
           },
           _
         } = endpoint,
         %{"limit" => limit} = args,
         opts
-      ) when is_binary(extract_key) and is_binary(page_key) do
+      )
+      when is_binary(extract_key) and is_binary(page_arg) do
     Logger.debug(
       "START collecting...",
-      subdomain: client.subdomain,
+      subdomain: config.subdomain,
       endpoint: endpoint,
       args: args,
       opts: opts
     )
 
-    case collect__internal(client, endpoint, args, opts) do
+    case collect__internal(config, endpoint, args, opts) do
       {:ok, records} = result ->
         Logger.debug(
           "DONE collecting",
-          subdomain: client.subdomain,
+          subdomain: config.subdomain,
           endpoint: endpoint,
           limit: limit,
           total_records: Enum.count(records)
@@ -127,7 +110,7 @@ defmodule Subscrape.HTTP do
       {:error, error} = result ->
         Logger.debug(
           "FAIL collecting",
-          subdomain: client.subdomain,
+          subdomain: config.subdomain,
           endpoint: endpoint,
           limit: limit,
           error: error
@@ -138,11 +121,11 @@ defmodule Subscrape.HTTP do
   end
 
   defp collect__internal(
-         %Subscrape{} = client,
+         %Subscrape{} = config,
          {
            %Endpoint{
              extract_key: extract_key,
-             page_key: page_key
+             page_arg: page_arg
            },
            _
          } = endpoint,
@@ -150,13 +133,13 @@ defmodule Subscrape.HTTP do
          opts
        ) do
     with {:ok, %{^extract_key => records}} when is_list(records) <-
-           client |> request(endpoint, args, opts) do
+           config |> request(endpoint, args, opts) do
       case Enum.count(records) do
         ^limit ->
           case collect__internal(
-                 client,
+                 config,
                  endpoint,
-                 args |> Map.put(page_key, records |> List.last()),
+                 args |> Map.put(page_arg, records |> List.last()),
                  opts
                ) do
             {:ok, rest} -> {:ok, records ++ rest}
@@ -169,8 +152,8 @@ defmodule Subscrape.HTTP do
     end
   end
 
-  def request(%Subscrape{} = client, endpoint, args, opts \\ []) do
-    url = url(client, endpoint)
+  def request(%Subscrape{} = config, endpoint, args, opts \\ []) do
+    url = url(config, endpoint)
 
     Logger.debug(
       "START -- Substack request",
@@ -179,7 +162,7 @@ defmodule Subscrape.HTTP do
       opts: opts
     )
 
-    case Cache.get(client, url, args) do
+    case Cache.get(config, url, args) do
       {:hit, b} ->
         Logger.debug(
           "DONE -- Substack request -- CACHE HIT",
@@ -191,7 +174,7 @@ defmodule Subscrape.HTTP do
         {:ok, b |> Jason.decode!()}
 
       :miss ->
-        case try_request(client, url, args, opts) do
+        case try_request(config, url, args, opts) do
           {:ok, %HTTPoison.Response{} = r} ->
             Logger.debug(
               "RECEIVED -- Substack request",
@@ -200,7 +183,7 @@ defmodule Subscrape.HTTP do
               opts: opts
             )
 
-            process_response(client, r)
+            process_response(config, r)
 
           {:error, e} = result ->
             Logger.error(
@@ -217,7 +200,7 @@ defmodule Subscrape.HTTP do
   end
 
   defp process_response(
-         %Subscrape{} = client,
+         %Subscrape{} = config,
          %HTTPoison.Response{
            status_code: status,
            request_url: url,
@@ -234,7 +217,7 @@ defmodule Subscrape.HTTP do
         )
 
         if status == 200 do
-          Cache.put(client, response)
+          Cache.put(config, response)
           result
         else
           {:error, [status: status, payload: payload]}
@@ -251,35 +234,35 @@ defmodule Subscrape.HTTP do
     end
   end
 
-  defp try_request(%Subscrape{} = client, url, args, opts)
-       when is_binary(url) and (is_nil(args) or is_map(args)) and
+  defp try_request(%Subscrape{} = config, url, args, opts)
+       when is_binary(url) and
+              (is_nil(args) or is_map(args)) and
               is_list(opts) do
     request_options = opts |> Keyword.take(@httpoison_request_option_keys)
     params = request_options |> Keyword.get(:params, [])
-    method = if is_nil(args), do: :get, else: :post
 
     request = %HTTPoison.Request{
-      method: method,
+      method: if(is_nil(args), do: :get, else: :post),
       url: url |> HTTPoison.Base.build_request_url(params),
-      headers: client |> headers(),
-      body: if(is_nil(args), do: "", else: args |> Jason.encode!(args)),
+      headers: config |> headers(),
+      body: if(is_nil(args), do: "", else: Jason.encode!(args)),
       params: params,
       # Shove `args` into the `options` so that we have it available for
       # logging if needed without having to pass it around too the whole time
       options: request_options |> Keyword.put(:args, args)
     }
 
-    max_attempts = client |> Subscrape.opt!(opts, :max_retry_attempts)
+    max_attempts = config |> Subscrape.opt!(opts, :max_retry_attempts)
 
-    try_request(client, request, max_attempts, [])
+    try_request(config, request, max_attempts, [])
   end
 
-  defp try_request(%Subscrape{} = client, request, max_attempts, errors)
+  defp try_request(%Subscrape{} = config, request, max_attempts, errors)
        when is_integer(max_attempts) and is_list(errors) and
               max_attempts >= 1 and length(errors) >= max_attempts do
     Logger.error(
       "#{max_attempts} Substack request attempts ALL FAILED, giving up",
-      subdomain: client.subdomain,
+      subdomain: config.subdomain,
       attempts: max_attempts,
       request: request,
       errors: errors
@@ -288,7 +271,7 @@ defmodule Subscrape.HTTP do
     {:error, "All retry attempts failed, see error log for details"}
   end
 
-  defp try_request(%Subscrape{} = client, request, max_attempts, errors)
+  defp try_request(%Subscrape{} = config, request, max_attempts, errors)
        when is_integer(max_attempts) and is_list(errors) and
               max_attempts >= 1 do
     Logger.debug(
@@ -308,13 +291,13 @@ defmodule Subscrape.HTTP do
         Logger.warn(
           "Substack request FAILED " <>
             "(attempt #{length(errors)}/#{max_attempts}), retrying...",
-          subdomain: client.subdomain,
+          subdomain: config.subdomain,
           attempts: max_attempts,
           request: request,
           error: error
         )
 
-        try_request(client, request, max_attempts, errors)
+        try_request(config, request, max_attempts, errors)
     end
   end
 end

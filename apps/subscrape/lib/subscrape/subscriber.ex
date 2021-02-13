@@ -16,36 +16,38 @@ defmodule Subscrape.Subscriber do
   @list_endpoint %Endpoint{
     format: "/api/v1/subscriber/",
     extract_key: "subscribers",
-    page_key: "after",
+    page_arg: "after",
   }
 
   @events_endpoint %Endpoint{
     format: "/api/v1/subscriber/<%= email %>/events",
     extract_key: "events",
-    page_key: "before",
+    page_arg: "before",
   }
 
-  defp remove_status(list) do
-    list |> Enum.map(fn {email, {_, value}} -> {email, value} end)
-  end
+  defp remove_status({email, {_, value}}), do: {email, value}
 
   @doc ~S"""
   Get a list of _all_ subscribers. Iterates through them page-by-page,
   request-by-request, to get them all.
+
+
   """
-  def list(%Subscrape{} = client, opts \\ []) do
+  def list(%Subscrape{} = config, opts \\ []) do
     Logger.debug(
       "Requesting Substack subscriber list",
-      subdomain: client.subdomain
+      subdomain: config.subdomain
     )
 
+    {kwds, opts} = opts |> Keyword.split([:term, :filter, :limit])
+
     HTTP.collect(
-      client,
+      config,
       @list_endpoint,
       %{
-        "term" => "",
-        "filter" => nil,
-        "limit" => client |> Subscrape.opt!(opts, :subscriber_list_limit)
+        "term" => kwds |> Keyword.get(:term, ""),
+        "filter" => kwds |> Keyword.get(:filter),
+        "limit" => kwds |> Keyword.get(:limit, config.subscriber_list_limit),
       },
       opts
     )
@@ -56,7 +58,7 @@ defmodule Subscrape.Subscriber do
 
   ## Example
 
-      > client |> Subscrape.Subscriber.get("neil@neilsouza.com")
+      > config |> Subscrape.Subscriber.get("neil@neilsouza.com")
       {:ok, %{
         "amount_paid" => 0,
         "bans" => [],
@@ -84,40 +86,42 @@ defmodule Subscrape.Subscriber do
       }}
 
   """
-  def get(%Subscrape{} = client, email, opts \\ []) when is_binary(email) do
+  def get(%Subscrape{} = config, email, opts \\ []) when is_binary(email) do
     HTTP.request(
-      client,
+      config,
       {@get_endpoint, [email: email]},
       nil,
       opts
     )
   end
 
-  def events(client, email, opts \\ [])
+  def events(config, subscriber, opts \\ [])
 
-  def events(%Subscrape{} = client, email, opts)
+  def events(%Subscrape{} = config, email, opts)
       when is_binary(email) do
     Logger.debug(
       "Requesting Substack events for subscriber",
-      subdomain: client.subdomain,
+      subdomain: config.subdomain,
       "subscriber.email": email
     )
 
+    {kwds, opts} = opts |> Keyword.split([:limit])
+
     HTTP.collect(
-      client,
+      config,
       {@events_endpoint, [email: email]},
       %{
         "email" => email,
-        "limit" => client |> Subscrape.opt!(opts, :subscriber_events_limit)
+        "limit" => kwds |> Keyword.get(:limit, config.subscriber_events_limit),
       },
       opts
     )
   end
 
-  def events(%Subscrape{} = client, %{"email" => email}, opts),
-    do: events(client, email, opts)
+  def events(%Subscrape{} = config, %{"email" => email}, opts),
+    do: events(config, email, opts)
 
-  def events(%Subscrape{} = client, subscribers, opts)
+  def events(%Subscrape{} = config, subscribers, opts)
       when is_list(subscribers) do
     results =
       for subscriber <- subscribers do
@@ -127,23 +131,20 @@ defmodule Subscrape.Subscriber do
             email when is_binary(email) -> email
           end
 
-        {email, events(client, email, opts)}
+        {email, events(config, email, opts)}
       end
 
-    {events, errors} =
+    {oks, errors} =
       results |> Enum.split_with(fn {_, {status, _}} -> status == :ok end)
 
     case errors do
-      [] ->
-        {:error, errors |> Enum.map(&remove_status/1)}
-
-      _ ->
-        {:ok, events |> Enum.map(&remove_status/1)}
+      [] -> {:ok, oks |> Enum.map(&remove_status/1)}
+      _ -> {:error, errors |> Enum.map(&remove_status/1)}
     end
   end
 
-  def events(%Subscrape{} = client, :all, opts) do
-    with {:ok, all} = list(client), do: events(client, all, opts)
+  def events(%Subscrape{} = config, :all, opts) do
+    with {:ok, all} = list(config), do: events(config, all, opts)
   end
 end
 

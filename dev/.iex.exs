@@ -16,7 +16,7 @@ defmodule SS do
   def app(),
     do: "milk"
 
-  def client() do
+  def config() do
     subdomain = System.get_env("STATS_MILK_SUBDOMAIN")
     sid = System.get_env("STATS_MILK_SID")
 
