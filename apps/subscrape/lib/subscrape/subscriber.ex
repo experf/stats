@@ -9,6 +9,7 @@ defmodule Subscrape.Subscriber do
   alias Subscrape.HTTP
   alias Subscrape.Endpoint
   alias Subscrape.Error
+  alias Subscrape.Subscriber.Event
 
   @get_endpoint %Endpoint{
     format: "/api/v1/subscriber/<%= email %>"
@@ -37,6 +38,9 @@ defmodule Subscrape.Subscriber do
         raise Error, message: message, reason: error
     end
   end
+
+  def email_for(email) when is_binary(email), do: email
+  def email_for(%{"email" => email}) when is_binary(email), do: email
 
   @doc ~S"""
   Get a list of _all_ subscribers. Iterates through them page-by-page,
@@ -96,11 +100,12 @@ defmodule Subscrape.Subscriber do
   Version of `list/2` that raises on failure.
   """
   def list!(%Subscrape{} = config, opts \\ []),
-    do: check_ok!(
-      "Failed to get subscriber list",
-      :list,
-      [config, opts]
-    )
+    do:
+      check_ok!(
+        "Failed to get subscriber list",
+        :list,
+        [config, opts]
+      )
 
   @doc ~S"""
   Get a subscriber.
@@ -197,12 +202,16 @@ defmodule Subscrape.Subscriber do
     )
   end
 
+  @doc ~S"""
+  Version of `get/3` that raises on failure.
+  """
   def get!(%Subscrape{} = config, email, opts \\ []) when is_binary(email),
-    do: check_ok!(
-      "Failed to get subscriber #{email}",
-      :get,
-      [config, email, opts]
-    )
+    do:
+      check_ok!(
+        "Failed to get subscriber #{email}",
+        :get,
+        [config, email, opts]
+      )
 
   @doc ~S"""
   Get all _events_ associated with a subscriber.
@@ -349,11 +358,12 @@ defmodule Subscrape.Subscriber do
   Version of `events/3` that raises on failure.
   """
   def events!(%Subscrape{} = config, subscriber, opts \\ []),
-    do: check_ok!(
-      "Failed to get subscriber events",
-      :events,
-      [config, subscriber, opts]
-    )
+    do:
+      check_ok!(
+        "Failed to get subscriber events",
+        :events,
+        [config, subscriber, opts]
+      )
 
   defp active_since?(subscriber_list_entry, %DateTime{} = since) do
     ["last_click", "last_open"]
@@ -415,5 +425,57 @@ defmodule Subscrape.Subscriber do
       do:
         subscriber_list |> Enum.filter(fn sub -> active_since?(sub, since) end)
 
+  @doc """
+  Get subscriber events that are timestamped strictly _after_ the `since`
+  argument.
 
+  Uses `Subscrape.HTTP.collect_while/5` to only request additional event pages
+  while all the events on the previous page qualify.
+
+  ## Parameters
+
+  -   `opts` — becomes the options to the `#{@events_endpoint.format}`.
+  """
+  def events_since(config, subscriber, since, opts \\ [])
+
+  def events_since(
+        %Subscrape{} = config,
+        email,
+        %DateTime{} = since,
+        opts
+      )
+      when is_binary(email) and is_list(opts) do
+    {kwds, opts} = opts |> Keyword.split([:limit])
+
+    with {:ok, events} <-
+           HTTP.collect_while(
+             config,
+             {@events_endpoint, [email: email]},
+             %{
+               "email" => email,
+               "limit" =>
+                 kwds |> Keyword.get(:limit, config.subscriber_events_limit)
+             },
+             fn _endpoint, _args, events ->
+               events
+               |> Enum.all?(fn event -> Event.after?(event, since) end)
+             end,
+             opts
+           ) do
+      {:ok,
+       events
+       |> Enum.take_while(fn event -> Event.after?(event, since) end)}
+    end
+  end
+
+  @doc ~S"""
+  Version of `events_since/4` that raises on failure.
+  """
+  def events_since!(config, email, since, opts \\ []),
+    do:
+      check_ok!(
+        "Failed to get events after #{since}",
+        :events_after,
+        [config, email, since, opts]
+      )
 end

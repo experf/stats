@@ -95,7 +95,13 @@ defmodule Subscrape.HTTP do
       opts: opts
     )
 
-    case collect__internal(config, endpoint, args, opts) do
+    case collect__internal(
+           config,
+           endpoint,
+           args,
+           &while_more/3,
+           opts
+         ) do
       {:ok, records} = result ->
         Logger.debug(
           "DONE collecting",
@@ -120,6 +126,53 @@ defmodule Subscrape.HTTP do
     end
   end
 
+  def while_more(_endpoint, %{"limit" => limit}, records)
+      when is_integer(limit) and limit > 0 and is_list(records),
+      do: length(records) == limit
+
+  def collect_while(
+        %Subscrape{} = config,
+        {
+          %Endpoint{
+            extract_key: extract_key,
+            page_arg: page_arg
+          },
+          _
+        } = endpoint,
+        args,
+        test_fn,
+        opts
+      )
+      when is_binary(extract_key) and is_binary(page_arg) do
+    collect__internal(config, endpoint, args, test_fn, opts)
+  end
+
+  def collect_until(
+        %Subscrape{} = config,
+        {
+          %Endpoint{
+            extract_key: extract_key,
+            page_arg: page_arg
+          },
+          _
+        } = endpoint,
+        args,
+        test_fn,
+        opts
+      )
+      when is_binary(extract_key) and is_binary(page_arg) do
+    collect__internal(
+      config,
+      endpoint,
+      args,
+      fn endpoint, args, records -> !test_fn.(endpoint, args, records) end,
+      opts
+    )
+  end
+
+  defp until_limit(_endpoint, %{"limit" => limit}, records),
+    do: Enum.count(records) < limit
+
   defp collect__internal(
          %Subscrape{} = config,
          {
@@ -129,25 +182,25 @@ defmodule Subscrape.HTTP do
            },
            _
          } = endpoint,
-         %{"limit" => limit} = args,
+         args,
+         test_fn,
          opts
        ) do
     with {:ok, %{^extract_key => records}} when is_list(records) <-
-           config |> request(endpoint, args, opts) do
-      case Enum.count(records) do
-        ^limit ->
-          case collect__internal(
-                 config,
-                 endpoint,
-                 args |> Map.put(page_arg, records |> List.last()),
-                 opts
-               ) do
-            {:ok, rest} -> {:ok, records ++ rest}
-            {:error, _} = result -> result
-          end
-
-        _ ->
-          {:ok, records}
+           request(config, endpoint, args, opts) do
+      if test_fn.(endpoint, args, records) do
+        case collect__internal(
+               config,
+               endpoint,
+               args |> Map.put(page_arg, records |> List.last()),
+               test_fn,
+               opts
+             ) do
+          {:ok, rest} -> {:ok, records ++ rest}
+          {:error, _} = result -> result
+        end
+      else
+        {:ok, records}
       end
     end
   end
@@ -200,13 +253,13 @@ defmodule Subscrape.HTTP do
   end
 
   defp process_response(
-    _config,
-    %HTTPoison.Response{
-      status_code: 403,
-      request_url: url,
-      body: "Not authorized"
-    }
-  ) do
+         _config,
+         %HTTPoison.Response{
+           status_code: 403,
+           request_url: url,
+           body: "Not authorized"
+         }
+       ) do
     {:error, %{status: 403, message: "403 Not authorized", request_url: url}}
   end
 
