@@ -200,6 +200,17 @@ defmodule Subscrape.HTTP do
   end
 
   defp process_response(
+    _config,
+    %HTTPoison.Response{
+      status_code: 403,
+      request_url: url,
+      body: "Not authorized"
+    }
+  ) do
+    {:error, %{status: 403, message: "403 Not authorized", request_url: url}}
+  end
+
+  defp process_response(
          %Subscrape{} = config,
          %HTTPoison.Response{
            status_code: status,
@@ -220,7 +231,7 @@ defmodule Subscrape.HTTP do
           Cache.put(config, response)
           result
         else
-          {:error, [status: status, payload: payload]}
+          {:error, %{status: status, payload: payload}}
         end
 
       {:error, decode_error} ->
@@ -230,7 +241,7 @@ defmodule Subscrape.HTTP do
           decode_error: decode_error
         )
 
-        {:error, [status: status, response: response]}
+        {:error, %{status: status, response: response}}
     end
   end
 
@@ -268,7 +279,10 @@ defmodule Subscrape.HTTP do
       errors: errors
     )
 
-    {:error, "All retry attempts failed, see error log for details"}
+    case errors do
+      [error] -> {:error, error}
+      _ -> {:error, "All retry attempts failed, see error log for details"}
+    end
   end
 
   defp try_request(%Subscrape{} = config, request, max_attempts, errors)

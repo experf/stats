@@ -10,6 +10,19 @@ alias Cortex.OpenGraph
 alias Cortex.Repo
 
 alias Cortex.Scrapers
+alias Subscrape.Subscriber
+
+defmodule M do
+  def ok!({:ok, value}), do: value
+end
+
+defmodule Dump do
+  def json(value, name) do
+    path = "tmp/#{name}.json"
+    content = value |> Jason.encode!(pretty: true)
+    File.write!(path, content)
+  end
+end
 
 defmodule SS do
   def app(),
@@ -20,6 +33,15 @@ defmodule SS do
     sid = System.get_env("STATS_MILK_SID")
 
     %Subscrape{subdomain: subdomain, sid: sid}
+  end
+
+  def bad_config() do
+    %Subscrape{
+      subdomain: System.get_env("STATS_MILK_SUBDOMAIN"),
+      sid: "",
+      cache_root: nil,
+      max_retry_attempts: 1,
+    }
   end
 
   def xander_email(), do: "xander@futureperfect.studio"
