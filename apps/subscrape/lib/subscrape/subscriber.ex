@@ -9,7 +9,6 @@ defmodule Subscrape.Subscriber do
   alias Subscrape.HTTP
   alias Subscrape.Endpoint
   alias Subscrape.Error
-  alias Subscrape.Subscriber.Event
 
   @get_endpoint %Endpoint{
     format: "/api/v1/subscriber/<%= email %>"
@@ -20,14 +19,6 @@ defmodule Subscrape.Subscriber do
     extract_key: "subscribers",
     page_arg: "after"
   }
-
-  @events_endpoint %Endpoint{
-    format: "/api/v1/subscriber/<%= email %>/events",
-    extract_key: "events",
-    page_arg: "before"
-  }
-
-  defp remove_status({email, {_, value}}), do: {email, value}
 
   defp check_ok!(message, function_name, args) do
     case apply(__MODULE__, function_name, args) do
@@ -213,158 +204,6 @@ defmodule Subscrape.Subscriber do
         [config, email, opts]
       )
 
-  @doc ~S"""
-  Get all _events_ associated with a subscriber.
-
-  Each _event_ looks something like:
-
-      %{
-        "post_title" => "Immersive film festival, art-making and AI, and proto-VR from 1975",
-        "post_url" => "/p/immersive-film-festival-art-making",
-        "text" => "Opened email",
-        "timestamp" => "2021-02-04T00:55:18.588000000+00:00",
-        "url" => nil
-      }
-
-  ## Parameters
-
-  -   `config` — A `Subscrape` struct holding the client configuration.
-  -   `subscriber` — One of the following:
-
-      1.  A subscriber email address binary.
-
-      2.  A map with a `"email"` key with binary value, such as returned
-          from `get/3` or an entry in a subscriber `list/2`.
-
-      3.  A list of (1) or (2).
-
-      4.  `:all` to first pull the subscriber `list/2`, then get all events for
-          each entry. This is mostly for development use and can take quite a
-          while.
-
-  ## Returns
-
-  `{:ok, result}` on success, `{:error, reason}` on failure.
-
-  The form of `result` is dictated by the `subscriber` argument:
-
-  1.  A single subscriber (options (1) or (2) in the `subscriber` parameter
-      description):
-
-      List of _event_ maps.
-
-  2.  Multiple subscribers (options (3) or (4) in the `subscriber` parameter
-      description):
-
-      List of `{email, [event, event, ...]}` pairs.
-
-  ## Examples
-
-  Get all of Xander's events, which may take multiple requests in serial:
-
-      >>> config |> Subscrape.Subscriber.events("xander@futureperfect.studio")
-      { :ok,
-        [
-          %{
-            "post_title" => "Immersive film festival, art-making and AI, and proto-VR from 1975",
-            "post_url" => "/p/immersive-film-festival-art-making",
-            "text" => "Opened email",
-            "timestamp" => "2021-02-04T00:55:18.588000000+00:00",
-            "url" => nil
-          },
-          ...
-        ]
-      }
-
-  Get all of both Xander and Neil's events, which also precedes totally in
-  serial:
-
-      >>> config
-      ... |> Subscrape.Subscriber.events(
-      ...   ["xander@futureperfect.studio", "neil@neilsouza.com"]
-      ... )
-      { :ok,
-        [
-          {"xander@futureperfect.studio",
-            [
-              %{
-                "post_title" => "Immersive film festival, art-making and AI, and proto-VR from 1975",
-                "post_url" => "/p/immersive-film-festival-art-making",
-                "text" => "Opened email",
-                "timestamp" => "2021-02-04T00:55:18.588000000+00:00",
-                "url" => nil
-              },
-              ...
-            ]
-          },
-          {"neil@neilsouza.com", []}
-        ]
-      }
-
-  """
-  def events(config, subscriber, opts \\ [])
-
-  def events(%Subscrape{} = config, email, opts)
-      when is_binary(email) do
-    Logger.debug(
-      "Requesting Substack events for subscriber",
-      subdomain: config.subdomain,
-      "subscriber.email": email
-    )
-
-    {kwds, opts} = opts |> Keyword.split([:limit])
-
-    HTTP.collect(
-      config,
-      {@events_endpoint, [email: email]},
-      %{
-        "email" => email,
-        "limit" => kwds |> Keyword.get(:limit, config.subscriber_events_limit)
-      },
-      opts
-    )
-  end
-
-  def events(%Subscrape{} = config, %{"email" => email}, opts),
-    do: events(config, email, opts)
-
-  def events(%Subscrape{} = config, subscribers, opts)
-      when is_list(subscribers) do
-    results =
-      for subscriber <- subscribers do
-        email =
-          case subscriber do
-            %{"email" => email} when is_binary(email) -> email
-            email when is_binary(email) -> email
-          end
-
-        {email, events(config, email, opts)}
-      end
-
-    {oks, errors} =
-      results |> Enum.split_with(fn {_, {status, _}} -> status == :ok end)
-
-    case errors do
-      [] -> {:ok, oks |> Enum.map(&remove_status/1)}
-      _ -> {:error, errors |> Enum.map(&remove_status/1)}
-    end
-  end
-
-  def events(%Subscrape{} = config, :all, opts) do
-    with {:ok, all} = list(config), do: events(config, all, opts)
-  end
-
-  @doc ~S"""
-  Version of `events/3` that raises on failure.
-  """
-  def events!(%Subscrape{} = config, subscriber, opts \\ []),
-    do:
-      check_ok!(
-        "Failed to get subscriber events",
-        :events,
-        [config, subscriber, opts]
-      )
-
   defp active_since?(subscriber_list_entry, %DateTime{} = since) do
     ["last_click", "last_open"]
     |> Enum.any?(fn key ->
@@ -424,58 +263,4 @@ defmodule Subscrape.Subscriber do
       when is_list(subscriber_list),
       do:
         subscriber_list |> Enum.filter(fn sub -> active_since?(sub, since) end)
-
-  @doc """
-  Get subscriber events that are timestamped strictly _after_ the `since`
-  argument.
-
-  Uses `Subscrape.HTTP.collect_while/5` to only request additional event pages
-  while all the events on the previous page qualify.
-
-  ## Parameters
-
-  -   `opts` — becomes the options to the `#{@events_endpoint.format}`.
-  """
-  def events_since(config, subscriber, since, opts \\ [])
-
-  def events_since(
-        %Subscrape{} = config,
-        email,
-        %DateTime{} = since,
-        opts
-      )
-      when is_binary(email) and is_list(opts) do
-    {kwds, opts} = opts |> Keyword.split([:limit])
-
-    with {:ok, events} <-
-           HTTP.collect_while(
-             config,
-             {@events_endpoint, [email: email]},
-             %{
-               "email" => email,
-               "limit" =>
-                 kwds |> Keyword.get(:limit, config.subscriber_events_limit)
-             },
-             fn _endpoint, _args, events ->
-               events
-               |> Enum.all?(fn event -> Event.after?(event, since) end)
-             end,
-             opts
-           ) do
-      {:ok,
-       events
-       |> Enum.take_while(fn event -> Event.after?(event, since) end)}
-    end
-  end
-
-  @doc ~S"""
-  Version of `events_since/4` that raises on failure.
-  """
-  def events_since!(config, email, since, opts \\ []),
-    do:
-      check_ok!(
-        "Failed to get events after #{since}",
-        :events_after,
-        [config, email, since, opts]
-      )
 end
