@@ -13,6 +13,10 @@
               to: Routes.link_path(@conn, :index),
               active: nav_match?(@conn, CortexWeb.LinkController) %>
 
+            <%= nav_item "Scrapers",
+              to: Routes.scraper_path(@conn, :index),
+              active: nav_match?(@conn, CortexWeb.ScraperController) %>
+
             <%= nav_item "Docs",
               to: "/docs/",
               target: "_blank" %>

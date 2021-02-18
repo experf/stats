@@ -90,6 +90,7 @@ defmodule CortexWeb.AppRouter do
       UserSettingsController, :confirm_email
 
     resources "/links", LinkController, except: [:delete]
+    resources "/scrapers", ScraperController
   end
 
   scope "/", CortexWeb do

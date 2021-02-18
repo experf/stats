@@ -1,0 +1,8 @@
+<h1>Show Scraper</h1>
+
+<ul>
+
+</ul>
+
+<span><%= link "Edit", to: Routes.scraper_path(@conn, :edit, @scraper) %></span>
+<span><%= link "Back", to: Routes.scraper_path(@conn, :index) %></span>

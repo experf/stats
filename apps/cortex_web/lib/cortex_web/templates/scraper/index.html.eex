@@ -1,0 +1,24 @@
+<h1>Listing Scrapers</h1>
+
+<table>
+  <thead>
+    <tr>
+
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+<%= for scraper <- @scrapers do %>
+    <tr>
+
+      <td>
+        <span><%= link "Show", to: Routes.scraper_path(@conn, :show, scraper) %></span>
+        <span><%= link "Edit", to: Routes.scraper_path(@conn, :edit, scraper) %></span>
+        <span><%= link "Delete", to: Routes.scraper_path(@conn, :delete, scraper), method: :delete, data: [confirm: "Are you sure?"] %></span>
+      </td>
+    </tr>
+<% end %>
+  </tbody>
+</table>
+
+<span><%= link "New Scraper", to: Routes.scraper_path(@conn, :new) %></span>
