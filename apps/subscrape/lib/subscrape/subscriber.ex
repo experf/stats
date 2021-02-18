@@ -8,7 +8,7 @@ defmodule Subscrape.Subscriber do
 
   alias Subscrape.HTTP
   alias Subscrape.Endpoint
-  alias Subscrape.Error
+  alias Subscrape.Helpers
 
   @get_endpoint %Endpoint{
     format: "/api/v1/subscriber/<%= email %>"
@@ -19,16 +19,6 @@ defmodule Subscrape.Subscriber do
     extract_key: "subscribers",
     page_arg: "after"
   }
-
-  defp check_ok!(message, function_name, args) do
-    case apply(__MODULE__, function_name, args) do
-      {:ok, result} ->
-        result
-
-      {:error, error} ->
-        raise Error, message: message, reason: error
-    end
-  end
 
   def email_for(email) when is_binary(email), do: email
   def email_for(%{"email" => email}) when is_binary(email), do: email
@@ -92,8 +82,9 @@ defmodule Subscrape.Subscriber do
   """
   def list!(%Subscrape{} = config, opts \\ []),
     do:
-      check_ok!(
+      Helpers.check_ok!(
         "Failed to get subscriber list",
+        __MODULE__,
         :list,
         [config, opts]
       )
@@ -198,12 +189,44 @@ defmodule Subscrape.Subscriber do
   """
   def get!(%Subscrape{} = config, email, opts \\ []) when is_binary(email),
     do:
-      check_ok!(
+      Helpers.check_ok!(
         "Failed to get subscriber #{email}",
+        __MODULE__,
         :get,
         [config, email, opts]
       )
 
+  @doc ~S"""
+  Filters a subscriber list to entries with "activity" after a `since` argument.
+
+  Useful for limiting `events/3` calls to only subscribers that have done
+  something since the last pull.
+
+  > ### ❗WARNING❗ ###
+  >
+  > Recent activity, as visible in the subscriber list entries, is
+  > limited to `"Clicked link in email"` and `"Opened email"` events.
+  >
+  > We have not yet found any efficient way of detecting new subscriber events
+  > of any other type.
+
+  ## Parameters
+
+  -   `subscriber_list` — List of maps as returned from `list/2`.
+
+  -   `since` — A `DateTime` that either `lastActivity.last_click` or
+      `lastActivity.last_open` must be *strictly* greater than.
+
+  ## Returns
+
+  A sub-list of `subscriber_list`.
+  """
+  def active_since(subscriber_list, %DateTime{} = since)
+      when is_list(subscriber_list),
+      do:
+        subscriber_list |> Enum.filter(fn sub -> active_since?(sub, since) end)
+
+  @spec active_since?(map, DateTime.t()) :: boolean
   defp active_since?(subscriber_list_entry, %DateTime{} = since) do
     ["last_click", "last_open"]
     |> Enum.any?(fn key ->
@@ -232,35 +255,4 @@ defmodule Subscrape.Subscriber do
       end
     end)
   end
-
-  @doc ~S"""
-  Filters a subscriber list to entries with "activity" after a `since` argument.
-
-  Useful for limiting `events/3` calls to only subscribers that have done
-  something since the last pull.
-
-  > ### ❗WARNING❗ ###
-  >
-  > Recent activity, as visible in the subscriber list entries, is
-  > limited to `"Clicked link in email"` and `"Opened email"` events.
-  >
-  > We have not yet found any efficient way of detecting new subscriber events
-  > of any other type.
-
-  ## Parameters
-
-  -   `subscriber_list` — List of maps as returned from `list/2`.
-
-  -   `since` — A `DateTime` that either `lastActivity.last_click` or
-      `lastActivity.last_open` must be *strictly* greater than.
-
-  ## Returns
-
-  A sub-list of `subscriber_list`.
-  """
-
-  def active_since(subscriber_list, %DateTime{} = since)
-      when is_list(subscriber_list),
-      do:
-        subscriber_list |> Enum.filter(fn sub -> active_since?(sub, since) end)
 end
