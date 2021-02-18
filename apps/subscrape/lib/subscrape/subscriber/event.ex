@@ -1,7 +1,6 @@
 defmodule Subscrape.Subscriber.Event do
   @moduledoc ~S"""
-  Functions for working with subscriber events, as returned from
-  `Subscrape.Subscriber.events/3`.
+  Functions for working with subscriber events.
   """
 
   require Logger
@@ -48,7 +47,7 @@ defmodule Subscrape.Subscriber.Event do
 
     HTTP.collect_while(
       config,
-      {@endpoint, [email: email]},
+      @endpoint |> Endpoint.bind(email: email),
       %{
         "email" => email,
         "limit" => kwds |> Keyword.get(:limit, config.subscriber_events_limit),

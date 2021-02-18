@@ -77,7 +77,7 @@ defmodule Subscrape do
       accept.
 
   -   `:subscriber_events_limit` — Same as `:subscriber_list_limit`, but for
-      the `Subscrape.Subscriber.events/2` call. Also defaults to `100`.
+      the `Subscrape.Subscriber.Event` calls. Also defaults to `100`.
 
   -   `:max_retry_attempts` — Number of times to retry a failed `HTTP` request
       (which is usually due to timeout). Defaults to `3`.

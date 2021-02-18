@@ -187,7 +187,7 @@ defmodule Subscrape.Subscriber do
   def get(%Subscrape{} = config, email, opts \\ []) when is_binary(email) do
     HTTP.request(
       config,
-      {@get_endpoint, [email: email]},
+      @get_endpoint |> Endpoint.bind(email: email),
       nil,
       opts
     )

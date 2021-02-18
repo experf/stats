@@ -36,17 +36,21 @@ defmodule Subscrape.Endpoint do
   defstruct [
     :format,
     :extract_key,
-    :page_arg
+    :page_arg,
+    params: [],
   ]
 
-  def to_path(%__MODULE__{} = self, kwds \\ []) when is_list(kwds) do
-    encoded_kwds =
-      kwds
+  def bind(%__MODULE__{} = self, params) when is_list(params),
+    do: %{self | params: params}
+
+  def to_path(%__MODULE__{} = self) do
+    encoded_params =
+      self.params
       |> Enum.map(fn {k, v} ->
         {k, v |> to_string() |> URI.encode_www_form()}
       end)
 
-    self.format |> EEx.eval_string(encoded_kwds)
+    self.format |> EEx.eval_string(encoded_params)
   end
 
 end # defmodule Subscrape.Endpoint
