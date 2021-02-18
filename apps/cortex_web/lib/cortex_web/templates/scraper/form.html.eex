@@ -5,7 +5,53 @@
     </div>
   <% end %>
 
+  <div class="form-floating mb-4">
+    <%= text_input f, :name, required: false, class: "form-control" %>
+    <%= label f, :name, "Name (optional)" %>
+    <%= error_tag f, :name %>
+  </div>
+
+  <div class="form-floating mb-4">
+    <%= select f, :module, module_options(), class: "form-control" %>
+    <%= label f, :module %>
+    <%= error_tag f, :module %>
+  </div>
+
+  <div class="mb-2">
+    <%= label f, :frequency, "Run frequencey" %>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col">
+      <div class=" form-floating">
+        <%= sub_number_input f, {:frequency, :days}, class: "form-control" %>
+        <%= sub_label f, {:frequency, :days} %>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class=" form-floating">
+        <%= sub_number_input f, {:frequency, :mins}, class: "form-control" %>
+        <%= sub_label f, {:frequency, :mins}, "Minutes" %>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class=" form-floating">
+        <%= sub_number_input f, {:frequency, :secs}, class: "form-control" %>
+        <%= sub_label f, {:frequency, :secs}, "Seconds" %>
+      </div>
+    </div>
+
+    <%= error_tag f, :frequency %>
+  </div>
+
+  <div class="form-floating mb-4">
+    <%= textarea f, :notes, class: "form-control" %>
+    <%= label f, :notes, "Notes (optional)" %>
+  </div>
+
   <div>
-    <%= submit "Save" %>
+    <%= submit "Save", class: "btn btn-primary" %>
   </div>
 <% end %>

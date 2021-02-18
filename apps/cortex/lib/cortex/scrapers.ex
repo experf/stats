@@ -7,6 +7,7 @@ defmodule Cortex.Scrapers do
   alias Cortex.Repo
 
   alias Cortex.Scrapers.Scraper
+  alias Cortex.Accounts.User
 
   @doc """
   Returns the list of scrapers.
@@ -49,9 +50,9 @@ defmodule Cortex.Scrapers do
       {:error, %Ecto.Changeset{}}
 
   """
-  def create_scraper(attrs \\ %{}) do
+  def create_scraper(%User{} = user, attrs \\ %{}) do
     %Scraper{}
-    |> Scraper.changeset(attrs)
+    |> Scraper.create_changeset(user, attrs)
     |> Repo.insert()
   end
 
@@ -67,9 +68,9 @@ defmodule Cortex.Scrapers do
       {:error, %Ecto.Changeset{}}
 
   """
-  def update_scraper(%Scraper{} = scraper, attrs) do
+  def update_scraper(%Scraper{} = scraper, %User{} = user, attrs) do
     scraper
-    |> Scraper.changeset(attrs)
+    |> Scraper.changeset(user, attrs)
     |> Repo.update()
   end
 
@@ -98,7 +99,7 @@ defmodule Cortex.Scrapers do
       %Ecto.Changeset{data: %Scraper{}}
 
   """
-  def change_scraper(%Scraper{} = scraper, attrs \\ %{}) do
-    Scraper.changeset(scraper, attrs)
+  def change_scraper(%Scraper{} = scraper, %User{} = user, attrs \\ %{}) do
+    Scraper.changeset(scraper, user, attrs)
   end
 end

@@ -1,9 +1,12 @@
 defmodule Cortex.Scrapers.Scraper do
+  require Logger
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Cortex.Accounts
+  alias Cortex.Accounts.User
   alias Cortex.Types.Interval
+
+  @module_values [Cortex.Scrapers.Substack]
 
   schema "scrapers" do
     # Optional name to identify the scraper
@@ -13,9 +16,7 @@ defmodule Cortex.Scrapers.Scraper do
     field :notes, :string
 
     # The name of the Elixir module to run
-    field :module, Ecto.Enum,
-      values: [Cortex.Scrapers.Substack],
-      default: Cortex.Scraper.Substack
+    field :module, Ecto.Enum, values: @module_values
 
     # How often the scraper should run
     field :frequency, Interval
@@ -42,25 +43,49 @@ defmodule Cortex.Scrapers.Scraper do
     field :state, :map
 
     # Who created the scraper
-    belongs_to :inserted_by, Accounts.User
+    belongs_to :inserted_by, User
 
     # Who last edited the scraper
-    belongs_to :updated_by, Accounts.User
+    belongs_to :updated_by, User
 
     timestamps()
   end
 
-  @doc false
-  def changeset(scraper, attrs) do
+  def module_values(), do: @module_values
+
+  def changeset(scraper, %User{} = user, attrs) do
     scraper
-    |> cast(attrs, [
-      :name,
-      :notes,
-      :module,
-      :frequency,
-      :timeout,
-      :config,
-    ])
+    |> cast(
+      attrs,
+      [
+        :name,
+        :notes,
+        :module,
+        :frequency,
+        :timeout,
+        :config
+      ]
+    )
     |> validate_required([:module])
+    |> put_change(:updated_by_id, user.id)
+  end
+
+  @doc false
+  def create_changeset(scraper, %User{} = user, attrs) do
+    scraper
+    |> cast(
+      attrs,
+      [
+        :name,
+        :notes,
+        :module,
+        :frequency,
+        :timeout,
+        :config
+      ]
+    )
+    |> validate_required([:module])
+    |> put_change(:inserted_by_id, user.id)
+    |> put_change(:updated_by_id, user.id)
   end
 end

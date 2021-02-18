@@ -10,12 +10,12 @@ defmodule CortexWeb.ScraperController do
   end
 
   def new(conn, _params) do
-    changeset = Scrapers.change_scraper(%Scraper{})
+    changeset = Scrapers.change_scraper(%Scraper{}, conn.assigns.current_user)
     render(conn, "new.html", changeset: changeset)
   end
 
   def create(conn, %{"scraper" => scraper_params}) do
-    case Scrapers.create_scraper(scraper_params) do
+    case Scrapers.create_scraper(conn.assigns.current_user, scraper_params) do
       {:ok, scraper} ->
         conn
         |> put_flash(:info, "Scraper created successfully.")
@@ -33,14 +33,18 @@ defmodule CortexWeb.ScraperController do
 
   def edit(conn, %{"id" => id}) do
     scraper = Scrapers.get_scraper!(id)
-    changeset = Scrapers.change_scraper(scraper)
+    changeset = Scrapers.change_scraper(scraper, conn.assigns.current_user)
     render(conn, "edit.html", scraper: scraper, changeset: changeset)
   end
 
   def update(conn, %{"id" => id, "scraper" => scraper_params}) do
     scraper = Scrapers.get_scraper!(id)
 
-    case Scrapers.update_scraper(scraper, scraper_params) do
+    case Scrapers.update_scraper(
+           scraper,
+           conn.assigns.current_user,
+           scraper_params
+         ) do
       {:ok, scraper} ->
         conn
         |> put_flash(:info, "Scraper updated successfully.")

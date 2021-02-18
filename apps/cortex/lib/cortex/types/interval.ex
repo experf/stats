@@ -18,21 +18,39 @@ defmodule Cortex.Types.Interval do
         https://hexdocs.pm/ecto/Ecto.Schema.html#module-primitive-types
       )
   """
+  require Logger
+
   use Ecto.Type
 
   @impl true
   def type, do: Postgrex.Interval
 
   @impl true
-  def cast(%{"months" => months, "days" => days, "secs" => secs}) do
-    do_cast(months, days, secs)
+  def cast(%{"mins" => mins} = attrs) do
+    attrs
+    |> Map.delete("mins")
+    |> Map.put(
+      "secs",
+      to_integer(mins) * 60 +
+      (attrs |> Map.get("secs", 0) |> to_integer())
+    )
+    |> cast()
   end
 
   def cast(%{months: months, days: days, secs: secs}) do
     do_cast(months, days, secs)
   end
 
-  def cast(_) do
+  def cast(attrs) when is_map(attrs) do
+    do_cast(
+      attrs |> Map.get("months", 0),
+      attrs |> Map.get("days", 0),
+      attrs |> Map.get("secs", 0)
+    )
+  end
+
+  def cast(value) do
+    Logger.error("Interval cast failed", value: value)
     :error
   end
 
@@ -41,11 +59,17 @@ defmodule Cortex.Types.Interval do
       months = to_integer(months)
       days = to_integer(days)
       secs = to_integer(secs)
-      {:ok, %{months: months, days: days, secs: secs}}
+      if months == 0 && days == 0 && secs == 0 do
+        {:ok, nil}
+      else
+        {:ok, %{months: months, days: days, secs: secs}}
+      end
     rescue
       _ -> :error
     end
   end
+
+  defp to_integer(""), do: 0
 
   defp to_integer(arg) when is_binary(arg) do
     String.to_integer(arg)
