@@ -37,6 +37,17 @@ defmodule Cortex.Types.Interval do
     |> cast()
   end
 
+  def cast(%{"hours" => hours} = attrs) do
+    attrs
+    |> Map.delete("hours")
+    |> Map.put(
+      "secs",
+      to_integer(hours) * 60 * 60 +
+      (attrs |> Map.get("secs", 0) |> to_integer())
+    )
+    |> cast()
+  end
+
   def cast(%{months: months, days: days, secs: secs}) do
     do_cast(months, days, secs)
   end

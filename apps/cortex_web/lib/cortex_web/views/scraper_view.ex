@@ -21,18 +21,38 @@ defmodule CortexWeb.ScraperView do
   def sub_number_input(form, {field, sub_field}, opts \\ []) do
     tag(
       :input,
-      opts
-      |> Keyword.merge(
+      [
         type: :number,
         id: sub_input_id(form, field, sub_field),
         name: input_name(form, field) <> "[#{sub_field}]",
         value: sub_input_value(form, field, sub_field)
-      )
+      ] |> Keyword.merge(opts)
     )
   end
 
+  def interval_hours(form, field) do
+    case form |> input_value(field) do
+      nil -> 0
+      interval -> interval.secs |> div(60 * 60)
+    end
+  end
+
+  def interval_mins_rem(form, field) do
+    case form |> input_value(field) do
+      nil -> 0
+      interval -> interval.secs |> rem(60 * 60) |> div(60)
+    end
+  end
+
+  def interval_secs_rem(form, field) do
+    case form |> input_value(field) do
+      nil -> 0
+      interval -> rem(interval.secs, 60)
+    end
+  end
+
   def sub_input_value(form, field, sub_field) do
-    form |> input_value(field) |> Map.get(sub_field)
+    form |> input_value(field) |> Map.get(sub_field, 0)
   end
 
   def sub_label(form, fields),

@@ -31,14 +31,24 @@
 
     <div class="col">
       <div class=" form-floating">
-        <%= sub_number_input f, {:frequency, :mins}, class: "form-control" %>
+        <%= sub_number_input f, {:frequency, :hours}, class: "form-control",
+          value: interval_hours(f, :frequency) %>
+        <%= sub_label f, {:frequency, :hours}, "Hours" %>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class=" form-floating">
+        <%= sub_number_input f, {:frequency, :mins}, class: "form-control",
+          value: interval_mins_rem(f, :frequency) %>
         <%= sub_label f, {:frequency, :mins}, "Minutes" %>
       </div>
     </div>
 
     <div class="col">
       <div class=" form-floating">
-        <%= sub_number_input f, {:frequency, :secs}, class: "form-control" %>
+        <%= sub_number_input f, {:frequency, :secs}, class: "form-control",
+          value: interval_secs_rem(f, :frequency) %>
         <%= sub_label f, {:frequency, :secs}, "Seconds" %>
       </div>
     </div>
