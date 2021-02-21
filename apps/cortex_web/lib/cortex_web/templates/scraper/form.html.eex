@@ -1,4 +1,4 @@
-<%= form_for @changeset, @action, fn f -> %>
+<%= form_for @changeset, @action, [class: was_validated?(@changeset)], fn f -> %>
   <%= if @changeset.action do %>
     <div class="alert alert-danger">
       <p>Oops, something went wrong! Please check the errors below.</p>
@@ -17,44 +17,8 @@
     <%= error_tag f, :module %>
   </div>
 
-  <div class="mb-2">
-    <%= label f, :frequency, "Run frequencey" %>
-  </div>
-
-  <div class="row mb-4">
-    <div class="col">
-      <div class=" form-floating">
-        <%= sub_number_input f, {:frequency, :days}, class: "form-control" %>
-        <%= sub_label f, {:frequency, :days} %>
-      </div>
-    </div>
-
-    <div class="col">
-      <div class=" form-floating">
-        <%= sub_number_input f, {:frequency, :hours}, class: "form-control",
-          value: interval_hours(f, :frequency) %>
-        <%= sub_label f, {:frequency, :hours}, "Hours" %>
-      </div>
-    </div>
-
-    <div class="col">
-      <div class=" form-floating">
-        <%= sub_number_input f, {:frequency, :mins}, class: "form-control",
-          value: interval_mins_rem(f, :frequency) %>
-        <%= sub_label f, {:frequency, :mins}, "Minutes" %>
-      </div>
-    </div>
-
-    <div class="col">
-      <div class=" form-floating">
-        <%= sub_number_input f, {:frequency, :secs}, class: "form-control",
-          value: interval_secs_rem(f, :frequency) %>
-        <%= sub_label f, {:frequency, :secs}, "Seconds" %>
-      </div>
-    </div>
-
-    <%= error_tag f, :frequency %>
-  </div>
+  <%= dhms_control_for_interval f, :frequency, "Run frequencey",
+    class: "mb-4" %>
 
   <div class="form-floating mb-4">
     <%= textarea f, :notes, class: "form-control" %>

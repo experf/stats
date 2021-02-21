@@ -67,6 +67,8 @@ defmodule Cortex.Scrapers.Scraper do
       ]
     )
     |> validate_required([:module])
+    |> Interval.validate_min(:frequency, %Postgrex.Interval{secs: 30})
+    |> Interval.validate_max(:frequency, %Postgrex.Interval{days: 7})
     |> put_change(:updated_by_id, user.id)
   end
 
