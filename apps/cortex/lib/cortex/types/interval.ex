@@ -1,9 +1,9 @@
 defmodule Cortex.Types.Interval do
   @moduledoc ~S"""
 
-  Adapted from [OvermindDL1/ecto_interval](
-    https://github.com/OvermindDL1/ecto_interval
-  ).
+  Adapted from [OvermindDL1/ecto_interval][].
+
+  [OvermindDL1/ecto_interval]: https://github.com/OvermindDL1/ecto_interval
 
   In particular, this file commit:
 

@@ -1,6 +1,6 @@
-defmodule CortexWeb.ClassHelpers do
-  use Phoenix.HTML
+defmodule Birdstrap.HTML.Class do
   require Logger
+  use Phoenix.HTML
 
   def has_class?(none, _) when is_nil(none), do: false
 

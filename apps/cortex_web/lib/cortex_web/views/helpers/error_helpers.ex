@@ -6,18 +6,68 @@ defmodule CortexWeb.ErrorHelpers do
   require Logger
 
   use Phoenix.HTML
+  use Birdstrap.HTML
 
   @doc """
-  Generates tag for inlined form input errors.
+  Generates tags for form input errors.
+
+  The default implementation returned a list of `span` tags (one for each error
+  present for the `field` — yeah, a single `field` may have multiple errors),
+  but I've changed it to:
+
+  1.  Wrap the whole thing in a outer tag, which has `.invalid-feedback` class
+      (it needs to be a _sibling_ of the invalid `<input>`).
+  2.  Use `<div>` by default for both the outer and per-error tags. Made more
+      sense to me. You can change this with an option.
+
+  Outer tag gets a custom `.field-errors` class, and inners get custom
+  `.field-errors`. Using the default `<div>` ths structure is:
+
+  ```html
+  <div class="field-errors invalid-feedback">
+    <div class="field-error">...</div>
+    <!-- ... -->
+  </div>
+  ```
+
+  ## Parameters
+
+  -   `form`  — the `Phoenix.HTML.Form` being rendered.
+  -   `field` — name of the field to render errors for.
+  -   `opts`  — become the HTML attributes of the _outer_ tag, except:
+      -   `outer_tag:` — tag name to use for the _outer_ tag, default `:div`.
+      -   `inner_tag:` — tag name to use for the _inner_ tag, default `:div`.
+
+      For example, you can make it render an ordered list like:
+
+          error_tag form, field, outer_tag: :ol, inner_tag: :li
+
+  ## Notes
+
+  1.  I wanted to move this into `Birdstrap` since it has to do with Bootstrap
+      integration, but I realized it's probably dup'd out here in every Phoenix
+      project because it calls `translate_error/1`, which uses `CortexWeb`.
+
+      So here it stays.
   """
   def error_tag(form, field, opts \\ []) do
-    {tag_name, opts} = opts |> Keyword.pop(:tag, :span)
-    Enum.map(Keyword.get_values(form.errors, field), fn error ->
-      content_tag(tag_name, translate_error(error),
-        class: "invalid-feedback",
-        phx_feedback_for: input_id(form, field)
-      )
-    end)
+    {outer_tag_name, opts} = opts |> Keyword.pop(:outer_tag, :div)
+    {inner_tag_name, opts} = opts |> Keyword.pop(:inner_tag, :div)
+    attrs =
+      opts
+      |> add_class("field-errors")
+      |> add_class("invalid-feedback")
+      |> Keyword.put_new(:phx_feedback_for, input_id(form, field))
+
+    content_tag outer_tag_name, attrs do
+      for error <- Keyword.get_values(form.errors, field) do
+        content_tag(
+          inner_tag_name,
+          translate_error(error),
+          class: "field-error"
+        )
+      end
+    end
   end
 
   @doc """

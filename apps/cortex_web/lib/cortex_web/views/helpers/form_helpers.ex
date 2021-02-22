@@ -1,8 +1,8 @@
 defmodule CortexWeb.FormHelpers do
   require Logger
   use Phoenix.HTML
+  use Birdstrap.HTML
   import CortexWeb.ErrorHelpers
-  import CortexWeb.ClassHelpers
   alias Cortex.Types.Interval
 
   @form_json_editor_class "form-json-editor"
@@ -64,7 +64,7 @@ defmodule CortexWeb.FormHelpers do
   ```html
   <div class="form-control-interval-dhms">
     <div>
-      <label>label_content</label>
+      <label><!-- label_content --></label>
     </div>
 
     <div class="row">
@@ -74,7 +74,7 @@ defmodule CortexWeb.FormHelpers do
           <label>Days</label>
         </div>
       </div>
-      <!-- ... -->
+      <!-- +3 more... -->
     </div>
 
     <!-- on error: -->
@@ -100,11 +100,10 @@ defmodule CortexWeb.FormHelpers do
         #
         # So, here it gets stuck on the `.row`. Not sure how I feel on the whole
         # BS5 form validation stuff, feels annoyingly convoluted so far.
-        content_tag(:div, dhms_input_cols(form, field),
-          class:
-            "row" |> add_class(spacing_class) |> add_valid_class(form, field)
+        row(dhms_input_cols(form, field),
+          class: spacing_class |> add_valid_class(form, field)
         ),
-        error_tag(form, field, tag: :div)
+        error_tag(form, field)
       ]
     end
   end
@@ -114,7 +113,7 @@ defmodule CortexWeb.FormHelpers do
           form |> input_value(field) |> Interval.to_dhms() do
       id = "#{input_id(form, field)}_#{sub_field}"
 
-      content_tag :div, class: "col" do
+      col do
         content_tag :div, class: "form-floating" do
           [
             tag(

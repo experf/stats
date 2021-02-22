@@ -63,6 +63,9 @@ defmodule CortexWeb do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
+      # Our Bootstrap 5 -> Phoenix utilities
+      use Birdstrap.HTML
+
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 

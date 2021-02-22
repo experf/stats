@@ -30,6 +30,7 @@ defmodule Stats.MixProject do
           "Dev Notes": @dev_notes_paths,
         ],
         nest_modules_by_prefix: [
+          Birdstrap,
           Cortex,
           CortexWeb,
           Subscrape,

@@ -37,6 +37,9 @@ defmodule CortexWeb.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      # Phoenix standard issue
+      # ======================================================================
+
       {:phoenix, "~> 1.5.7"},
       {:phoenix_ecto, "~> 4.0"},
       {:phoenix_html, "~> 2.11"},
@@ -45,10 +48,21 @@ defmodule CortexWeb.MixProject do
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"},
       {:gettext, "~> 0.11"},
-      {:cortex, in_umbrella: true},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
+
+      # Sibling apps
+      # ======================================================================
+
+      {:cortex, in_umbrella: true},
+      {:birdstrap, in_umbrella: true},
+
+      # Additions
+      # ======================================================================
+
+      # How we generated the auth scaffolding
       {:phx_gen_auth, "~> 0.6", only: [:dev], runtime: false},
+
       # So we can server `index.html` files at directory paths like usual in
       # `/docs/`
       {:plug_static_index_html, "~> 1.0"},
