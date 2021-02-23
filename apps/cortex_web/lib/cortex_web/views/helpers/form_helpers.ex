@@ -41,6 +41,14 @@ defmodule CortexWeb.FormHelpers do
     end
   end
 
+
+
+  def dhms_control_for_interval(form, field),
+    do: dhms_control_for_interval(form, field, [])
+
+  def dhms_control_for_interval(form, field, opts, do: help) when is_list(opts),
+    do: dhms_control_for_interval(form, field, [{:help, help} | opts])
+
   @doc ~S"""
   Render a "Days, hours, minutes, seconds" (DHMS) set of form controls for a
   `field` that stores a `Postgrex.Interval` value.
@@ -82,14 +90,25 @@ defmodule CortexWeb.FormHelpers do
   </div>
   ```
   """
-  def dhms_control_for_interval(form, field, label_content, opts \\ []) do
-    {spacing_size, opts} = opts |> Keyword.pop(:spacing_size, 2)
+  def dhms_control_for_interval(form, field, opts) when is_list(opts) do
+    {opts, attrs} = opts |> Keyword.split([:spacing, :label, :help])
 
-    spacing_class = "mb-#{spacing_size}"
+    spacing_class = "mb-#{Keyword.get(opts, :spacing, 2)}"
+    help =
+      if opts |> Keyword.has_key?(:help) do
+        content_tag :div, opts[:help], class: "form-help"
+      else
+        []
+      end
 
-    content_tag :div, add_class(opts, "form-control-interval-dhms") do
+    content_tag :div, add_class(attrs, "form-control-interval-dhms") do
       [
-        content_tag(:div, label(form, field, label_content),
+        content_tag(
+          :div,
+          [
+            label(form, field, opts |> Keyword.get(:label, humanize(field))),
+            # help,
+          ],
           class: spacing_class
         ),
         # Bootstrap 5 form validation wants the `.is-invalid` class on a
@@ -103,14 +122,15 @@ defmodule CortexWeb.FormHelpers do
         row(dhms_input_cols(form, field),
           class: spacing_class |> add_valid_class(form, field)
         ),
-        error_tag(form, field)
+        error_tag(form, field),
+        help,
       ]
     end
   end
 
   defp dhms_input_cols(form, field) do
     for {sub_field, sub_value} <-
-          form |> input_value(field) |> Interval.to_dhms() do
+          form |> input_value(field) |> Interval.to_dhms!() do
       id = "#{input_id(form, field)}_#{sub_field}"
 
       col do

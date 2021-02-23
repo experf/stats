@@ -17,8 +17,11 @@
     <%= error_tag f, :module %>
   </div>
 
-  <%= dhms_control_for_interval f, :frequency, "Run frequencey",
-    class: "mb-4" %>
+  <%= dhms_control_for_interval f, :frequency, class: "mb-4" do %>
+    <small>How often to run the scraper (approimantly).</small>
+  <% end %>
+
+  <%= dhms_control_for_interval f, :timeout, class: "mb-4" %>
 
   <div class="form-floating mb-4">
     <%= textarea f, :notes, class: "form-control" %>

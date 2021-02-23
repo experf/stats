@@ -39,20 +39,82 @@ defmodule Cortex.Types.Interval do
   @hours_per_day 24
   @secs_per_day @hours_per_day * @secs_per_hour
 
+  @doc ~S"""
+  Get the string you want for any of the `Postgrex.Interval` struct keys.
+
+  ## Examples
+
+      iex> Cortex.Types.Interval.humanize(:mins)
+      "Minutes"
+
+  """
+  @spec humanize(:days | :hours | :mins | :secs) :: binary
   def humanize(:days), do: "Days"
   def humanize(:hours), do: "Hours"
   def humanize(:mins), do: "Minutes"
   def humanize(:secs), do: "Seconds"
 
-  def to_dhms(nil), do: [days: 0, hours: 0, mins: 0, secs: 0]
+  @doc ~S"""
+  Get a `Keyword` list for an interval simplified to days, hours, minutes and
+  seconds (DHMS). Used to render form controls with those inputs.
 
-  def to_dhms(%Postgrex.Interval{months: months}) when months != 0 do
-    {:error, "Can not convert non-zero months to days"}
-  end
+  ## Examples
 
-  def to_dhms(%Postgrex.Interval{microsecs: microsecs}) when microsecs != 0 do
-    {:error, "Can not convert non-zero microsecs to seconds"}
-  end
+  1.  Basics
+
+          iex> %Postgrex.Interval{secs: 60} |> Cortex.Types.Interval.to_dhms()
+          {:ok, [days: 0, hours: 0, mins: 1, secs: 0]}
+
+          iex> %Postgrex.Interval{secs: 3_600} |> Cortex.Types.Interval.to_dhms()
+          {:ok, [days: 0, hours: 1, mins: 0, secs: 0]}
+
+          iex> %Postgrex.Interval{secs: 15_599} |> Cortex.Types.Interval.to_dhms()
+          {:ok, [days: 0, hours: 4, mins: 19, secs: 59]}
+
+  2.  Heads up — `days` is it's own field! `to_dhms/1` will **_not_** simplify
+      large amounts of seconds into `days` for you:
+
+          iex> %Postgrex.Interval{secs: 172_800} |> Cortex.Types.Interval.to_dhms()
+          {:ok, [days: 0, hours: 48, mins: 0, secs: 0]}
+
+      This is because, in practice, it doesn't need to — `cast/1` handles that
+      business in the application flow.
+
+  3.  `nil` is accepted:
+
+          iex> nil |> Cortex.Types.Interval.to_dhms()
+          {:ok, [days: 0, hours: 0, mins: 0, secs: 0]}
+
+  4.  We don't try to convert `months`:
+
+          iex> %Postgrex.Interval{months: 1} |> Cortex.Types.Interval.to_dhms()
+          {:error, "Can not convert to DHMS -- months and microsecs must both be 0"}
+
+  5.  We also have nothing to do with `microsecs`, so that's prohibited as well:
+
+          iex> %Postgrex.Interval{microsecs: 1} |> Cortex.Types.Interval.to_dhms()
+          {:error, "Can not convert to DHMS -- months and microsecs must both be 0"}
+
+  6.  Anything that is _not_ a `Postgrex.Interval` struct will be attempted to
+      be `cast/1` first:
+
+          iex> %{"secs" => "172800"} |> Cortex.Types.Interval.to_dhms()
+          {:ok, [days: 2, hours: 0, mins: 0, secs: 0]}
+
+      You'll notice that this time, seconds _was_ simplified to days due to the
+      map being passed through `cast/1`.
+
+      > 📢 We need this functionality because — for reason I can't really pin
+      > down at the moment — the params map ends up being used as the value to
+      > render when there are multiple intervals being rendered on a page _and_
+      > one of them fails to validate.
+      >
+      > It's the _other_ interval that ends up here as a `%{string => string}`
+      > map. Whatever, it works.
+  """
+  def to_dhms(value)
+
+  def to_dhms(nil), do: {:ok, [days: 0, hours: 0, mins: 0, secs: 0]}
 
   def to_dhms(%Postgrex.Interval{
         months: 0,
@@ -60,12 +122,34 @@ defmodule Cortex.Types.Interval do
         secs: secs,
         microsecs: 0
       }) do
-    [
-      days: days,
-      hours: secs |> div(@secs_per_hour),
-      mins: secs |> rem(@secs_per_hour) |> div(@secs_per_min),
-      secs: secs |> rem(@secs_per_min)
-    ]
+    {:ok,
+     [
+       days: days,
+       hours: secs |> div(@secs_per_hour),
+       mins: secs |> rem(@secs_per_hour) |> div(@secs_per_min),
+       secs: secs |> rem(@secs_per_min)
+     ]}
+  end
+
+  def to_dhms(%Postgrex.Interval{} = _) do
+    {:error, "Can not convert to DHMS -- months and microsecs must both be 0"}
+  end
+
+  def to_dhms(value) do
+    case cast(value) do
+      {:ok, interval} -> to_dhms(interval)
+      :error -> {:error, "Failed to cast to interval"}
+    end
+  end
+
+  @doc ~S"""
+  Bangin' version of `to_dhms/1` (raises on error).
+  """
+  def to_dhms!(value) do
+    case to_dhms(value) do
+      {:ok, dhms} -> dhms
+      {:error, message} -> raise RuntimeError, message: message
+    end
   end
 
   @impl true
@@ -109,6 +193,17 @@ defmodule Cortex.Types.Interval do
   def cast(value) do
     Logger.error("Interval cast failed", value: value)
     :error
+  end
+
+  def cast!(value) do
+    case cast(value) do
+      {:ok, interval} ->
+        interval
+
+      :error ->
+        raise ArgumentError,
+          message: "Failed to cast to Postgrex.Interval: #{inspect(value)}"
+    end
   end
 
   defp do_cast(months, days, secs) do
@@ -230,8 +325,10 @@ defimpl Inspect, for: [Postgrex.Interval] do
   end
 end
 
-defimpl Phoenix.HTML.Safe, for: [Postgrex.Interval] do
-  def to_iodata(inv) do
-    to_string(inv)
+if Code.ensure_loaded?(Phoenix.HTML.Safe) do
+  defimpl Phoenix.HTML.Safe, for: [Postgrex.Interval] do
+    def to_iodata(inv) do
+      to_string(inv)
+    end
   end
 end

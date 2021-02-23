@@ -53,6 +53,12 @@ defmodule Cortex.Scrapers.Scraper do
 
   def module_values(), do: @module_values
 
+  defp validate_frequency(%Ecto.Changeset{} = changeset) do
+    changeset
+    |> Interval.validate_min(:frequency, %Postgrex.Interval{secs: 30})
+    |> Interval.validate_max(:frequency, %Postgrex.Interval{days: 7})
+  end
+
   def changeset(scraper, %User{} = user, attrs) do
     scraper
     |> cast(
@@ -67,12 +73,10 @@ defmodule Cortex.Scrapers.Scraper do
       ]
     )
     |> validate_required([:module])
-    |> Interval.validate_min(:frequency, %Postgrex.Interval{secs: 30})
-    |> Interval.validate_max(:frequency, %Postgrex.Interval{days: 7})
+    |> validate_frequency()
     |> put_change(:updated_by_id, user.id)
   end
 
-  @doc false
   def create_changeset(scraper, %User{} = user, attrs) do
     scraper
     |> cast(
@@ -87,6 +91,7 @@ defmodule Cortex.Scrapers.Scraper do
       ]
     )
     |> validate_required([:module])
+    |> validate_frequency()
     |> put_change(:inserted_by_id, user.id)
     |> put_change(:updated_by_id, user.id)
   end
