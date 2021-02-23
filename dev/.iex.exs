@@ -10,6 +10,8 @@ alias Cortex.OpenGraph
 alias Cortex.Repo
 
 alias Cortex.Scrapers
+alias Cortex.Scrapers.Scraper
+alias Cortex.Scrapers.Substack
 alias Subscrape.Subscriber
 
 defmodule M do

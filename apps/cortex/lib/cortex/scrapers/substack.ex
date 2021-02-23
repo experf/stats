@@ -1,5 +1,8 @@
 defmodule Cortex.Scrapers.Substack do
+  require Logger
+
   alias Cortex.Events
+  alias Cortex.Scrapers.Scraper
 
   @event_subtypes %{
     "Clicked link in email" => "email.link.click",
@@ -51,12 +54,19 @@ defmodule Cortex.Scrapers.Substack do
   end
 
   def scrape_subscriber_events(%Subscrape{} = config, app) do
-    {:ok, subscriber_events} = config |> Subscrape.Subscriber.events(:all)
+    {:ok, subscriber_events} = config |> Subscrape.Subscriber.Event.all("blah")
     for {email, events} <- subscriber_events do
       for {props, unix_ms} <- prepare_subscriber_events(app, email, events) do
         Events.produce(props, unix_ms)
       end
     end
+  end
+
+  def scrape(%Scraper{id: id, state: state}) do
+    delay = Enum.random(1_000..3_000)
+    Logger.info("Scraping Substack", scraper_id: id, delay: "#{delay}ms")
+    Process.sleep(delay)
+    {:ok, %{delay: delay}}
   end
 
   # def scrape(%Subscrape{} = config, app) do

@@ -17,15 +17,42 @@
     <%= error_tag f, :module %>
   </div>
 
+  <div class="form-floating mb-4">
+    <%= textarea f, :notes, class: "form-control" %>
+    <%= label f, :notes, "Notes (optional)" %>
+  </div>
+
   <%= dhms_control_for_interval f, :frequency, class: "mb-4" do %>
     <small>How often to run the scraper (approimantly).</small>
   <% end %>
 
-  <%= dhms_control_for_interval f, :timeout, class: "mb-4" %>
+  <%= dhms_control_for_interval f, :timeout, class: "mb-4" do %>
+    <small>Optional time limit for scrapes. All zeros means no timeout.
+    </small>
+  <% end %>
 
-  <div class="form-floating mb-4">
-    <%= textarea f, :notes, class: "form-control" %>
-    <%= label f, :notes, "Notes (optional)" %>
+ <div class="mb-4 has-validation">
+    <h5>
+      Scraper Configuration
+    </h5>
+
+    <small id="ogpHelp" class="form-text text-muted">
+      Editor is
+      <%= github_repo_link "josdejong/jsoneditor" %>,
+      check out the
+      <%= github_file_link "josdejong/jsoneditor", "docs/shortcut_keys.md" %>
+      page.
+
+      I also hacked in insert and append alternatives to deal with lack of
+      <code>insert</code> key on MacBook keyboards:
+
+      <table>
+        <tr><td>^⏎</td><td>Insert a new field with type auto</td></tr>
+        <tr><td>^⇧⏎</td><td>Append a new field with type auto</td></tr>
+      </table>
+    </small>
+
+    <%= json_editor f, :config %>
   </div>
 
   <div>

@@ -9,10 +9,6 @@ defmodule Cortex.Types.JSONSchemaMap do
   # https://hexdocs.pm/ecto/Ecto.ParameterizedType.html#content
   use Ecto.ParameterizedType
 
-  @spec is_empty(any) ::
-          {:or,
-           [{:context, Cortex.Types.JSONSchemaMap} | {:import, Kernel}, ...],
-           [{:==, [...], [...]} | {:or, [...], [...]}, ...]}
   defmacro is_empty(value) do
     quote do
       is_nil(unquote(value)) or
@@ -21,6 +17,7 @@ defmodule Cortex.Types.JSONSchemaMap do
         unquote(value) == %{}
     end
   end
+
   @doc """
   Convert the options specified in the field macro into parameters to be used in
   other callbacks.

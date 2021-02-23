@@ -28,6 +28,9 @@ defmodule Cortex.Types.Interval do
 
   use Ecto.Type
 
+  @millisecs_per_sec 1_000
+  @microsecs_per_sec 1_000_000
+
   @secs_per_min 60
   @mins_per_hours 60
   @secs_per_hour @secs_per_min * @mins_per_hours
@@ -38,6 +41,46 @@ defmodule Cortex.Types.Interval do
   # at least.
   @hours_per_day 24
   @secs_per_day @hours_per_day * @secs_per_hour
+  @microsecs_per_day @secs_per_day * @microsecs_per_sec
+
+  # Helpers
+  # ==========================================================================
+
+  defp to_integer(""), do: 0
+
+  defp to_integer(arg) when is_binary(arg) do
+    String.to_integer(arg)
+  end
+
+  defp to_integer(arg) when is_integer(arg) do
+    arg
+  end
+
+  def simplify(struct, src_key, dest_key, src_per_dest_ratio) do
+    src_value = struct |> Map.get(src_key, 0)
+    dest_value = struct |> Map.get(dest_key, 0)
+    extra_dest = src_value |> div(src_per_dest_ratio)
+    rem_src = src_value |> rem(src_per_dest_ratio)
+    %{struct | src_key => rem_src, dest_key => dest_value + extra_dest}
+  end
+
+  def simplify(struct, conversions) when is_list(conversions) do
+    conversions
+    |> Enum.reduce(
+      struct,
+      fn {src_key, dest_key, src_per_dest_ratio}, struct ->
+        struct |> simplify(src_key, dest_key, src_per_dest_ratio)
+      end
+    )
+  end
+
+  def simplify(struct) do
+    struct
+    |> simplify([
+      {:microsecs, :secs, @microsecs_per_sec},
+      {:secs, :days, @secs_per_day}
+    ])
+  end
 
   @doc ~S"""
   Get the string you want for any of the `Postgrex.Interval` struct keys.
@@ -131,9 +174,9 @@ defmodule Cortex.Types.Interval do
      ]}
   end
 
-  def to_dhms(%Postgrex.Interval{} = _) do
-    {:error, "Can not convert to DHMS -- months and microsecs must both be 0"}
-  end
+  def to_dhms(%Postgrex.Interval{} = _),
+    do:
+      {:error, "Can not convert to DHMS -- months and microsecs must both be 0"}
 
   def to_dhms(value) do
     case cast(value) do
@@ -152,10 +195,63 @@ defmodule Cortex.Types.Interval do
     end
   end
 
+  @spec to_milliseconds(nil | Postgrex.Interval.t()) ::
+          {:error, binary} | {:ok, integer}
+  def to_milliseconds(nil),
+    do: {:error, "Can not convert `nil` interval to milliseconds"}
+
+  def to_milliseconds(%Postgrex.Interval{
+        months: 0,
+        days: days,
+        secs: secs,
+        microsecs: 0
+      }) do
+    {:ok, (days * @secs_per_day + secs) * @millisecs_per_sec}
+  end
+
+  def to_milliseconds(%Postgrex.Interval{} = _),
+    do:
+      {:error,
+       "Can not convert to milliseconds -- months and microsecs must both be 0"}
+
+  # `Ecto.Changeset` Validation Helpers
+  # --------------------------------------------------------------------------
+
+  def validate_min(changeset, field, %Postgrex.Interval{} = min) do
+    changeset
+    |> Ecto.Changeset.validate_change(field, fn field, value ->
+      case Postgrex.Interval.compare(value, min) do
+        :lt -> [{field, "Minimum #{min}"}]
+        _ -> []
+      end
+    end)
+  end
+
+  def validate_max(changeset, field, %Postgrex.Interval{} = max) do
+    changeset
+    |> Ecto.Changeset.validate_change(field, fn field, value ->
+      case Postgrex.Interval.compare(value, max) do
+        :gt -> [{field, "Maximum #{max}"}]
+        _ -> []
+      end
+    end)
+  end
+
+  # `Ecto.Type` Behavior
+  # ==========================================================================
+  #
+  # See https://hexdocs.pm/ecto/Ecto.Type.html
+  #
+
   @impl true
   def type, do: Postgrex.Interval
 
+  # Casting: External → Runtime Representation
+  # ----------------------------------------------------------------------------
+
   @impl true
+  def cast(%Postgrex.Interval{} = interval), do: {:ok, interval |> simplify()}
+
   def cast(%{"mins" => mins} = attrs) do
     attrs
     |> Map.delete("mins")
@@ -223,15 +319,8 @@ defmodule Cortex.Types.Interval do
     end
   end
 
-  defp to_integer(""), do: 0
-
-  defp to_integer(arg) when is_binary(arg) do
-    String.to_integer(arg)
-  end
-
-  defp to_integer(arg) when is_integer(arg) do
-    arg
-  end
+  # Loading: Database → Runtime Representation
+  # ----------------------------------------------------------------------------
 
   @impl true
   def load(%{
@@ -252,70 +341,47 @@ defmodule Cortex.Types.Interval do
      }}
   end
 
+  # Dumping: Runtime → Database Representation
+  # ----------------------------------------------------------------------------
+
   @impl true
-  def dump(%Postgrex.Interval{} = interval), do: {:ok, interval}
-
-  # def dump(%{months: months, days: days, secs: secs}) do
-  #   {:ok, %Postgrex.Interval{months: months, days: days, secs: secs}}
-  # end
-
-  # def dump(%{"months" => months, "days" => days, "secs" => secs}) do
-  #   {:ok, %Postgrex.Interval{months: months, days: days, secs: secs}}
-  # end
+  def dump(%Postgrex.Interval{} = interval) do
+    Logger.debug("*** DUMPING ***", interval: interval)
+    {:ok, interval}
+  end
 
   def dump(_), do: :error
-
-  def validate_min(changeset, field, %Postgrex.Interval{} = min) do
-    changeset
-    |> Ecto.Changeset.validate_change(field, fn field, value ->
-      case Postgrex.Interval.compare(value, min) do
-        :lt -> [{field, "Minimum #{min}"}]
-        _ -> []
-      end
-    end)
-  end
-
-  def validate_max(changeset, field, %Postgrex.Interval{} = max) do
-    changeset
-    |> Ecto.Changeset.validate_change(field, fn field, value ->
-      case Postgrex.Interval.compare(value, max) do
-        :gt -> [{field, "Maximum #{max}"}]
-        _ -> []
-      end
-    end)
-  end
 end
 
 defimpl String.Chars, for: [Postgrex.Interval] do
   import Kernel, except: [to_string: 1]
 
-  def to_string(%{:months => months, :days => days, :secs => secs}) do
-    m =
-      if months === 0 do
-        ""
-      else
-        " #{months} months"
-      end
+  @millisecs_per_sec 1_000
+  @millisecs_per_microsec 1_000
 
-    d =
-      if days === 0 do
-        ""
-      else
-        " #{days} days"
-      end
+  def to_string(%Postgrex.Interval{
+        months: 0,
+        days: 0,
+        secs: 0,
+        microsecs: 0
+      }),
+      do: "<None>"
 
-    s =
-      if secs === 0 do
-        ""
-      else
-        " #{secs} seconds"
+  def to_string(%Postgrex.Interval{
+        months: months,
+        days: days,
+        secs: secs,
+        microsecs: microsecs
+      }) do
+    secs = secs + div(microsecs, @millisecs_per_microsec) / @millisecs_per_sec
+    [{"m", months}, {"d", days}, {"s", secs}]
+    |> Enum.reduce("", fn {symbol, value}, string ->
+      cond do
+        value === 0 -> string
+        string == "" -> "#{value}#{symbol}"
+        true -> "#{string} #{value}#{symbol}"
       end
-
-    if months === 0 and days === 0 and secs === 0 do
-      "<None>"
-    else
-      "Every#{m}#{d}#{s}"
-    end
+    end)
   end
 end
 

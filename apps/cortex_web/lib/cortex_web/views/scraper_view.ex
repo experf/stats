@@ -9,8 +9,7 @@ defmodule CortexWeb.ScraperView do
     Scraper.module_values()
     |> Enum.map(fn module ->
       string = Atom.to_string(module)
-      name = string |> String.replace(~r/^Elixir\./, "")
-      {name, string}
+      {string |> Scraper.module_name(), string}
     end)
   end
 
