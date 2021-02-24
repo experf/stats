@@ -185,8 +185,6 @@ defmodule Cortex.Scrapers.Substack do
       |> Enum.map(fn {%DateTime{} = dt, _props} -> dt end)
       |> Enum.max(DateTime)
 
-    require IEx; IEx.pry
-
     case self.last_subscriber_event_at do
       nil ->
         %{self | last_subscriber_event_at: new_event_at}
