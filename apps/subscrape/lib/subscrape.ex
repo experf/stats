@@ -99,8 +99,8 @@ defmodule Subscrape do
     cache_root: Application.get_env(:subscrape, __MODULE__, [])[:cache_root],
   ]
 
-  def new(props) when is_map(props) do
-    __MODULE__ |> struct(props)
+  def new(props) when is_map(props) or is_list(props) do
+    __MODULE__ |> struct!(props)
   end
 
   def opt!(%__MODULE__{} = self, opts, key)

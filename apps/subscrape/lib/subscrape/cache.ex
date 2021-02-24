@@ -55,6 +55,9 @@ defmodule Subscrape.Cache do
   def get(%Subscrape{cache_root: cache_root}, _, _) when is_nil(cache_root),
     do: :miss
 
+  def put(%Subscrape{cache_root: cache_root}, _) when is_nil(cache_root),
+    do: :ok
+
   def put(
         %Subscrape{cache_root: cache_root} = config,
         %HTTPoison.Response{} = response

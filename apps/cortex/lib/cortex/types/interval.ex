@@ -43,6 +43,11 @@ defmodule Cortex.Types.Interval do
   @secs_per_day @hours_per_day * @secs_per_hour
   @microsecs_per_day @secs_per_day * @microsecs_per_sec
 
+  def from_monotonic_start(start, :microsecond) do
+    %Postgrex.Interval{microsecs: System.monotonic_time(:microsecond) - start}
+    |> simplify()
+  end
+
   # Helpers
   # ==========================================================================
 
@@ -345,10 +350,7 @@ defmodule Cortex.Types.Interval do
   # ----------------------------------------------------------------------------
 
   @impl true
-  def dump(%Postgrex.Interval{} = interval) do
-    Logger.debug("*** DUMPING ***", interval: interval)
-    {:ok, interval}
-  end
+  def dump(%Postgrex.Interval{} = interval), do: {:ok, interval}
 
   def dump(_), do: :error
 end

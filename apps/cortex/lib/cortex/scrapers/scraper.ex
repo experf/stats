@@ -4,56 +4,59 @@ defmodule Cortex.Scrapers.Scraper do
   """
 
   require Logger
+
   use Ecto.Schema
   use GenServer
+
   import Ecto.Changeset
 
   alias Cortex.Repo
   alias Cortex.Accounts.User
   alias Cortex.Types.Interval
   alias Cortex.Types.JSONMap
+  alias Cortex.Scrapers.Error
 
   @module_values [Cortex.Scrapers.Substack]
 
   schema "scrapers" do
     # Optional name to identify the scraper
-    field :name, :string
+    field(:name, :string)
 
     # Optional notes
-    field :notes, :string
+    field(:notes, :string)
 
     # The name of the Elixir module to run
-    field :module, Ecto.Enum, values: @module_values
+    field(:module, Ecto.Enum, values: @module_values)
 
     # How often the scraper should run
-    field :frequency, Interval
+    field(:frequency, Interval)
 
     # After how long (if ever) to kill a run
-    field :timeout, Interval
+    field(:timeout, Interval)
 
     # State flag to prevent multiple instances running
-    field :is_running, :boolean, default: false
+    field(:is_running, :boolean, default: false)
 
     # When the last run was started (if any)
-    field :last_run_started_at, :naive_datetime
+    field(:last_run_started_at, :naive_datetime)
 
     # How long the last run took to complete (if it did)
-    field :last_run_duration, Interval
+    field(:last_run_duration, Interval)
 
     # What happen as the result of the last run
-    field :last_run_status, Ecto.Enum, values: [:ok, :error]
+    field(:last_run_status, Ecto.Enum, values: [:ok, :error])
 
     # Module-specific configuration data
-    field :config, JSONMap
+    field(:config, JSONMap)
 
     # Module-specific state data
-    field :state, JSONMap
+    field(:state, JSONMap)
 
     # Who created the scraper
-    belongs_to :inserted_by, User
+    belongs_to(:inserted_by, User)
 
     # Who last edited the scraper
-    belongs_to :updated_by, User
+    belongs_to(:updated_by, User)
 
     timestamps()
   end
@@ -181,7 +184,13 @@ defmodule Cortex.Scrapers.Scraper do
 
   defp run_changeset(scraper, attrs) do
     scraper
-    |> cast(attrs, [:last_run_started_at, :last_run_duration, :state])
+    |> cast(attrs, [
+      :last_run_status,
+      :last_run_started_at,
+      :last_run_duration,
+      :state
+    ])
+
     # |> validate_
   end
 
@@ -191,17 +200,21 @@ defmodule Cortex.Scrapers.Scraper do
   # 1.  https://hexdocs.pm/elixir/GenServer.html#module-receiving-regular-messages
   #
 
-  def gen_server_name(%__MODULE__{id: id}) when is_integer(id) do
-    {:global, {__MODULE__, id}}
-  end
+  def server_name(id) when is_integer(id),
+    do: {:global, {__MODULE__, id}}
+
+  def server_name(%__MODULE__{id: id}) when is_integer(id),
+    do: server_name(id)
 
   def start_link(%__MODULE__{} = scraper) do
-    GenServer.start_link(__MODULE__, scraper, name: gen_server_name(scraper))
+    GenServer.start_link(__MODULE__, scraper, name: server_name(scraper))
   end
 
-  def stop(%__MODULE__{} = scraper) do
-    scraper
-    |> gen_server_name()
+  def stop(%__MODULE__{id: id}), do: stop(id)
+
+  def stop(id) when is_integer(id) do
+    id
+    |> server_name()
     |> GenServer.stop()
   end
 
@@ -214,41 +227,55 @@ defmodule Cortex.Scrapers.Scraper do
 
   @impl true
   def handle_info(:work, id) do
-    Logger.info("Doing work!", scraper_id: id)
+    Logger.debug("Starting work!", scraper_id: id)
 
-    scraper = Repo.get!(__MODULE__, id)
+    scraper = __MODULE__ |> Repo.get!(id)
 
-    duration_start = System.monotonic_time(:microsecond)
-    started_at = NaiveDateTime.utc_now()
-
-    case apply(scraper.module, :scrape, [scraper]) do
-      {:ok, new_state} ->
-        duration_end = System.monotonic_time(:microsecond)
-        duration =
-            %Postgrex.Interval{microsecs: duration_end - duration_start}
-            |> Interval.simplify()
-
+    case scraper |> run() do
+      {:ok, scraper} ->
         Logger.info(
-          "#{scraper} scrape done, updating database record...",
-          duration: to_string(duration)
+          "#{scraper} run OK",
+          scraper_id: id,
+          run_started_at: scraper.last_run_started_at,
+          run_duration: scraper.last_run_duration |> to_string(),
+          new_state: scraper.state,
+          record_updated_at: scraper.updated_at
         )
 
-        scraper
-        |> run_changeset(%{
-          state: new_state,
-          last_run_started_at: started_at,
-          last_run_duration: duration
-        })
-        |> Repo.update()
-    end
+        scraper |> schedule_work()
 
-    # Reschedule once more
-    schedule_work(scraper)
+      {:error, %Error{} = error} ->
+        Logger.error(
+          error.message,
+          scraper_id: id,
+          cause: error.cause
+        )
+
+        # Since `run/1` failed we _don't_ get an updated `Scraper` struct
+        # back, so try to schedule using the `id` (which will re-get the record)
+        id |> schedule_work()
+    end
 
     {:noreply, id}
   end
 
-  def schedule_work(%__MODULE__{} = scraper) do
+  defp schedule_work(id) when is_integer(id) do
+    case __MODULE__ |> Repo.get(id) do
+      nil ->
+        Logger.error(
+          "Scraper##{id} not found in DB, unable to schedule. Stopping.",
+          scraper_id: id
+        )
+
+        id |> stop()
+        nil
+
+      scraper ->
+        schedule_work(scraper)
+    end
+  end
+
+  defp schedule_work(%__MODULE__{} = scraper) do
     case scraper.frequency |> Interval.to_milliseconds() do
       {:ok, ms} ->
         Logger.info("Scheduling scraper #{scraper}",
@@ -260,10 +287,70 @@ defmodule Cortex.Scrapers.Scraper do
 
       {:error, error} ->
         Logger.error(
-          "Unable to schedule scraper #{scraper}",
+          "Unable to schedule #{scraper} -- " <>
+            "failed to convert frequency to milliseconds. Stopping.",
           scraper_id: scraper.id,
           error: error
         )
+
+        scraper |> stop()
+    end
+
+    nil
+  end
+
+  # Execution
+  # ==========================================================================
+
+  def instantiate(%__MODULE__{module: module, config: config, state: state}) do
+    apply(module, :new, [config, state])
+  end
+
+  def run(%__MODULE__{} = scraper) do
+    duration_start = System.monotonic_time(:microsecond)
+    started_at = NaiveDateTime.utc_now()
+
+    scraper =
+      scraper
+      |> run_changeset(%{
+        is_running: true,
+        last_run_status: nil,
+        last_run_started_at: started_at,
+        last_run_duration: nil
+      })
+      |> Repo.update!()
+
+    case apply(scraper.module, :scrape, [scraper]) do
+      {:ok, new_state} ->
+        scraper =
+          scraper
+          |> run_changeset(%{
+            is_running: false,
+            state: new_state,
+            last_run_status: :ok,
+            last_run_duration:
+              Interval.from_monotonic_start(duration_start, :microsecond),
+          })
+          |> Repo.update!()
+
+        {:ok, scraper}
+
+      {:error, module_error} ->
+        scraper =
+          scraper
+          |> run_changeset(%{
+            is_running: false,
+            last_run_status: :error,
+            last_run_duration:
+              Interval.from_monotonic_start(duration_start, :microsecond),
+          })
+          |> Repo.update!()
+
+        {:error,
+         %Error{
+           message: "#{scraper} run FAILED in #{scraper.module}.scrape/1",
+           cause: module_error
+         }}
     end
   end
 
