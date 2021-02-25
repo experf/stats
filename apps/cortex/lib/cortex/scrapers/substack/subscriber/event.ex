@@ -217,7 +217,7 @@ defmodule Cortex.Scrapers.Substack.Subscriber.Event do
   end
 
   @doc ~S"""
-  Do the scrape, returning an updated `Cortex.Scrapers.Substack.t/0` struct.
+  Do the scrape, returning an updated `t:Cortex.Scrapers.Substack.t/0` struct.
   """
   def scrape!(
         %Substack{
