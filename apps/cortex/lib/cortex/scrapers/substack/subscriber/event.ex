@@ -79,7 +79,6 @@ defmodule Cortex.Scrapers.Substack.Subscriber.Event do
     }
   end
 
-
   # Public API
   # ==========================================================================
 
@@ -169,9 +168,10 @@ defmodule Cortex.Scrapers.Substack.Subscriber.Event do
   def scrape_new!(_self, []), do: []
 
   def scrape_new!(
-        %Substack{app: app, client: client},
+        %Substack{app: app, client: %Subscrape{} = client},
         subscriber_list
-      ) do
+      )
+      when is_binary(app) and is_list(subscriber_list) do
     subscriber_list
     |> Enum.flat_map(fn %{email: email} ->
       client
@@ -202,12 +202,12 @@ defmodule Cortex.Scrapers.Substack.Subscriber.Event do
   def scrape_updated!(
         %Substack{
           app: app,
-          client: client,
+          client: %Subscrape{} = client,
           last_subscriber_event_at: %DateTime{} = last_subscriber_event_at
         },
         subscriber_list
       )
-      when is_binary(app) and is_binary(client) and is_list(subscriber_list) do
+      when is_binary(app) and is_list(subscriber_list) do
     subscriber_list
     |> Enum.flat_map(fn %{email: email} ->
       client

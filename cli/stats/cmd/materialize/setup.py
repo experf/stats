@@ -26,3 +26,10 @@ def run():
         text=True,
         input=(views_dir / "events.sql"),
     )
+
+    sh.run(
+        "psql",
+        cfg.materialize.postgres.url,
+        text=True,
+        input=(views_dir / "substack_subscriber_events.sql"),
+    )
