@@ -3,6 +3,7 @@ defmodule Cortex.Scrapers.Substack do
 
   alias Cortex.Events
   alias Cortex.Scrapers.Scraper
+  alias Cortex.Ext
 
   @event_subtypes %{
     "Clicked link in email" => "email.link.click",
@@ -34,7 +35,7 @@ defmodule Cortex.Scrapers.Substack do
       |> Map.get("last_subscriber_event_at")
       |> case do
         nil -> nil
-        s when is_binary(s) -> s |> DateTime.from_iso8601()
+        s when is_binary(s) -> s |> Ext.DateTime.from_iso8601!()
       end
 
     last_subscriber_email = state |> Map.get("last_subscriber_email")
@@ -55,30 +56,15 @@ defmodule Cortex.Scrapers.Substack do
     }
   end
 
-  def iso8601_to_unix_ms(iso8601) when is_binary(iso8601) do
-    # `datetime` will be in UTC, with `_offset_seconds` storing the offset
-    # info encoded in the `iso8601` string ("...T+08:00", etc.).
-    #
-    # Since we are headed for unix time, which _is_ UTC, we don't need to use
-    # that data -- we can go strait from the UTC datetime to unix.
-    {:ok, datetime, _offset_seconds} = DateTime.from_iso8601(iso8601)
-    DateTime.to_unix(datetime, :millisecond)
-  end
-
-  def extract_unix_ms(%{"timestamp" => iso8601}) when is_binary(iso8601) do
-    iso8601_to_unix_ms(iso8601)
-  end
-
   def prepare_subscriber_event(
         app,
         email,
         %{"text" => text, "timestamp" => iso8601} = event
       ) do
-    {:ok, datetime, _offset} = iso8601 |> DateTime.from_iso8601()
     subtype = @event_subtypes |> Map.get(text, "other")
 
     {
-      datetime,
+      iso8601 |> Ext.DateTime.from_iso8601!(),
       %{
         type: "substack.subscriber.event",
         app: app,
@@ -170,31 +156,35 @@ defmodule Cortex.Scrapers.Substack do
     {new_subs, updated_subs}
   end
 
-  def produce_subscriber_events(%__MODULE__{} = self, []) do
+  def produce_subscriber_events!([]) do
     Logger.info("No new subscriber events")
-    self
+    :ok
   end
 
-  def produce_subscriber_events(%__MODULE__{} = self, events) do
-    for chunk <- events |> Enum.chunk_every(100) do
-      Events.produce!(chunk)
-    end
+  def produce_subscriber_events!(event_values) when is_list(event_values) do
+    for chunk <- event_values |> Enum.chunk_every(100),
+      do: chunk |> Events.produce!()
 
-    new_event_at =
-      events
-      |> Enum.map(fn {%DateTime{} = dt, _props} -> dt end)
-      |> Enum.max(DateTime)
+    :ok
+  end
 
-    case self.last_subscriber_event_at do
-      nil ->
-        %{self | last_subscriber_event_at: new_event_at}
+  defp most_recent_datetime_from_events(event_values) do
+    event_values
+    |> Enum.max_by(&elem(&1, 0), DateTime)
+    |> elem(0)
+  end
 
-      %DateTime{} = last_subscriber_event_at ->
-        case new_event_at |> DateTime.compare(last_subscriber_event_at) do
-          :gt -> %{self | last_subscriber_event_at: new_event_at}
-          _ -> self
-        end
-    end
+  defp first_email_from_events([{_datetime, %{email: email}} | _]), do: email
+
+  # If we are recoding _no_ events, then there is no update.
+  def update(%__MODULE__{} = self, []), do: self
+
+  def update(%__MODULE__{} = self, event_values) when is_list(event_values) do
+    %{
+      self
+      | last_subscriber_email: first_email_from_events(event_values),
+        last_subscriber_event_at: most_recent_datetime_from_events(event_values)
+    }
   end
 
   def scrape(%Scraper{id: id, config: config, state: state}) do
@@ -216,9 +206,9 @@ defmodule Cortex.Scrapers.Substack do
       all: all_sub_events |> length()
     )
 
-    new_state = self |> produce_subscriber_events(all_sub_events) |> to_state()
+    all_sub_events |> produce_subscriber_events!()
 
-    {:ok, new_state}
+    {:ok, self |> update(all_sub_events) |> to_state()}
   end
 
   # def scrape(%Subscrape{} = config, app) do
