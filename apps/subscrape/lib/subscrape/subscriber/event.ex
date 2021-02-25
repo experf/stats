@@ -12,13 +12,21 @@ defmodule Subscrape.Subscriber.Event do
 
   @type subscriber :: binary | map
 
-  @endpoint %Endpoint{
-    format: "/api/v1/subscriber/<%= email %>/events",
-    extract_key: "events",
-    page_arg: "before"
+  @type t :: %{
+    optional(:post_title) => binary,
+    optional(:post_url) => binary,
+    :text => binary,
+    :timestamp => binary,
+    :url => binary | nil,
   }
 
-  def datetime_for(%{"timestamp" => iso8601_s}) do
+  @endpoint %Endpoint{
+    format: "/api/v1/subscriber/<%= email %>/events",
+    extract_key: :events,
+    page_arg: :before
+  }
+
+  def datetime_for(%{timestamp: iso8601_s}) do
     with {:ok, datetime, _} <- DateTime.from_iso8601(iso8601_s),
          do: {:ok, datetime}
   end
@@ -49,8 +57,8 @@ defmodule Subscrape.Subscriber.Event do
       config,
       @endpoint |> Endpoint.bind(email: email),
       %{
-        "email" => email,
-        "limit" => kwds |> Keyword.get(:limit, config.subscriber_events_limit),
+        email: email,
+        limit: kwds |> Keyword.get(:limit, config.subscriber_events_limit),
       } |> Map.merge(args),
       test_fn,
       opts

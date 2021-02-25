@@ -5,8 +5,8 @@ defmodule Subscrape.Endpoint do
 
   @type t :: %__MODULE__{
     format: binary,
-    extract_key: nil | binary,
-    page_arg: nil | binary,
+    extract_key: nil | atom,
+    page_arg: nil | atom,
   }
 
   @doc ~S"""
@@ -53,4 +53,4 @@ defmodule Subscrape.Endpoint do
     self.format |> EEx.eval_string(encoded_params)
   end
 
-end # defmodule Subscrape.Endpoint
+end

@@ -193,7 +193,7 @@ defmodule Subscrape.HTTP do
   records returned is equal to that limit.
   """
   @spec while_more(Subscrape.Endpoint.t(), map, list) :: boolean
-  def while_more(_endpoint, %{"limit" => limit}, records)
+  def while_more(_endpoint, %{limit: limit}, records)
       when is_integer(limit) and limit > 0 and is_list(records),
       do: length(records) == limit
 
@@ -207,7 +207,7 @@ defmodule Subscrape.HTTP do
           map,
           keyword
         ) :: {:error, any} | {:ok, any}
-  def collect(config, endpoint, %{"limit" => limit} = args, opts \\ [])
+  def collect(config, endpoint, %{limit: limit} = args, opts \\ [])
       when is_integer(limit) and limit > 0 do
     collect_while(
       config,
@@ -254,7 +254,7 @@ defmodule Subscrape.HTTP do
         test_fn,
         opts
       )
-      when is_binary(extract_key) and is_binary(page_arg) do
+      when is_atom(extract_key) and is_atom(page_arg) do
     with {:ok, %{^extract_key => records}} when is_list(records) <-
            request(config, endpoint, args, opts) do
       if length(records) > 0 && test_fn.(endpoint, args, records) do
@@ -372,7 +372,7 @@ defmodule Subscrape.HTTP do
 
     case Cache.get(config, url, args) do
       {:hit, b} ->
-        {:ok, b |> Jason.decode!()}
+        {:ok, b |> Jason.decode!(keys: :atoms)}
 
       :miss ->
         request = prepare_request(config, url, args, opts)
@@ -404,7 +404,7 @@ defmodule Subscrape.HTTP do
            body: body
          } = response
        ) do
-    case body |> Jason.decode() do
+    case body |> Jason.decode(keys: :atoms) do
       {:ok, payload} = result ->
         if status == 200 do
           Cache.put(config, response)

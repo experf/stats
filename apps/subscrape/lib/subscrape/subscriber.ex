@@ -16,12 +16,17 @@ defmodule Subscrape.Subscriber do
 
   @list_endpoint %Endpoint{
     format: "/api/v1/subscriber/",
-    extract_key: "subscribers",
-    page_arg: "after"
+    extract_key: :subscribers,
+    page_arg: :after
+  }
+
+  @type t :: %{
+    email: binary,
+    id: pos_integer,
   }
 
   def email_for(email) when is_binary(email), do: email
-  def email_for(%{"email" => email}) when is_binary(email), do: email
+  def email_for(%{email: email}) when is_binary(email), do: email
 
   @doc ~S"""
   Get a list of _all_ subscribers. Iterates through them page-by-page,
@@ -32,23 +37,23 @@ defmodule Subscrape.Subscriber do
   Each _entry_ in the subscriber list looks something like:
 
       %{
-        "email" => "xander@futureperfect.studio",
-        "expiry" => nil,
-        "id" => 16585900,
-        "lastActivity" => %{
-          "amount_paid" => 0,
-          "data_updated_at" => "2021-02-12T11:18:21.497000000-08:00",
-          "emails_opened" => 6,
-          "emails_received" => 8,
-          "last_click" => "2021-01-27T03:58:11.090000000+00:00",
-          "last_open" => "2021-02-04T00:55:18.588000000+00:00",
-          "links_clicked" => 51,
-          "publication_id" => 35776,
-          "source" => "direct",
-          "user_id" => 16585900
+        email: "xander@futureperfect.studio",
+        expiry: nil,
+        id: 16585900,
+        lastActivity: %{
+          amount_paid: 0,
+          data_updated_at: "2021-02-12T11:18:21.497000000-08:00",
+          emails_opened: 6,
+          emails_received: 8,
+          last_click: "2021-01-27T03:58:11.090000000+00:00",
+          last_open: "2021-02-04T00:55:18.588000000+00:00",
+          links_clicked: 51,
+          publication_id: 35776,
+          source: "direct",
+          user_id: 16585900
         },
-        "subscription_id" => 33518260,
-        "type" => nil
+        subscription_id: 33518260,
+        type: nil
       }
 
   > ❗ It's important to note that the `lastActivity.data_updated_at` field
@@ -69,9 +74,9 @@ defmodule Subscrape.Subscriber do
       config,
       @list_endpoint,
       %{
-        "term" => kwds |> Keyword.get(:term, ""),
-        "filter" => kwds |> Keyword.get(:filter),
-        "limit" => kwds |> Keyword.get(:limit, config.subscriber_list_limit)
+        term: kwds |> Keyword.get(:term, ""),
+        filter: kwds |> Keyword.get(:filter),
+        limit: kwds |> Keyword.get(:limit, config.subscriber_list_limit)
       },
       opts
     )
@@ -228,9 +233,9 @@ defmodule Subscrape.Subscriber do
 
   @spec active_since?(map, DateTime.t()) :: boolean
   defp active_since?(subscriber_list_entry, %DateTime{} = since) do
-    ["last_click", "last_open"]
+    [:last_click, :last_open]
     |> Enum.any?(fn key ->
-      case subscriber_list_entry |> get_in(["lastActivity", key]) do
+      case subscriber_list_entry |> get_in([:lastActivity, key]) do
         nil ->
           false
 

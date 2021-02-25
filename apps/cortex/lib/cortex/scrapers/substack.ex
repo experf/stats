@@ -1,17 +1,15 @@
 defmodule Cortex.Scrapers.Substack do
   require Logger
 
-  alias Cortex.Events
   alias Cortex.Scrapers.Scraper
   alias Cortex.Ext
+  alias Cortex.Scrapers.Substack.Subscriber
 
-  @event_subtypes %{
-    "Clicked link in email" => "email.link.click",
-    "Dropped email" => "sub.drop",
-    "Free Signup" => "sub.new",
-    "Opened email" => "email.open",
-    "Post seen" => "post.view",
-    "Received email" => "email.receive"
+  @type t :: %__MODULE__{
+    app: binary,
+    client: Subscrape.t(),
+    last_subscriber_event_at: nil | DateTime.t(),
+    last_subscriber_email: nil | binary,
   }
 
   defstruct [
@@ -49,111 +47,11 @@ defmodule Cortex.Scrapers.Substack do
     )
   end
 
-  def to_state(%__MODULE__{} = self) do
+  def to_state(%__MODULE__{} = this) do
     %{
-      "last_subscriber_email" => self.last_subscriber_email,
-      "last_subscriber_event_at" => self.last_subscriber_event_at
+      "last_subscriber_email" => this.last_subscriber_email,
+      "last_subscriber_event_at" => this.last_subscriber_event_at
     }
-  end
-
-  def prepare_subscriber_event(
-        app,
-        email,
-        %{"text" => text, "timestamp" => iso8601} = event
-      ) do
-    subtype = @event_subtypes |> Map.get(text, "other")
-
-    {
-      iso8601 |> Ext.DateTime.from_iso8601!(),
-      %{
-        type: "substack.subscriber.event",
-        app: app,
-        email: email,
-        src: event,
-        subtype: subtype
-      }
-    }
-  end
-
-  def scrape_new_subscriber_events(_self, []), do: []
-
-  def scrape_new_subscriber_events(
-        %__MODULE__{app: app, client: client},
-        subscribers
-      ) do
-    subscribers
-    |> Enum.reduce(
-      [],
-      fn %{"email" => email}, result ->
-        events =
-          client
-          |> Subscrape.Subscriber.Event.all!(email)
-          |> Enum.map(fn event ->
-            prepare_subscriber_event(app, email, event)
-          end)
-
-        result |> Enum.concat(events)
-      end
-    )
-  end
-
-  def scrape_updated_subscriber_events(_self, []), do: []
-
-  def scrape_updated_subscriber_events(
-        %__MODULE__{
-          app: app,
-          client: client,
-          last_subscriber_event_at: last_subscriber_event_at
-        },
-        subscribers
-      ) do
-    subscribers
-    |> Enum.reduce(
-      [],
-      fn %{"email" => email}, result ->
-        events =
-          client
-          |> Subscrape.Subscriber.Event.since!(
-            email,
-            last_subscriber_event_at
-          )
-          |> Enum.map(fn event ->
-            prepare_subscriber_event(app, email, event)
-          end)
-
-        result |> Enum.concat(events)
-      end
-    )
-  end
-
-  # This is the initial-state case, when there is no state information about
-  # what events have been scraped.
-  #
-  # In this case, we scrape _everyone_. It takes some time.
-  #
-  defp subscribers_to_scrape(%__MODULE__{
-         client: client,
-         last_subscriber_event_at: nil
-       }),
-       do: {client |> Subscrape.Subscriber.list!(), []}
-
-  defp subscribers_to_scrape(%__MODULE__{
-         client: client,
-         last_subscriber_event_at: %DateTime{} = last_subscriber_event_at,
-         last_subscriber_email: last_subscriber_email
-       }) do
-    {new_subs, previously_scraped_subs} =
-      client
-      |> Subscrape.Subscriber.list!()
-      |> Enum.split_while(fn %{"email" => email} ->
-        email != last_subscriber_email
-      end)
-
-    updated_subs =
-      previously_scraped_subs
-      |> Subscrape.Subscriber.active_since(last_subscriber_event_at)
-
-    {new_subs, updated_subs}
   end
 
   def produce_subscriber_events!([]) do
@@ -163,52 +61,19 @@ defmodule Cortex.Scrapers.Substack do
 
   def produce_subscriber_events!(event_values) when is_list(event_values) do
     for chunk <- event_values |> Enum.chunk_every(100),
-      do: chunk |> Events.produce!()
+      do: chunk |> Cortex.Events.produce!()
 
     :ok
   end
 
-  defp most_recent_datetime_from_events(event_values) do
-    event_values
-    |> Enum.max_by(&elem(&1, 0), DateTime)
-    |> elem(0)
-  end
-
-  defp first_email_from_events([{_datetime, %{email: email}} | _]), do: email
-
-  # If we are recoding _no_ events, then there is no update.
-  def update(%__MODULE__{} = self, []), do: self
-
-  def update(%__MODULE__{} = self, event_values) when is_list(event_values) do
-    %{
-      self
-      | last_subscriber_email: first_email_from_events(event_values),
-        last_subscriber_event_at: most_recent_datetime_from_events(event_values)
-    }
-  end
-
   def scrape(%Scraper{id: id, config: config, state: state}) do
-    self = new(config, state)
+    this = new(config, state)
 
-    Logger.info("Scraping Substack", scraper_id: id, self: self)
+    Logger.info("Scraping Substack", scraper_id: id, this: this)
 
-    {new_subs, updated_subs} = self |> subscribers_to_scrape()
+    this = this |> Subscriber.Event.scrape!()
 
-    new_sub_events = self |> scrape_new_subscriber_events(new_subs)
-    updated_sub_events = self |> scrape_updated_subscriber_events(updated_subs)
-
-    all_sub_events = new_sub_events ++ updated_sub_events
-
-    Logger.debug(
-      "COUNTS",
-      new: new_sub_events |> length(),
-      updated: updated_sub_events |> length(),
-      all: all_sub_events |> length()
-    )
-
-    all_sub_events |> produce_subscriber_events!()
-
-    {:ok, self |> update(all_sub_events) |> to_state()}
+    {:ok, this |> to_state()}
   end
 
   # def scrape(%Subscrape{} = config, app) do
