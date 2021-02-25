@@ -310,7 +310,7 @@ defmodule Subscrape.HTTP do
 
   > ℹ️ See `url/3`
 
-  When `config.cache_root` is set (not `nil`), a hash is computed from the
+  When `config.cache` is set (not `nil`), a hash is computed from the
   `config.subdomain`, the request URL, and the `args`, and the corresponding
   file path is first checked.
 
@@ -350,7 +350,7 @@ defmodule Subscrape.HTTP do
   1.  The response status is `200`
   2.  The response body is successfully JSON decoded
 
-  then we cache the decoded payload (if `config.cache_root` is set)
+  then we cache the decoded payload (if `config.cache` is set)
   and return a tuple:
 
       {:ok, decoded_payload}

@@ -108,7 +108,10 @@ config :cortex_web, CortexWeb.LinkEndpoint,
   ]
 
 config :subscrape, Subscrape,
-  cache_root: Path.expand("../tmp/cache/subscrape/2021-02-25", __DIR__)
+  cache: %{
+    root: Path.expand("../tmp/cache/subscrape/2021-02-24", __DIR__),
+    read_only: true
+  }
 
 import_if_exists = fn rel_path ->
   if File.exists?("#{__DIR__}/#{rel_path}"), do: import_config(rel_path)

@@ -1,4 +1,24 @@
 defmodule Subscrape.Cache do
+  @type t :: %__MODULE__{
+          root: binary,
+          read_only: boolean
+        }
+
+  defstruct [
+    :root,
+    read_only: false
+  ]
+
+  @spec new(binary | map) :: t()
+  def new(root) when is_binary(root),
+    do: __MODULE__ |> struct!(root: root)
+
+  def new(props) when is_map(props),
+    do: __MODULE__ |> struct!(props)
+
+  def cast(nil), do: nil
+  def cast(x), do: new(x)
+
   # Recursively expand maps into sorted lists of `[key, value]` lists in order to
   # produce a consistent `JSON` string.
   defp order_maps(x) do
@@ -41,29 +61,36 @@ defmodule Subscrape.Cache do
   @doc ~S"""
   Path to a cache file, see `key/3`.
   """
-  def path(%Subscrape{cache_root: cache_root} = config, url, args)
-      when is_binary(cache_root),
-      do: Path.join(cache_root, filename(config, url, args))
+  def path(
+        %Subscrape{
+          cache: %__MODULE__{
+            root: root
+          }
+        } = config,
+        url,
+        args
+      )
+      when is_binary(root),
+      do: Path.join(config.cache.root, filename(config, url, args))
 
-  def get(%Subscrape{cache_root: cache_root} = config, url, args)
-      when is_binary(cache_root) do
+  def get(%Subscrape{cache: nil}, _, _), do: :miss
+
+  def get(%Subscrape{cache: %__MODULE__{}} = config, url, args) do
     path = path(config, url, args)
 
     if File.exists?(path), do: {:hit, File.read!(path)}, else: :miss
   end
 
-  def get(%Subscrape{cache_root: cache_root}, _, _) when is_nil(cache_root),
-    do: :miss
+  def put(%Subscrape{cache: nil}, _), do: :ok
 
-  def put(%Subscrape{cache_root: cache_root}, _) when is_nil(cache_root),
-    do: :ok
+  def put(%Subscrape{cache: %__MODULE__{read_only: true}}, _), do: :ok
 
   def put(
-        %Subscrape{cache_root: cache_root} = config,
+        %Subscrape{cache: %__MODULE__{root: root}} = config,
         %HTTPoison.Response{} = response
       )
-      when is_binary(cache_root) do
-    unless File.exists?(cache_root), do: File.mkdir_p!(cache_root)
+      when is_binary(root) do
+    unless File.exists?(root), do: File.mkdir_p!(root)
 
     path(config, response.request_url, response.request.options[:args])
     |> File.write!(response.body)
@@ -74,6 +101,11 @@ defmodule Subscrape.Cache do
   @doc ~S"""
   Clear the cache by deleting the directory.
   """
-  def clear(%Subscrape{cache_root: cache_root}) when is_binary(cache_root),
-      do: cache_root |> File.rm_rf!()
+  def clear(%Subscrape{
+        cache: %__MODULE__{
+          root: root
+        }
+      })
+      when is_binary(root),
+      do: root |> File.rm_rf!()
 end

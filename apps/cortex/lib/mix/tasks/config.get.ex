@@ -49,7 +49,12 @@ defmodule Mix.Tasks.Config.Get do
 
       ```bash
       $ mix config.get :subscrape Subscrape
-      [cache_root: "/Users/nrser/src/gh/nrser/tmp/cache/subscrape"]
+      [
+        cache: %{
+          read_only: true,
+          root: "/Users/nrser/src/gh/nrser/stats/tmp/cache/subscrape/2021-02-24"
+        }
+      ]
       ```
 
   4.  When converting to `JSON` we convert `Keyword` lists to objects:
@@ -57,7 +62,10 @@ defmodule Mix.Tasks.Config.Get do
       ```bash
       $ mix config.get :subscrape Subscrape --output json
       {
-        "cache_root": "/Users/nrser/src/gh/nrser/tmp/cache/subscrape"
+        "cache": {
+          "read_only": true,
+          "root": "/Users/nrser/src/gh/nrser/stats/tmp/cache/subscrape/2021-02-24"
+        }
       }
       ```
 

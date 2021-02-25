@@ -5,13 +5,15 @@ defmodule Subscrape do
 
   require Logger
 
+  alias Subscrape.Cache
+
   @type t :: %__MODULE__{
           subdomain: binary,
           sid: binary,
           user_agent: binary,
           subscriber_list_limit: integer,
           subscriber_events_limit: integer,
-          cache_root: nil | binary,
+          cache: nil | Cache.t(),
         }
 
   @doc ~S"""
@@ -82,7 +84,7 @@ defmodule Subscrape do
   -   `:max_retry_attempts` — Number of times to retry a failed `HTTP` request
       (which is usually due to timeout). Defaults to `3`.
 
-  -   `:cache_root` — Where to keep a cache of response data. This is useful in
+  -   `:cache` — Where to keep a cache of response data. This is useful in
       development as Substack's API has rate limiting.
   """
   @enforce_keys [:subdomain, :sid]
@@ -96,11 +98,28 @@ defmodule Subscrape do
     subscriber_list_limit: 100,
     subscriber_events_limit: 100,
     max_retry_attempts: 3,
-    cache_root: Application.get_env(:subscrape, __MODULE__, [])[:cache_root],
+    cache: nil,
   ]
 
-  def new(props) when is_map(props) or is_list(props) do
-    __MODULE__ |> struct!(props)
+  @spec get_env() :: map
+  def get_env() do
+    case Application.get_env(:subscrape, __MODULE__, %{}) do
+      kwds when is_list(kwds) -> kwds |> Enum.into(%{})
+      map when is_map(map) -> map
+    end
+  end
+
+  def new(props) when is_map(props) do
+    __MODULE__
+    |> struct!(
+      get_env()
+      |> Map.merge(props)
+      |> Map.update(:cache, nil, &Cache.cast/1)
+    )
+  end
+
+  def new(kwds) when is_list(kwds) do
+    kwds |> Enum.into(%{}) |> new()
   end
 
   def opt!(%__MODULE__{} = self, opts, key)

@@ -34,14 +34,14 @@ defmodule SS do
     subdomain = System.get_env("STATS_MILK_SUBDOMAIN")
     sid = System.get_env("STATS_MILK_SID")
 
-    %Subscrape{subdomain: subdomain, sid: sid}
+    Subscrape.new(subdomain: subdomain, sid: sid)
   end
 
   def bad_config() do
     %Subscrape{
       subdomain: System.get_env("STATS_MILK_SUBDOMAIN"),
       sid: "",
-      cache_root: nil,
+      cache: nil,
       max_retry_attempts: 1,
     }
   end
