@@ -33,7 +33,59 @@ defmodule Cortex.Scrapers.Substack.Subscriber.Event do
 
   @produce_chunk_size 100
 
-  def subtype(text), do: @subtypes |> Map.get(text, "other")
+  # Helpers
+  # ==========================================================================
+
+  # Helps `scrape_new!/2` and `scrape_updated!/2` map over `to_cortex_event/3`.
+  #
+  defp to_cortex_events(events, email, app) do
+    events |> Enum.map(fn e -> e |> to_cortex_event(email, app) end)
+  end
+
+  # Extracts the most recent `t:DateTime.t/0` from a non-empty list of Cortex
+  # events. Used to update `last_subscriber_event_at` in the state.
+  defp most_recent_event_at(events) do
+    events
+    |> Enum.max_by(&elem(&1, 0), DateTime)
+    |> elem(0)
+  end
+
+  # Grab the most recent subscriber email from a non-empty list of Cortex
+  # events, in order to update `last_subscriber_email` in the state.
+  #
+  # Because:
+  #
+  # 1.  Subscribers are ordered with most recent first.
+  # 2.  Events are ordered by subscriber.
+  # 3.  New subscribers are listed before updated ones.
+  #
+  # This simply amounts to the email on the first event.
+  #
+  defp most_recent_subscriber_email([{_, %{email: email}} | _]), do: email
+
+  # Update the `t:Cortex.Scrapers.Substack.t/0` struct when there were no
+  # events found, hence no update.
+  #
+  defp update(%Substack{} = this, []), do: this
+
+  # Update the `t:Cortex.Scrapers.Substack.t/0` struct when there were events
+  # found, setting `last_subscriber_email` and `last_subscriber_event_at`.
+  #
+  defp update(%Substack{} = this, events) when is_list(events) do
+    %{
+      this
+      | last_subscriber_email: most_recent_subscriber_email(events),
+        last_subscriber_event_at: most_recent_event_at(events)
+    }
+  end
+
+
+  # Public API
+  # ==========================================================================
+
+  @spec subtype(binary) :: binary
+  def subtype(text) when is_binary(text),
+    do: @subtypes |> Map.get(text, "other")
 
   @doc ~S"""
   Convert a Substack subscriber event (as returned from
@@ -97,10 +149,6 @@ defmodule Cortex.Scrapers.Substack.Subscriber.Event do
     }
   end
 
-  defp to_cortex_events(events, email, app) do
-    events |> Enum.map(fn e -> e |> to_cortex_event(email, app) end)
-  end
-
   @doc ~S"""
   Given a list of subscribers that appear to have been added _since_ the last
   scrape (per `last_subscriber_email` in the `Substack` struct), scrape
@@ -149,7 +197,7 @@ defmodule Cortex.Scrapers.Substack.Subscriber.Event do
         ) :: [t()]
   def scrape_updated!(substack, subscriber_list)
 
-  def scrape_updated!(_substack, []), do: []
+  def scrape_updated!(_, []), do: []
 
   def scrape_updated!(
         %Substack{
@@ -168,25 +216,9 @@ defmodule Cortex.Scrapers.Substack.Subscriber.Event do
     end)
   end
 
-  defp most_recent_event_at(events) do
-    events
-    |> Enum.max_by(&elem(&1, 0), DateTime)
-    |> elem(0)
-  end
-
-  defp most_recent_subscriber_email([{_, %{email: email}} | _]), do: email
-
-  # If we are recoding _no_ events, then there is no update.
-  def update(%Substack{} = this, []), do: this
-
-  def update(%Substack{} = this, events) when is_list(events) do
-    %{
-      this
-      | last_subscriber_email: most_recent_subscriber_email(events),
-        last_subscriber_event_at: most_recent_event_at(events)
-    }
-  end
-
+  @doc ~S"""
+  Do the scrape, returning an updated `Cortex.Scrapers.Substack.t/0` struct.
+  """
   def scrape!(
         %Substack{
           last_subscriber_email: last_subscriber_email,
