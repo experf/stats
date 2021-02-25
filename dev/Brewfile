@@ -1,3 +1,4 @@
 brew "pyenv"
 brew "pyenv-virtualenv"
 brew "yarn"
+brew "jack"
