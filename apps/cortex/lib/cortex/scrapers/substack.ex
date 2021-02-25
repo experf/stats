@@ -54,18 +54,6 @@ defmodule Cortex.Scrapers.Substack do
     }
   end
 
-  def produce_subscriber_events!([]) do
-    Logger.info("No new subscriber events")
-    :ok
-  end
-
-  def produce_subscriber_events!(event_values) when is_list(event_values) do
-    for chunk <- event_values |> Enum.chunk_every(100),
-      do: chunk |> Cortex.Events.produce!()
-
-    :ok
-  end
-
   def scrape(%Scraper{id: id, config: config, state: state}) do
     this = new(config, state)
 
