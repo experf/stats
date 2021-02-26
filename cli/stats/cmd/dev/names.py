@@ -28,10 +28,10 @@ def add_to(subparsers):
     )
 
 
-def run(args):
+def run(limit):
     with CSV_PATH.open("r") as file:
         reader = csv.reader(file)
-        matches = [row for row in reader if len(row[0]) <= args.limit]
+        matches = [row for row in reader if len(row[0]) <= limit]
 
         table = Table.grid(padding=(1, 2))
         table.add_column("Term")

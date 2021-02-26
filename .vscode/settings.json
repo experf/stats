@@ -1,4 +1,4 @@
 {
   "python.pythonPath": "${env:HOME}/.pyenv/versions/experf-stats/bin/python",
-  "python.linting.pylintEnabled": true,
+  "python.linting.pylintEnabled": false,
 }

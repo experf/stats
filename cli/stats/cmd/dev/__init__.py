@@ -9,11 +9,11 @@ def add_to(subparsers):
         help="Stuff used developing this CLI and the rest of the app",
     )
 
-    parser.add_argument(
-        "--blah",
-        choices=["one", "two"],
-        help="BLAH!",
-    )
+    # parser.add_argument(
+    #     "--blah",
+    #     choices=["one", "two"],
+    #     help="BLAH!",
+    # )
 
     # parser.add_argument(
     #     "argv",

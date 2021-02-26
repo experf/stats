@@ -12,14 +12,14 @@ from typing import (
 # from warnings import warn
 
 from rich.table import Table
-from rich.console import Console, ConsoleRenderable, RichCast
+from rich.console import Console
 from rich.text import Text
 from rich.style import Style
 # from rich.containers import Renderables
 from rich.traceback import Traceback
 from rich.pretty import Pretty
 
-from .io import OUT, ERR
+from .io import OUT, ERR, is_rich
 from . import cfg
 
 CRITICAL = logging.CRITICAL  # 50
@@ -30,10 +30,6 @@ WARN = logging.WARN  # ↑
 INFO = logging.INFO  # 20
 DEBUG = logging.DEBUG  # 10
 NOTSET = logging.NOTSET  # 0
-
-
-def is_rich_renderable(x: Any) -> bool:
-    return isinstance(x, (ConsoleRenderable, RichCast))  # , str))
 
 
 def get_pkg_logger():
@@ -202,7 +198,7 @@ class RichHandler(logging.Handler):
             table.add_column(style=Style(color="#4ec9b0", italic=True))
             table.add_column()
             for key, value in record.data.items():
-                if is_rich_renderable(value):
+                if is_rich(value):
                     rich_value_type = None
                     rich_value = value
                 else:

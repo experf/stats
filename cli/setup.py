@@ -24,6 +24,8 @@ setuptools.setup(
         "requests>=2.24.0,<3.0",
         "kafka-python>=2.0.2,<3",
         "beautifulsoup4>=4.9.3,<5",
+        # midi experiment
+        "python-rtmidi>=1.4.7,<2",
     ],
     scripts = [
         'bin/stats',
