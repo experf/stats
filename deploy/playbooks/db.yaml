@@ -1,0 +1,11 @@
+---
+- name: >-
+    Deploy stats database
+  hosts: db
+  become: true
+  become_user: root
+  
+  roles:
+    - role: nrser.nansi.postgres
+  
+  

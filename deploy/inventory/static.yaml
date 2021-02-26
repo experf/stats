@@ -1,0 +1,39 @@
+# https://docs.ansible.com/ansible/latest/plugins/inventory/yaml.html
+# 
+all:
+  hosts:
+    pixeldust:
+      ansible_host: 52.188.205.122
+      # tf_provider: azurerm
+      # tf_resource: azurerm_linux_virtual_machine
+      
+  # Groups
+  # ==========================================================================
+  # 
+  # Hosts are assigned here, variables are assigned in
+  # 
+  #     @/inventory/group_vars/<group_name>.yaml
+  # 
+  children:
+    # Provider Groups
+    # ========================================================================
+    
+    azure:
+      hosts:
+        pixeldust:
+    
+    # Operating System Groups
+    # ========================================================================
+          
+    ubuntu:
+      hosts:
+        pixeldust: {}
+    
+    # Application Groups
+    # ========================================================================
+        
+    db:
+      hosts:
+        pixeldust: {}
+    
+    
