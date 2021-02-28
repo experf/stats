@@ -1,0 +1,20 @@
+---
+- name: >-
+    Setup stats app prerequisites
+  hosts: app
+  become: true
+  become_user: root
+  
+  tasks:
+    - name: Install Erlang
+      nrser.nansi.erlang_package:
+        version: 23.2.1
+        
+    - name: Install Elixir
+      nrser.nansi.elixir_package:
+        version: 1.11.2
+        
+    - name: Install NodeJS
+      nrser.nansi.nodejs_package:
+        version: 14.16.0
+        

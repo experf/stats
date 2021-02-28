@@ -1,0 +1,60 @@
+---
+- name: >-
+    Deploy Kafka to stats servers
+  hosts: kafka
+  become: true
+  become_user: root
+  
+  tasks:
+    # Resources:
+    # 
+    # 1.  https://medium.com/better-programming/a-simple-apache-kafka-cluster-with-docker-kafdrop-and-python-cf45ab99e2b9
+    # 
+    - name: Deploy single-instance Zookeeper
+      nrser.nansi.systemd_docker_service:
+        name: zookeeper
+        state: present
+        description: Zookeeper (for Kafka)
+        tag: "zookeeper:3.6.2"
+        config:
+          - nrser.nansi.serialize:
+              data:
+                ZOO_MY_ID: 1
+                ZOO_SERVERS: server.1=0.0.0.0:2888:2889;2181
+              format: env
+              dest: "{config}/.env"
+              mode: '0600'
+        opts:
+          hostname: zookeeper
+          network: host
+          volume:
+            - "zookeeper-data:/data:rw"
+            - "zookeeper-datalog:/datalog:rw"
+          env-file: "{config}/.env"
+  
+    - name: Deploy single-instance Kafka
+      nrser.nansi.systemd_docker_service:
+        name: kafka
+        state: present
+        description: Kafka Broker
+        tag: "confluentinc/cp-kafka:5.5.3"
+        requires:
+          - zookeeper.service
+        config:
+          - nrser.nansi.serialize:
+              data:
+                KAFKA_ADVERTISED_LISTENERS: LISTENER_HOST_NETWORK://127.0.0.1:9091
+                KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_HOST_NETWORK:PLAINTEXT
+                KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_HOST_NETWORK
+                KAFKA_ZOOKEEPER_CONNECT: "127.0.0.1:2181"
+                KAFKA_BROKER_ID: 1
+                KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+              format: env
+              dest: "{config}/.env"
+              mode: '0600'
+        opts:
+          hostname: kafka
+          network: host
+          volume:
+            - "kafka-data:/var/lib/kafka/data:rw"
+          env-file: "{config}/.env"

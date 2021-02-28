@@ -1,0 +1,9 @@
+- name: >-
+    Scratch bytes
+  hosts: pixeldust
+  become: true
+  become_user: root
+  # gather_facts: false
+  
+  roles:
+    - role: nrser.nansi.opscripts

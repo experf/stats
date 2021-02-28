@@ -35,5 +35,13 @@ all:
     db:
       hosts:
         pixeldust: {}
+        
+    kafka:
+      hosts:
+        pixeldust: {}
+        
+    app:
+      hosts:
+        pixeldust: {}
     
     
