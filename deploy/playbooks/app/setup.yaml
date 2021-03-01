@@ -8,7 +8,7 @@
   tasks:
     - name: Install Erlang
       nrser.nansi.erlang_package:
-        version: 23.2.1
+        version: 23.2.3
         
     - name: Install Elixir
       nrser.nansi.elixir_package:

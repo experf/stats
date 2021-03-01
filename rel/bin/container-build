@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+# Common / useful `set` commands
+set -Ee # Exit on error
+set -o pipefail # Check status of piped commands
+set -u # Error on undefined vars
+# set -v # Print everything
+set -x # Print commands (with expanded vars)
+
+cd /opt/build
+
+APP_NAME="cortex"
+APP_VSN="0.1.0"
+
+mkdir -p /opt/build/rel/artifacts
+
+cd /opt/build
+
+export MIX_ENV=prod
+
+export SECRET_KEY_BASE="$(mix phx.gen.secret)"
+export DATABASE_URL=ecto://USER:PASS@HOST/database
+
+# Fetch deps and compile
+mix deps.get
+# Run an explicit clean to remove any build artifacts from the host
+mix do clean, compile --force
+
+# Phoenix
+#
+# https://hexdocs.pm/distillery/guides/phoenix_walkthrough.html
+cd apps/cortex_web
+npm run deploy --prefix assets
+cd /opt/build
+
+mix phx.digest
+
+# Build the release
+mix distillery.release
+# Copy tarball to output
+cp "_build/prod/rel/$APP_NAME/releases/$APP_VSN/$APP_NAME.tar.gz" rel/artifacts/"$APP_NAME-$APP_VSN.tar.gz"
+
+exit 0
