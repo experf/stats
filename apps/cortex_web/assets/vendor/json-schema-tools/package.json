@@ -1,4 +1,6 @@
 {
+  "name": "json-schema-tools",
+  "version": "0.0.1",
   "private": true,
   "repository": {},
   "description": "Stuff to muck w JSON Schema.",
