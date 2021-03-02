@@ -11,6 +11,7 @@ defmodule Subscrape.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
       deps: deps()
     ]
   end
@@ -31,6 +32,12 @@ defmodule Subscrape.MixProject do
       {:jason, "~> 1.0"}, # JSON en/decoder
       {:httpoison, "~> 1.8.0"}, # HTTP client
       {:ex_doc, "~> 0.23", only: :dev, runtime: false}, # Docs generation
+    ]
+  end
+
+  defp aliases do
+    [
+      setup: ["deps.get"],
     ]
   end
 end

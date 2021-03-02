@@ -11,6 +11,7 @@ defmodule Birdstrap.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.11",
       start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
       deps: deps()
     ]
   end
@@ -31,6 +32,12 @@ defmodule Birdstrap.MixProject do
       {:phoenix, "~> 1.5.7"},
       {:phoenix_html, "~> 2.11"},
       {:ex_doc, "~> 0.23", only: :dev, runtime: false}, # Docs generation
+    ]
+  end
+
+  defp aliases do
+    [
+      setup: ["deps.get"],
     ]
   end
 end
