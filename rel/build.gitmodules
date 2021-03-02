@@ -1,0 +1,14 @@
+[submodule "umbrella/apps/cortex_web/assets/vendor/bootstrap"]
+	path = apps/cortex_web/assets/vendor/bootstrap
+	url = /src/apps/cortex_web/assets/vendor/bootstrap
+[submodule "umbrella/apps/cortex_web/assets/vendor/jsoneditor"]
+	path = apps/cortex_web/assets/vendor/jsoneditor
+	url = /src/apps/cortex_web/assets/vendor/jsoneditor
+[submodule "crawler-user-agents"]
+	path = apps/cortex_web/priv/crawler-user-agents
+	url = /src/apps/cortex_web/priv/crawler-user-agents
+	branch = nrser/stats
+[submodule "nansi"]
+	path = deploy/collections/ansible_collections/nrser/nansi
+	url = /src/deploy/collections/ansible_collections/nrser/nansi
+	branch = collection

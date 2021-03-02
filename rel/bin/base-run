@@ -1,1 +1,5 @@
-docker run -it elixir-ubuntu:latest /bin/bash
+#!/usr/bin/env bash
+
+docker run \
+  -v "$(git rev-parse --show-toplevel):/src" \
+  -it elixir-ubuntu:latest /bin/bash

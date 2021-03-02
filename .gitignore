@@ -20,3 +20,6 @@ erl_crash.dump
 *.ez
 
 /tmp/
+
+# Where Distillery releases get deposited, see `//rel/bin/`
+/rel/artifacts/

@@ -25,4 +25,11 @@ RUN mix local.rebar --force && \
       github avdi/dotenv_elixir \
       ref 11effeb0ff8519ddeb04dbbbe2e56f071f830fd0
 
+RUN wget https://dl.yarnpkg.com/debian/pubkey.gpg && \
+    apt-key add pubkey.gpg && \
+    echo "deb https://dl.yarnpkg.com/debian/ stable main" \
+      > "/etc/apt/sources.list.d/yarn.list" && \
+    apt-get update -y && \
+    apt-get install -y --no-install-recommends yarn
+
 CMD ["/bin/bash"]
