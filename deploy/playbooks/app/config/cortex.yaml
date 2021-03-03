@@ -20,6 +20,8 @@
               - postgresql.service
               - kafka.service
           Service:
+            User: "{{ APP_USER }}"
+            Group: "{{ APP_USER }}"
             ExecStartPre: "{{ bin }} eval Cortex.Release.migrate"
             ExecStart: "{{ bin }} foreground"
             Restart: always
