@@ -37,12 +37,19 @@ config :cortex_web, CortexWeb.AppEndpoint,
   root: ".",
   version: Application.spec(:cortex, :vsn)
 
-# ## Using releases (Elixir v1.9+)
-#
-# If you are doing OTP releases, you need to instruct Phoenix
-# to start each relevant endpoint:
-#
-#     config :cortex_web, CortexWeb.AppEndpoint, server: true
-#
-# Then you can assemble a release by calling `mix release`.
-# See `mix help release` for more information.
+mailgun_api_key =
+  System.get_env("CORTEX_MAILGUN_API_KEY") ||
+    raise """
+    environment variable CORTEX_MAILGUN_API_KEY is missing.
+    """
+
+mailgun_domain =
+  System.get_env("CORTEX_MAILGUN_DOMAIN") ||
+    raise """
+    environment variable CORTEX_MAILGUN_DOMAIN is missing.
+    """
+
+config :cortex, Cortex.Mailer,
+  adapter: Swoosh.Adapters.Mailgun,
+  api_key: mailgun_api_key,
+  domain: mailgun_domain
