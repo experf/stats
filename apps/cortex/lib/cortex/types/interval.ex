@@ -41,7 +41,6 @@ defmodule Cortex.Types.Interval do
   # at least.
   @hours_per_day 24
   @secs_per_day @hours_per_day * @secs_per_hour
-  @microsecs_per_day @secs_per_day * @microsecs_per_sec
 
   def from_monotonic_start(start, :microsecond) do
     %Postgrex.Interval{microsecs: System.monotonic_time(:microsecond) - start}
