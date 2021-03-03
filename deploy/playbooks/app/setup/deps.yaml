@@ -1,0 +1,61 @@
+---
+- name: >-
+    Install stats app dependencies
+  hosts: app
+  become: true
+  become_user: root
+  
+  roles:
+    - role: nrser.nansi.nginx
+  
+  tasks:
+    - tags:
+        - nginx
+      block:
+        - name: Install Nginx
+          nrser.nansi.nginx_package:
+        
+        - name: Generate OpenSSL dhparam (so Nginx can use it)
+          nrser.nansi.nginx_dhparam:
+          notify: nginx_restart
+        
+        - name: Write Nginx config
+          nrser.nansi.nginx_config:
+          notify: nginx_restart
+        
+        - name: Enable Nginx server
+          service:
+            name: nginx
+            state: started
+            enabled: True
+    
+    - name: Install Docker CE
+      tags:
+        - docker
+      nrser.nansi.apt_ext:
+        state: present
+        key_id: 9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88
+        key_url: https://download.docker.com/linux/ubuntu/gpg
+        repo: deb [arch={arch}] https://download.docker.com/linux/ubuntu {release} stable
+        names:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+  
+    - name: Install Erlang
+      tags:
+        - erlang
+      nrser.nansi.erlang_package:
+        version: 23.2.3
+        
+    - name: Install Elixir
+      tags:
+        - elixir
+      nrser.nansi.elixir_package:
+        version: 1.11.2
+        
+    - name: Install NodeJS
+      tags:
+        - nodejs
+      nrser.nansi.nodejs_package:
+        version: 14.16.0

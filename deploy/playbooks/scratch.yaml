@@ -1,9 +1,9 @@
 - name: >-
     Scratch bytes
-  hosts: pixeldust
-  become: true
-  become_user: root
-  # gather_facts: false
+  hosts: localhost
+  # become: true
+  # become_user: root
+  gather_facts: false
   
-  roles:
-    - role: nrser.nansi.opscripts
+  tasks:
+    - debug: var=CORTEX_WEB_SECRET

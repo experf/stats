@@ -18,6 +18,22 @@ HUMANS:
 APP_NAME: stats
 APP_VERSION: 0.1.0
 
+CORTEX_WEB_HOST: stats.expand.live
+CORTEX_WEB_PORT: 4080
+
+CORTEX_WEB_SECRET: >-
+  {{
+    lookup(
+      'community.general.onepassword',
+      'Stats -- Cortex Web -- Secret',
+      field='password',
+      username=(
+        HUMANS | nrser.nansi.find_has_all(name=lookup('env', 'USER'))
+      ).fp_email,
+      subdomain='futureperfectcreativestudio',
+    )
+  }}
+
 APP_USER: "{{ APP_NAME }}"
 
 DB_NAME: cortex_prod
@@ -33,3 +49,4 @@ DB_PASSWORD: >-
       subdomain='futureperfectcreativestudio',
     )
   }}
+DB_HOST: localhost

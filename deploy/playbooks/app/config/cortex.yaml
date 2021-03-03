@@ -1,0 +1,36 @@
+---
+- name: >-
+    Configure Cortex
+  hosts: app
+  become: true
+  become_user: root
+  
+  vars:
+    dest: "/usr/local/experf/{{ APP_NAME }}/{{ APP_VERSION }}"
+    bin: "{{ dest }}/bin/{{ APP_NAME }}"
+  
+  tasks:
+    - name: >-
+        Configure cortex Systemd service
+      nrser.nansi.systemd_unit:
+        name: cortex
+        data:
+          Unit:
+            Description: Stats Cortex App
+            Requires:
+              - postgresql.service
+              - kafka.service
+          Service:
+            ExecStartPre: "{{ bin }} eval Cortex.Release.migrate"
+            ExecStart: "{{ bin }} foreground"
+            Restart: always
+            TimeoutStartSec: 0
+            Environment:
+              - "CORTEX_WEB_SECRET={{ CORTEX_WEB_SECRET }}"
+              - "CORTEX_DATABASE_URL=ecto://{{ APP_USER }}:{{ DB_PASSWORD }}@{{ DB_HOST }}/{{ DB_NAME }}"
+              - "CORTEX_WEB_HOST={{ CORTEX_WEB_HOST }}"
+              - "CORTEX_WEB_PORT={{ CORTEX_WEB_PORT }}"
+          Install:
+            WantedBy: multi-user.target  
+            
+    

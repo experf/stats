@@ -7,6 +7,7 @@
   
   vars:
     dest: "/usr/local/experf/{{ APP_NAME }}/{{ APP_VERSION }}"
+    bin: "{{ dest }}/bin/{{ APP_NAME }}"
   
   tasks:
     - file:
@@ -24,15 +25,5 @@
         path: "{{ dest }}"
         owner: "{{ APP_USER }}"
         group: "{{ APP_USER }}"
-    
-    # - nrser.nansi.systemd_unit:
-    #     data:
-    #       Unit:
-    #         Description: Stats App
-    #         Requires:
-    #           - postgresql.service
-    #           - kafka.service
-    #       Service:
-    #         ExecStartPre:
             
     

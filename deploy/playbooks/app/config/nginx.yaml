@@ -1,0 +1,22 @@
+---
+- name: >-
+    Setup Nginx to proxy to stats app
+  hosts: app
+  become: true
+  become_user: root
+  
+  roles:
+    - role: nrser.nansi.nginx
+  
+  tasks:    
+    - nrser.nansi.nginx_site:
+        name: stats
+        server_names:
+          - "{{ CORTEX_WEB_HOST }}"
+        log_dir: /var/log/nginx/stats
+        lets_encrypt: True
+        http: redirect
+        https: True
+        proxy: True
+        proxy_port: "{{ CORTEX_WEB_PORT }}"
+        
