@@ -39,6 +39,14 @@ environment :prod do
   set include_src: false
   set cookie: :"u`sn5?v46&ESMU1n46S)nwJ}c[Dd%_LMSx3%9c?Jl~:cu%3L=]wP*/ltit9O3Oe9"
   set vm_args: "rel/vm.args"
+
+  # SEE https://hexdocs.pm/distillery/config/runtime.html#mix-config-provider
+  set config_providers: [
+    {Distillery.Releases.Config.Providers.Elixir, ["${RELEASE_ROOT_DIR}/etc/prod.secret.exs"]}
+  ]
+  set overlays: [
+    {:copy, "rel/config/prod.secret.exs", "etc/prod.secret.exs"}
+  ]
 end
 
 # You may define one or more releases in this file.
@@ -56,4 +64,3 @@ release :stats do
     subscrape: :permanent
   ]
 end
-

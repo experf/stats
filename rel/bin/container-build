@@ -12,9 +12,6 @@ APP_VSN="0.1.0"
 
 export MIX_ENV=prod
 
-export SECRET_KEY_BASE="$(mix phx.gen.secret)"
-export DATABASE_URL=ecto://USER:PASS@HOST/database
-
 cd /opt/build
 git clone /src src
 

@@ -5,9 +5,9 @@
 use Mix.Config
 
 database_url =
-  System.get_env("DATABASE_URL") ||
+  System.get_env("CORTEX_DATABASE_URL") ||
     raise """
-    environment variable DATABASE_URL is missing.
+    environment variable CORTEX_DATABASE_URL is missing.
     For example: ecto://USER:PASS@HOST/DATABASE
     """
 
@@ -17,18 +17,25 @@ config :cortex, Cortex.Repo,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
 
 secret_key_base =
-  System.get_env("SECRET_KEY_BASE") ||
+  System.get_env("CORTEX_WEB_SECRET") ||
     raise """
-    environment variable SECRET_KEY_BASE is missing.
+    environment variable CORTEX_WEB_SECRET is missing.
     You can generate one by calling: mix phx.gen.secret
     """
 
 config :cortex_web, CortexWeb.AppEndpoint,
   http: [
-    port: String.to_integer(System.get_env("PORT") || "4000"),
+    port: String.to_integer(System.get_env("CORTEX_WEB_PORT") || "4000"),
     transport_options: [socket_opts: [:inet6]]
   ],
-  secret_key_base: secret_key_base
+  url: [
+    host: System.get_env("CORTEX_WEB_HOST") || "stats.expand.live",
+    port: 80
+  ],
+  secret_key_base: secret_key_base,
+  server: true,
+  root: ".",
+  version: Application.spec(:cortex, :vsn)
 
 # ## Using releases (Elixir v1.9+)
 #

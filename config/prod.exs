@@ -10,18 +10,11 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :cortex_web, CortexWeb.AppEndpoint,
-  http: [
-    port: String.to_integer(System.get_env("CORTEX_WEB_PORT") || "4000"),
-    transport_options: [socket_opts: [:inet6]]
-  ],
+  cache_static_manifest: "priv/static/cache_manifest.json",
   url: [
     host: System.get_env("CORTEX_WEB_HOST") || "stats.expand.live",
     port: 80
-  ],
-  cache_static_manifest: "priv/static/cache_manifest.json",
-  server: true,
-  root: ".",
-  version: Application.spec(:cortex, :vsn)
+  ]
 
 # ## SSL Support
 #

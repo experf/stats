@@ -1,0 +1,35 @@
+HUMANS:
+  - name: nrser
+    admin: true
+    github: nrser
+    git:
+      "user.name": nrser
+      "user.email": neil@neilsouza.com
+    fp_email: neil@futureperfect.studio
+  
+  - name: xander
+    admin: true
+    github: xanderseren
+    git:
+      "user.name": xanderseren
+      "user.email": xander@theactualschool.com
+    fp_email: xander@futureperfect.studio
+
+APP_NAME: stats
+APP_VERSION: 0.1.0
+
+APP_USER: "{{ APP_NAME }}"
+
+DB_NAME: cortex_prod
+DB_PASSWORD: >-
+  {{
+    lookup(
+      'community.general.onepassword',
+      'Stats -- PostgreSQL',
+      field='password',
+      username=(
+        HUMANS | nrser.nansi.find_has_all(name=lookup('env', 'USER'))
+      ).fp_email,
+      subdomain='futureperfectcreativestudio',
+    )
+  }}

@@ -1,0 +1,38 @@
+---
+- name: >-
+    Deploy stats app
+  hosts: app
+  become: true
+  become_user: root
+  
+  vars:
+    dest: "/usr/local/experf/{{ APP_NAME }}/{{ APP_VERSION }}"
+  
+  tasks:
+    - file:
+        path: "{{ dest }}"
+        state: directory
+  
+    - ansible.builtin.unarchive:
+        src: "../../../rel/artifacts/{{ APP_NAME }}-{{ APP_VERSION }}.tar.gz"
+        dest: "{{ dest }}"
+        mode: 0755
+        
+    - name: >-
+        Change owner and group to {{ APP_USER }}:{{ APP_USER }}
+      file:
+        path: "{{ dest }}"
+        owner: "{{ APP_USER }}"
+        group: "{{ APP_USER }}"
+    
+    # - nrser.nansi.systemd_unit:
+    #     data:
+    #       Unit:
+    #         Description: Stats App
+    #         Requires:
+    #           - postgresql.service
+    #           - kafka.service
+    #       Service:
+    #         ExecStartPre:
+            
+    
