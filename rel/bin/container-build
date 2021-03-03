@@ -7,9 +7,6 @@ set -u # Error on undefined vars
 # set -v # Print everything
 set -x # Print commands (with expanded vars)
 
-APP_NAME="stats"
-APP_VSN="0.1.0"
-
 export MIX_ENV=prod
 
 cd /opt/build
@@ -43,9 +40,16 @@ cd /opt/build/src/apps/cortex_web
 mix phx.digest
 
 cd /opt/build/src
+
 # Build the release
 mix distillery.release
+
 # Copy tarball to output
-cp "_build/prod/rel/$APP_NAME/releases/$APP_VSN/$APP_NAME.tar.gz" /src/rel/artifacts/"$APP_NAME-$APP_VSN.tar.gz"
+NAME="$(mix project.get name)"
+VERSION="$(mix project.get version)"
+
+cp \
+  "_build/prod/rel/${NAME}/releases/${VERSION}/${NAME}.tar.gz" \
+  /src/rel/artifacts/"${NAME}.beam-${VERSION}.tar.gz"
 
 exit 0

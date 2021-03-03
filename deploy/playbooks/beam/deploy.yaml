@@ -1,0 +1,31 @@
+---
+- name: >-
+    Deploy Stats umbrella app
+  hosts: beam
+  become: true
+  become_user: root
+  
+  vars:
+    archive_filename: >-
+      {{ STATS_BEAM_PROJECT_NAME }}.beam-{{ STATS_BEAM_VERSION }}.tar.gz
+  
+  tasks:
+    - file:
+        path: "{{ STATS_BEAM_DEST }}"
+        state: directory
+  
+    - ansible.builtin.unarchive:
+        src: >-
+          {{  (CTL_REPO_ROOT, 'rel', 'artifacts', archive_filename)
+              | nrser.nansi.to_path }}
+        dest: "{{ STATS_BEAM_DEST }}"
+        mode: 0755
+        
+    - name: >-
+        Change owner and group to {{ STATS_USER }}:{{ STATS_USER }}
+      file:
+        path: "{{ STATS_BEAM_DEST }}"
+        owner: "{{ STATS_USER }}"
+        group: "{{ STATS_USER }}"
+            
+    

@@ -15,40 +15,40 @@
         state: present
   
     - name: >-
-        Create app user `{{ APP_USER }}`
+        Create app user `{{ STATS_USER }}`
       user:
-        name: "{{ APP_USER }}"
+        name: "{{ STATS_USER }}"
         state: present
         create_home: false
         shell: /bin/bash
   
-    - name: "Create `{{ DB_NAME }}` database"
+    - name: "Create `{{ STATS_DB_NAME }}` database"
       become: true
       become_user: postgres
       postgresql_db:
-        name: "{{ DB_NAME }}"
+        name: "{{ STATS_DB_NAME }}"
     
-    - name: "Add user `{{ APP_USER }}` to database `{{ DB_NAME }}`"
+    - name: "Add user `{{ STATS_USER }}` to database `{{ STATS_DB_NAME }}`"
       become: true
       become_user: postgres
       postgresql_user:
-        db: "{{ DB_NAME }}"
-        name: "{{ APP_USER }}"
-        password: "{{ DB_PASSWORD }}"
+        db: "{{ STATS_DB_NAME }}"
+        name: "{{ STATS_USER }}"
+        password: "{{ STATS_DB_PASSWORD }}"
         priv: ALL
   
-    - name: "Ensure user `{{ APP_USER }}` does not have unnecessary privilege"
+    - name: "Ensure user `{{ STATS_USER }}` does not have unnecessary privilege"
       become: true
       become_user: postgres
       postgresql_user:
-        name: "{{ APP_USER }}"
+        name: "{{ STATS_USER }}"
         role_attr_flags: NOSUPERUSER,NOCREATEDB
     
-    - name: "Ensure no other user can access the `{{ DB_NAME }}` database"
+    - name: "Ensure no other user can access the `{{ STATS_DB_NAME }}` database"
       become: true
       become_user: postgres
       postgresql_privs:
-        db: "{{ DB_NAME }}"
+        db: "{{ STATS_DB_NAME }}"
         role: PUBLIC
         type: database
         priv: ALL

@@ -1,7 +1,7 @@
 ---
 - name: >-
     Setup Nginx to proxy to stats app
-  hosts: app
+  hosts: beam
   become: true
   become_user: root
   
@@ -13,7 +13,7 @@
         name: stats
         server_names:
           - "{{ CORTEX_WEB_HOST }}"
-        log_dir: /var/log/nginx/stats
+        log_dir: "/var/log/nginx/{{ CORTEX_WEB_HOST }}"
         lets_encrypt: True
         http: redirect
         https: True

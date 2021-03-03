@@ -1,0 +1,57 @@
+---
+# Variables for servers running the BEAM runtime, which means the `Stats` Elixir
+# umbrella app in our case.
+
+STATS_BEAM_VERSION: 0.1.0
+
+# Currently the same as the system name by (nascent) convention, but it seems
+# like using this var where it directly represents the Elixir (Mix) project 
+# name should help structural comprehension.
+STATS_BEAM_PROJECT_NAME: "{{ STATS_NAME }}"
+
+STATS_BEAM_DEST: >-
+  /usr/local/experf/{{ STATS_NAME }}/beam/{{ STATS_BEAM_VERSION }}
+
+STATS_BEAM_SERVICE_NAME: "{{ STATS_NAME }}.beam"
+
+# `cortex` Elixir App
+# ============================================================================
+
+CORTEX_MAILGUN_DOMAIN: >-
+  {{
+    lookup(
+      'community.general.onepassword',
+      'Stats -- Cortex -- Mailgun Sending Key',
+      field='username',
+      username=ONEPASSWORD_USERNAME,
+      subdomain=ONEPASSWORD_SUBDOMAIN,
+    )
+  }}
+
+CORTEX_MAILGUN_API_KEY: >-
+  {{
+    lookup(
+      'community.general.onepassword',
+      'Stats -- Cortex -- Mailgun Sending Key',
+      field='password',
+      username=ONEPASSWORD_USERNAME,
+      subdomain=ONEPASSWORD_SUBDOMAIN,
+    )
+  }}
+
+# `cortex_web` Elixir App
+# ============================================================================
+
+CORTEX_WEB_HOST: stats.expand.live
+CORTEX_WEB_PORT: 4080
+
+CORTEX_WEB_SECRET: >-
+  {{
+    lookup(
+      'community.general.onepassword',
+      'Stats -- Cortex Web -- Secret',
+      field='password',
+      username=ONEPASSWORD_USERNAME,
+      subdomain=ONEPASSWORD_SUBDOMAIN,
+    )
+  }}

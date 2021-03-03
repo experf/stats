@@ -1,3 +1,11 @@
+---
+# Global Variables
+# ============================================================================
+#
+# Variables that (conceptually) span above the Stats system. Eventually, we'd
+# like for these to be in some single source of truth (at least, conceptually).
+# 
+
 HUMANS:
   - name: nrser
     admin: true
@@ -5,7 +13,7 @@ HUMANS:
     git:
       "user.name": nrser
       "user.email": neil@neilsouza.com
-    fp_email: neil@futureperfect.studio
+    org_email: neil@futureperfect.studio
   
   - name: xander
     admin: true
@@ -13,68 +21,43 @@ HUMANS:
     git:
       "user.name": xanderseren
       "user.email": xander@theactualschool.com
-    fp_email: xander@futureperfect.studio
+    org_email: xander@futureperfect.studio
 
-APP_NAME: stats
-APP_VERSION: 0.1.0
+ONEPASSWORD_SUBDOMAIN: futureperfectcreativestudio
+ONEPASSWORD_USERNAME: >-
+  (HUMANS | nrser.nansi.find_has_all(name=lookup('env', 'USER'))).org_email
 
-APP_DEST: "/usr/local/experf/{{ APP_NAME }}/{{ APP_VERSION }}"
+# Controller Variables
+# ============================================================================
+#
+# Variables that relate to the _controller_ host -- the one that you run 
+# Ansible commands on (as opposed to the _target_ system being managed). Right
+# now (2021-03-04), that means your dev machine.
+# 
 
-CORTEX_WEB_HOST: stats.expand.live
-CORTEX_WEB_PORT: 4080
+# The Git repository root directory, which is useful for finding things on the
+# controller.
+CTL_REPO_ROOT: "{{ lookup('pipe', 'git rev-parse --show-toplevel') }}"
 
-CORTEX_WEB_SECRET: >-
-  {{
-    lookup(
-      'community.general.onepassword',
-      'Stats -- Cortex Web -- Secret',
-      field='password',
-      username=(
-        HUMANS | nrser.nansi.find_has_all(name=lookup('env', 'USER'))
-      ).fp_email,
-      subdomain='futureperfectcreativestudio',
-    )
-  }}
+# System & Shared Variables
+# ============================================================================
+#
+# Variables that are Stats system-wide or shared across multiple components 
+# (like database connection credentials).
+# 
 
-APP_USER: "{{ APP_NAME }}"
+STATS_NAME: stats
+STATS_USER: "{{ STATS_NAME }}"
 
-DB_NAME: cortex_prod
-DB_PASSWORD: >-
+STATS_DB_NAME: cortex_prod
+STATS_DB_PASSWORD: >-
   {{
     lookup(
       'community.general.onepassword',
       'Stats -- PostgreSQL',
       field='password',
-      username=(
-        HUMANS | nrser.nansi.find_has_all(name=lookup('env', 'USER'))
-      ).fp_email,
-      subdomain='futureperfectcreativestudio',
+      username=ONEPASSWORD_USERNAME,
+      subdomain=ONEPASSWORD_SUBDOMAIN,
     )
   }}
-DB_HOST: localhost
-
-CORTEX_MAILGUN_DOMAIN: >-
-  {{
-    lookup(
-      'community.general.onepassword',
-      'Stats -- Cortex -- Mailgun Sending Key',
-      field='username',
-      username=(
-        HUMANS | nrser.nansi.find_has_all(name=lookup('env', 'USER'))
-      ).fp_email,
-      subdomain='futureperfectcreativestudio',
-    )
-  }}
-
-CORTEX_MAILGUN_API_KEY: >-
-  {{
-    lookup(
-      'community.general.onepassword',
-      'Stats -- Cortex -- Mailgun Sending Key',
-      field='password',
-      username=(
-        HUMANS | nrser.nansi.find_has_all(name=lookup('env', 'USER'))
-      ).fp_email,
-      subdomain='futureperfectcreativestudio',
-    )
-  }}
+STATS_DB_HOST: localhost

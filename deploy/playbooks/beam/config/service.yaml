@@ -1,38 +1,40 @@
 ---
 - name: >-
     Configure Cortex
-  hosts: app
+  hosts: beam
   become: true
   become_user: root
   
   vars:
-    bin: "{{ APP_DEST }}/bin/{{ APP_NAME }}"
+    bin: "{{ STATS_BEAM_DEST }}/bin/{{ STATS_BEAM_PROJECT_NAME }}"
+    db_url: >-
+      ecto://{{ STATS_USER }}:{{ STATS_DB_PASSWORD }}@{{ STATS_DB_HOST }}/{{ STATS_DB_NAME }}
   
   tasks:
     - name: >-
-        Configure cortex Systemd service
+        Configure `{{ STATS_BEAM_SERVICE_NAME }}` Systemd service
       nrser.nansi.systemd_unit:
-        name: cortex
+        name: "{{ STATS_BEAM_SERVICE_NAME }}"
         data:
           Unit:
-            Description: Stats Cortex App
+            Description: Stats system BEAM (Erlang/Elixir) service
             Requires:
               - postgresql.service
               - kafka.service
           Service:
-            User: "{{ APP_USER }}"
-            Group: "{{ APP_USER }}"
+            User: "{{ STATS_USER }}"
+            Group: "{{ STATS_USER }}"
             ExecStartPre: "{{ bin }} eval Cortex.Release.migrate"
             ExecStart: "{{ bin }} foreground"
             Restart: always
             TimeoutStartSec: 0
             Environment:
               - "CORTEX_WEB_SECRET={{ CORTEX_WEB_SECRET }}"
-              - "CORTEX_DATABASE_URL=ecto://{{ APP_USER }}:{{ DB_PASSWORD }}@{{ DB_HOST }}/{{ DB_NAME }}"
-              - "CORTEX_WEB_HOST={{ CORTEX_WEB_HOST }}"
-              - "CORTEX_WEB_PORT={{ CORTEX_WEB_PORT }}"
+              - "CORTEX_DATABASE_URL={{ db_url }}"
               - "CORTEX_MAILGUN_DOMAIN={{ CORTEX_MAILGUN_DOMAIN }}"
               - "CORTEX_MAILGUN_API_KEY={{ CORTEX_MAILGUN_API_KEY }}"
+              - "CORTEX_WEB_HOST={{ CORTEX_WEB_HOST }}"
+              - "CORTEX_WEB_PORT={{ CORTEX_WEB_PORT }}"
           Install:
             WantedBy: multi-user.target  
             

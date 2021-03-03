@@ -24,7 +24,7 @@ all:
     
     # Operating System Groups
     # ========================================================================
-          
+    
     ubuntu:
       hosts:
         pixeldust: {}
@@ -40,7 +40,7 @@ all:
       hosts:
         pixeldust: {}
         
-    app:
+    beam:
       hosts:
         pixeldust: {}
     

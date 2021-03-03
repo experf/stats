@@ -1,2 +1,3 @@
 ---
 - import_playbook: config/nginx.yaml
+- import_playbook: config/service.yaml
