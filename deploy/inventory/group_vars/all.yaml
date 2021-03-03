@@ -18,6 +18,8 @@ HUMANS:
 APP_NAME: stats
 APP_VERSION: 0.1.0
 
+APP_DEST: "/usr/local/experf/{{ APP_NAME }}/{{ APP_VERSION }}"
+
 CORTEX_WEB_HOST: stats.expand.live
 CORTEX_WEB_PORT: 4080
 
@@ -50,3 +52,29 @@ DB_PASSWORD: >-
     )
   }}
 DB_HOST: localhost
+
+CORTEX_MAILGUN_DOMAIN: >-
+  {{
+    lookup(
+      'community.general.onepassword',
+      'Stats -- Cortex -- Mailgun Sending Key',
+      field='username',
+      username=(
+        HUMANS | nrser.nansi.find_has_all(name=lookup('env', 'USER'))
+      ).fp_email,
+      subdomain='futureperfectcreativestudio',
+    )
+  }}
+
+CORTEX_MAILGUN_API_KEY: >-
+  {{
+    lookup(
+      'community.general.onepassword',
+      'Stats -- Cortex -- Mailgun Sending Key',
+      field='password',
+      username=(
+        HUMANS | nrser.nansi.find_has_all(name=lookup('env', 'USER'))
+      ).fp_email,
+      subdomain='futureperfectcreativestudio',
+    )
+  }}

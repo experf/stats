@@ -6,4 +6,5 @@
   gather_facts: false
   
   tasks:
-    - debug: var=CORTEX_WEB_SECRET
+    - debug: var=CORTEX_MAILGUN_DOMAIN
+    - debug: var=CORTEX_MAILGUN_API_KEY

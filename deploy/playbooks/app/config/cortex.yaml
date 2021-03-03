@@ -6,8 +6,7 @@
   become_user: root
   
   vars:
-    dest: "/usr/local/experf/{{ APP_NAME }}/{{ APP_VERSION }}"
-    bin: "{{ dest }}/bin/{{ APP_NAME }}"
+    bin: "{{ APP_DEST }}/bin/{{ APP_NAME }}"
   
   tasks:
     - name: >-
@@ -30,6 +29,8 @@
               - "CORTEX_DATABASE_URL=ecto://{{ APP_USER }}:{{ DB_PASSWORD }}@{{ DB_HOST }}/{{ DB_NAME }}"
               - "CORTEX_WEB_HOST={{ CORTEX_WEB_HOST }}"
               - "CORTEX_WEB_PORT={{ CORTEX_WEB_PORT }}"
+              - "CORTEX_MAILGUN_DOMAIN={{ CORTEX_MAILGUN_DOMAIN }}"
+              - "CORTEX_MAILGUN_API_KEY={{ CORTEX_MAILGUN_API_KEY }}"
           Install:
             WantedBy: multi-user.target  
             

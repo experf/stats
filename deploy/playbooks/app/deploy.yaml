@@ -5,24 +5,20 @@
   become: true
   become_user: root
   
-  vars:
-    dest: "/usr/local/experf/{{ APP_NAME }}/{{ APP_VERSION }}"
-    bin: "{{ dest }}/bin/{{ APP_NAME }}"
-  
   tasks:
     - file:
-        path: "{{ dest }}"
+        path: "{{ APP_DEST }}"
         state: directory
   
     - ansible.builtin.unarchive:
         src: "../../../rel/artifacts/{{ APP_NAME }}-{{ APP_VERSION }}.tar.gz"
-        dest: "{{ dest }}"
+        dest: "{{ APP_DEST }}"
         mode: 0755
         
     - name: >-
         Change owner and group to {{ APP_USER }}:{{ APP_USER }}
       file:
-        path: "{{ dest }}"
+        path: "{{ APP_DEST }}"
         owner: "{{ APP_USER }}"
         group: "{{ APP_USER }}"
             
