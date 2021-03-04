@@ -19,4 +19,14 @@
         https: True
         proxy: True
         proxy_port: "{{ CORTEX_WEB_PORT }}"
-        
+    
+    - nrser.nansi.nginx_site:
+        name: "{{ CORTEX_WEB_LINK_URL_HOST }}"
+        server_names:
+          - "{{ CORTEX_WEB_LINK_URL_HOST }}"
+        log_dir: "/var/log/nginx/{{ CORTEX_WEB_LINK_URL_HOST }}"
+        lets_encrypt: True
+        http: redirect
+        https: True
+        proxy: True
+        proxy_port: "{{ CORTEX_WEB_LINK_HTTP_PORT }}"

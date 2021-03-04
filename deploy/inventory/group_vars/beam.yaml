@@ -55,3 +55,7 @@ CORTEX_WEB_SECRET: >-
       subdomain=ONEPASSWORD_SUBDOMAIN,
     )
   }}
+
+CORTEX_WEB_LINK_URL_HOST: go.expand.live
+CORTEX_WEB_LINK_HTTP_PORT: 4081
+

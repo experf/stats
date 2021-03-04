@@ -35,6 +35,8 @@
               - "CORTEX_MAILGUN_API_KEY={{ CORTEX_MAILGUN_API_KEY }}"
               - "CORTEX_WEB_HOST={{ CORTEX_WEB_HOST }}"
               - "CORTEX_WEB_PORT={{ CORTEX_WEB_PORT }}"
+              - "CORTEX_WEB_LINK_URL_HOST={{ CORTEX_WEB_LINK_URL_HOST }}"
+              - "CORTEX_WEB_LINK_HTTP_PORT={{ CORTEX_WEB_LINK_HTTP_PORT }}"
           Install:
             WantedBy: multi-user.target  
             
