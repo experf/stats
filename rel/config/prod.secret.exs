@@ -30,7 +30,7 @@ config :cortex_web, CortexWeb.AppEndpoint,
   ],
   url: [
     host: System.get_env("CORTEX_WEB_HOST") || "stats.expand.live",
-    port: 80
+    port: 443
   ],
   secret_key_base: secret_key_base,
   server: true,

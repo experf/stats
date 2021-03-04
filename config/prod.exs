@@ -13,7 +13,7 @@ config :cortex_web, CortexWeb.AppEndpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
   url: [
     host: System.get_env("CORTEX_WEB_HOST") || "stats.expand.live",
-    port: 80
+    port: 443
   ]
 
 # ## SSL Support
