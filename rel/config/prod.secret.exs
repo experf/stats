@@ -31,7 +31,7 @@ config :cortex_web, CortexWeb.AppEndpoint,
   url: [
     scheme: "https",
     host: System.get_env("CORTEX_WEB_HOST") || "stats.expand.live",
-    port: 80,
+    port: 443,
   ],
   secret_key_base: secret_key_base,
   server: true,
@@ -48,7 +48,7 @@ config :cortex_web, CortexWeb.LinkEndpoint,
   url: [
     scheme: "https",
     host: System.get_env("CORTEX_WEB_LINK_URL_HOST") || "go.expand.live",
-    port: 80,
+    port: 443,
   ],
   server: true
 
