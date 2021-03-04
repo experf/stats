@@ -10,11 +10,26 @@
       {{ STATS_BEAM_PROJECT_NAME }}.beam-{{ STATS_BEAM_VERSION }}.tar.gz
   
   tasks:
-    - file:
+    - name: >-
+        Create destination directory `{{ STATS_BEAM_DEST }}`
+      file:
         path: "{{ STATS_BEAM_DEST }}"
         state: directory
+        
+    - name: Query destination directory contents
+      find:
+        paths: "{{ STATS_BEAM_DEST }}"
+        file_type: any
+      register: find_result
+
+    - name: Fail when destination directory is _not_ empty
+      fail:
+        msg: "Destination directory `{{ STATS_BEAM_DEST }}` is not empty."
+      when: find_result.matched > 0
   
-    - ansible.builtin.unarchive:
+    - name: >-
+        Copy and unpack release archive `{{ archive_filename }}`
+      unarchive:
         src: >-
           {{  (CTL_REPO_ROOT, 'rel', 'artifacts', archive_filename)
               | nrser.nansi.to_path }}
@@ -22,7 +37,7 @@
         mode: 0755
         
     - name: >-
-        Change owner and group to {{ STATS_USER }}:{{ STATS_USER }}
+        Change owner and group to `{{ STATS_USER }}:{{ STATS_USER }}`
       file:
         path: "{{ STATS_BEAM_DEST }}"
         owner: "{{ STATS_USER }}"

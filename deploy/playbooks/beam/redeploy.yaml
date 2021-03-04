@@ -1,0 +1,31 @@
+---
+# Overwrite a previously deployed version.
+# 
+# This is for early deployments in the immediate term (as of 2021-03-04), before
+# we have full-on tagging and artifact storage and such in place. Can make it 
+# easier to iterate quickly if you're careful with it.
+#
+# Pretty much stops the service, whacks the deploy directory, then goes through
+# the normal deploy and config/service processes.
+# 
+- name: >-
+    RE-Deploy Stats umbrella app (overwrite)
+  hosts: beam
+  become: true
+  become_user: root
+  
+  tasks:
+    - name: >-
+        Stop Stats BEAM service
+      systemd:
+        name: "{{ STATS_BEAM_SERVICE_NAME }}.service"
+        state: stopped
+      
+    - name: >-
+        Remove destination directory `{{ STATS_BEAM_DEST }}`
+      file:
+        path: "{{ STATS_BEAM_DEST }}"
+        state: absent
+
+- import_playbook: deploy.yaml
+- import_playbook: config/service.yaml

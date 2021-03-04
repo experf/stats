@@ -1,10 +1,15 @@
 - name: >-
     Scratch bytes
-  hosts: localhost
-  # become: true
-  # become_user: root
-  gather_facts: false
+  hosts: beam
+  become: true
+  become_user: root
+  # gather_facts: false
   
   tasks:
-    - debug: var=CORTEX_MAILGUN_DOMAIN
-    - debug: var=CORTEX_MAILGUN_API_KEY
+    - name: Check destination directory is empty
+      find:
+        paths: "{{ STATS_BEAM_DEST }}"
+        file_type: any
+      register: find_result
+      
+    - debug: var=find_result
