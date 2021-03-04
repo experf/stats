@@ -29,7 +29,7 @@ config :cortex_web, CortexWeb.AppEndpoint,
     transport_options: [socket_opts: [:inet6]]
   ],
   url: [
-    schema: "https",
+    scheme: "https",
     host: System.get_env("CORTEX_WEB_HOST") || "stats.expand.live",
   ],
   secret_key_base: secret_key_base,
@@ -45,7 +45,7 @@ config :cortex_web, CortexWeb.LinkEndpoint,
     transport_options: [socket_opts: [:inet6]],
   ],
   url: [
-    schema: "https",
+    scheme: "https",
     host: System.get_env("CORTEX_WEB_LINK_URL_HOST") || "go.expand.live",
   ],
   server: true
