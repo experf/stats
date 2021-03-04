@@ -37,6 +37,19 @@ config :cortex_web, CortexWeb.AppEndpoint,
   root: ".",
   version: Application.spec(:cortex, :vsn)
 
+config :cortex_web, CortexWeb.LinkEndpoint,
+  http: [
+    port: String.to_integer(
+      System.get_env("CORTEX_WEB_LINK_HTTP_PORT") || "4001"
+    ),
+    transport_options: [socket_opts: [:inet6]],
+  ],
+  url: [
+    host: System.get_env("CORTEX_WEB_LINK_URL_HOST") || "go.expand.live",
+    port: 443
+  ],
+  server: true
+
 mailgun_api_key =
   System.get_env("CORTEX_MAILGUN_API_KEY") ||
     raise """
