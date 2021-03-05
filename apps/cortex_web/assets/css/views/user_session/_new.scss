@@ -4,20 +4,17 @@
   h1, h3, h5 {
     @extend .my-4;
   }
-  
+
   .content {
     // @extend .mx-auto;
-    @extend .offset-lg-2;
-    @extend .col-lg-8;
-    text-align: center;
   }
-  
+
   .form-floating,
   .form-check,
   .form-actions {
     @extend .mb-4;
   }
-  
+
   .form-check {
     @extend .form-check-inline;
     @extend .form-switch;
