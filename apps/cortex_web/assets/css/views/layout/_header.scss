@@ -1,0 +1,29 @@
+.header-app-logo, .header-app-name, .navbar-brand {
+  font-family: $archivo-black;
+  color:$float-black;
+  text-transform:uppercase;
+}
+
+.header-app-divider {
+  padding:0 0.25rem;
+  font-family: $archivo-regular;
+  margin-top:1px;
+}
+
+.header-app-name {
+  font-family: $archivo-black;
+  padding-right:1.0rem;
+  margin-top:1px;
+}
+
+.header-toggle {
+  cursor:pointer;
+  margin-right:10px;
+}
+
+.header-toggle:hover {
+}
+
+.header-toggle-btn {
+  height:15px;
+}

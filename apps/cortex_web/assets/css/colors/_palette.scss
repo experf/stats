@@ -1,19 +1,17 @@
 // General background color
-$stats-color-bg: $mtn-black;
+$stats-color-bg: $float-white;
 
 // Highlight an area against `$stats-color-bg`
-// 
+//
 // Should make the area stand-out sufficiently while still providing strong
 // contrast to foreground elements (`$stats-color-text`, etc.).
-// 
-$stats-color-bg-highlight: $mtn-anthracite;
+//
+$stats-color-bg-highlight: $float-mint;
 
-$stats-color-bg-lowlight: $mtn-coke;
+$stats-color-bg-lowlight: $float-mint;
 
 // General text color
-$stats-color-text: $mtn-yosemite;
+$stats-color-text: $float-black;
 
-$stats-color-link: $mtn-mt-everest;
-$stats-color-link-hover: $mtn-malachite;
-
-
+$stats-color-link: $float-black;
+$stats-color-link-hover: $float-mint;

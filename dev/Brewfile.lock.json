@@ -1,0 +1,72 @@
+{
+  "entries": {
+    "brew": {
+      "pyenv": {
+        "version": "1.2.22",
+        "bottle": {
+          "cellar": ":any",
+          "prefix": "/usr/local",
+          "files": {
+            "big_sur": {
+              "url": "https://homebrew.bintray.com/bottles/pyenv-1.2.22.big_sur.bottle.tar.gz",
+              "sha256": "a322edd9999aee4027116f4ff65034c8bfd1bc1af8fbef136544330f62d003d6"
+            },
+            "arm64_big_sur": {
+              "url": "https://homebrew.bintray.com/bottles/pyenv-1.2.22.arm64_big_sur.bottle.tar.gz",
+              "sha256": "21cd3cc25153de842b519606d689824bddc55912b9021cbfedd80d25fa09d4d3"
+            },
+            "catalina": {
+              "url": "https://homebrew.bintray.com/bottles/pyenv-1.2.22.catalina.bottle.tar.gz",
+              "sha256": "b4f3038e29acde1d99579104ae100777621b9716fe797e7917dad1e9795d3473"
+            },
+            "mojave": {
+              "url": "https://homebrew.bintray.com/bottles/pyenv-1.2.22.mojave.bottle.tar.gz",
+              "sha256": "525b4cc06fb46fd1e86d2272b4b692585679c5bb5c6a7b543cbdedd6f0096cf9"
+            }
+          }
+        }
+      },
+      "pyenv-virtualenv": {
+        "version": "1.1.5",
+        "bottle": false
+      },
+      "yarn": {
+        "version": "1.22.10",
+        "bottle": false
+      },
+      "jack": {
+        "version": "1.9.16",
+        "bottle": {
+          "cellar": "/usr/local/Cellar",
+          "prefix": "/usr/local",
+          "files": {
+            "big_sur": {
+              "url": "https://homebrew.bintray.com/bottles/jack-1.9.16.big_sur.bottle.tar.gz",
+              "sha256": "8700de5add46350491add58d820108aabb5ab18545a4fab4fa20b2f05287e9ef"
+            },
+            "catalina": {
+              "url": "https://homebrew.bintray.com/bottles/jack-1.9.16.catalina.bottle.tar.gz",
+              "sha256": "0c30bbc478e9305530f69fee884640dee62e5613c997dca8c99e736d8c943899"
+            },
+            "mojave": {
+              "url": "https://homebrew.bintray.com/bottles/jack-1.9.16.mojave.bottle.tar.gz",
+              "sha256": "dc531389d6a167fc2caa078f480272f8048bbf5d85ff4f46c299a42456661360"
+            }
+          }
+        }
+      }
+    }
+  },
+  "system": {
+    "macos": {
+      "catalina": {
+        "HOMEBREW_VERSION": "2.7.7",
+        "HOMEBREW_PREFIX": "/usr/local",
+        "Homebrew/homebrew-core": "5ae50eca2ea704763d91b4fbdbd80b574663e9ee",
+        "CLT": "12.3.0.0.1.1607026830",
+        "Xcode": "12.0",
+        "macOS": "10.15.7"
+      }
+    }
+  }
+}

@@ -6,14 +6,19 @@ $dark: $stats-color-bg;
 $body-color: $stats-color-text;
 $body-bg: $stats-color-bg;
 
-$link-hover-color: $mtn-malachite;
+$primary: $float-mint;
+
+$link-color: $float-black;
+$link-hover-color: $float-mint;
+$text-primary: $float-black;
+$danger: red;
 
 $input-bg: $body-bg;
 
 $code-hover-color: $mtn-malachite;
 
-$navbar-dark-color: $mtn-sand;
-$navbar-dark-hover-color: $mtn-terra;
+$navbar-dark-color: $float-black;
+$navbar-dark-hover-color: $float-mint;
 
 $table-striped-bg: rgba($stats-color-link, 0.05);
 // $table-hover-bg: rgba($stats-color-link, 0.1);
