@@ -1,12 +1,46 @@
-<header>
+<header class="shadow-sm p-2 bg-white rounded">
   <section class="container">
-    <nav role="navigation" class="navbar navbar-expand-lg navbar-dark">
+    <nav role="navigation" class="navbar navbar-expand-lg">
+
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
         <ul class="navbar-nav mr-auto">
-          <%= nav_item "Stats",
-            to: Routes.page_path(@conn, :index),
-            active: nav_match?(@conn, CortexWeb.PageController, :index) %>
+          <li class="nav-item dropdown">
+            <a class="nav-link header-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-reference="navbar">
+              <img class="header-toggle-btn" src="/images/toggle-open.svg" />
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="http://expand.live">Home</a>
+              <a class="dropdown-item" href="/">→ Stats</a>
+              <div class="dropdown-divider"></div>
+                <%= if @current_user do %>
+                  <%= if @current_user.confirmed_at do %>
+                    <%= link "Settings",
+                      class: "dropdown-item",
+                      to: Routes.user_settings_path(@conn, :edit) %>
+                    <%= link "Log out",
+                      class: "dropdown-item",
+                      to: Routes.user_session_path(@conn, :delete),
+                      method: :delete %>
+                  <% end %>
+
+                <% else %>
+                  <%= link "Log in",
+                    class: "dropdown-item",
+                    to: Routes.user_session_path(@conn, :new) %>
+
+                  <%= link "Activate Account",
+                    class: "dropdown-item",
+                    to: Routes.user_registration_path(@conn, :new) %>
+                <% end %>
+              </div>
+          </li>
+
+          <a class="navbar-brand" href="/">
+            <img src="/images/temp-logo.svg" width="30" height="30" class="d-inline-block align-top" alt="">
+          expand.live
+          </a>
 
           <%= if @current_user && @current_user.confirmed_at do %>
             <%= nav_item "Links",
@@ -20,38 +54,18 @@
             <%= nav_item "Docs",
               to: "/docs/",
               target: "_blank" %>
+
+            <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+              <%= nav_item "Dashboard",
+                to: Routes.live_dashboard_path(@conn, :home),
+                target: "_blank" %>
+            <% end %>
           <% end %>
         </ul>
       </div>
 
       <ul class="navbar-nav ml-auto">
-        <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
-          <%= nav_item "LiveDashboard",
-            to: Routes.live_dashboard_path(@conn, :home),
-            target: "_blank" %>
-        <% end %>
 
-        <%= if @current_user do %>
-          <%= if @current_user.confirmed_at do %>
-            <%= nav_item @current_user.email, to: "#" %>
-
-            <%= nav_item "Settings",
-              to: Routes.user_settings_path(@conn, :edit),
-              active: nav_match?(@conn, CortexWeb.UserSettingsController) %>
-
-          <% end %>
-
-          <%= nav_item "Log out",
-            to: Routes.user_session_path(@conn, :delete),
-            method: :delete %>
-
-        <% else %>
-          <%= nav_item "Activate Account",
-            to: Routes.user_registration_path(@conn, :new) %>
-
-          <%= nav_item "Log in",
-            to: Routes.user_session_path(@conn, :new) %>
-        <% end %>
       </ul>
 
     </nav>
