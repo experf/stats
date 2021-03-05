@@ -10,7 +10,7 @@
     <link rel="manifest" href="/site.webmanifest">
     <meta name="msapplication-config" content="/browserconfig.xml" />
     <title>
-      ExPerf Stats
+      Expand → Stats
       <%= if Map.has_key?(assigns, :title) do %>
         | <%= assigns[:title] %>
       <% end %>
