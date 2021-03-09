@@ -3,17 +3,17 @@ import sys
 from pathlib import Path
 import json
 from functools import total_ordering
-import re
 from textwrap import dedent
 from io import StringIO
+from collections import UserList
 
-from rich.console import Console, ConsoleRenderable, RichCast
+from rich.console import Console, ConsoleRenderable, RichCast, RenderGroup
 from rich.theme import Theme
 from rich.pretty import Pretty
 from rich.markdown import Markdown
 from mdutils.mdutils import MdUtils
 
-from stats import cfg
+from stats import cfg, etc
 
 THEME = Theme(
     {
@@ -29,6 +29,7 @@ THEME = Theme(
 OUT = Console(theme=THEME, file=sys.stdout)
 ERR = Console(theme=THEME, file=sys.stderr)
 
+EMPTY = RenderGroup()
 
 def is_rich(x: Any) -> bool:
     return isinstance(x, (ConsoleRenderable, RichCast))
@@ -65,6 +66,15 @@ def render_to_string(data) -> str:
     console = Console(file=sio)
     render_to_console(data, console)
     return sio.getvalue()
+
+
+class RenderGrouper(UserList):
+    def to_group(self):
+        return RenderGroup(*self.data)
+
+    def join(self, separator):
+        return self.__class__(etc.interspersed(self.data, separator))
+
 
 @total_ordering
 class ViewFormat:

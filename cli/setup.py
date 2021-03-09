@@ -19,7 +19,7 @@ setuptools.setup(
     ],
     python_requires='>=3.9',
     install_requires=[
-        "rich>=7.0.0,<8",
+        "rich>=9.13.0,<10",
         "argcomplete>=1.12.1,<2",
         "requests>=2.24.0,<3.0",
         "kafka-python>=2.0.2,<3",

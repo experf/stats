@@ -1,4 +1,5 @@
 from typing import (
+    Generator,
     TypeVar,
     Union,
     Literal,
@@ -9,11 +10,17 @@ from typing import (
     overload,
     Optional,
     Container,
+    List,
 )
 
-from stats import log as logging
-
-LOG = logging.getLogger(__name__)
+# ❗❗❗ ATTENTION ❗❗❗
+#
+# Do **_NOT_** import _any_ sibling modules (or their descdenants) here. No
+# `stats.log` or anything else.
+#
+# Everything should be able to use this modules, and Python strait-up can't deal
+# with circular imports.
+#
 
 K = TypeVar("K")
 T = TypeVar("T")
@@ -89,12 +96,14 @@ def find(predicate, itr, not_found=None):
             return item
     return not_found
 
+
 @overload
 def find_map(
     fn: Callable[[TItem], Union[TResult, Nope]],
     itr: Iterable[TItem],
 ) -> Optional[TResult]:
     pass
+
 
 @overload
 def find_map(
@@ -104,6 +113,7 @@ def find_map(
 ) -> Union[TResult, TNotFound]:
     pass
 
+
 @overload
 def find_map(
     fn: Callable[[TItem], Union[TResult, TNothing]],
@@ -111,6 +121,7 @@ def find_map(
     nothing: Container[TNothing],
 ) -> Optional[TResult]:
     pass
+
 
 @overload
 def find_map(
@@ -120,6 +131,7 @@ def find_map(
     nothing: Container[TNothing],
 ) -> Union[TResult, TNotFound]:
     pass
+
 
 def find_map(
     fn,
@@ -127,7 +139,7 @@ def find_map(
     not_found=None,
     nothing=(None, False),
 ):
-    """
+    """\
     Like `find()`, but returns first value returned by `predicate` that is not
     `False` or `None`.
 
@@ -142,3 +154,37 @@ def find_map(
         if result not in nothing:
             return result
     return not_found
+
+
+def intersperse(
+    iterable: Iterable[TItem], separator: V
+) -> Generator[Union[TItem, V], None, None]:
+    """\
+    Like a "join", but general.
+
+    >>> list(intersperse([1, 2, 3], 'and'))
+    [1, 'and', 2, 'and', 3]
+    """
+    iterator = iter(iterable)
+    yield next(iterator)
+    for item in iterator:
+        yield separator
+        yield item
+
+def interspersed(
+    iterable: Iterable[TItem], separator: V
+) -> List[Union[TItem, V]]:
+    """\
+    Just `intersperse`, but converts the result to a `list` for you (instead
+    of a generator).
+
+    >>> list(intersperse([1, 2, 3], 'and'))
+    [1, 'and', 2, 'and', 3]
+    """
+    return list(intersperse(iterable, separator))
+
+
+if __name__ == '__main__':
+    from pathlib import Path
+    import doctest
+    doctest.testmod()
