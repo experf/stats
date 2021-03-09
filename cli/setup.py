@@ -26,6 +26,8 @@ setuptools.setup(
         "beautifulsoup4>=4.9.3,<5",
         # midi experiment
         "python-rtmidi>=1.4.7,<2",
+        # _creating_ Markdown, believe it or not
+        "mdutils>=1.3.0,<2",
     ],
     scripts = [
         'bin/stats',

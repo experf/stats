@@ -1,4 +1,8 @@
 {
   "python.pythonPath": "${env:HOME}/.pyenv/versions/experf-stats/bin/python",
   "python.linting.pylintEnabled": false,
+  "cSpell.words": [
+    "mdutils",
+    "positionals"
+  ],
 }

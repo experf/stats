@@ -5,14 +5,15 @@ import argparse
 import json
 
 import argcomplete
-from rich.markdown import Markdown
+from rich.console import Console
 
 from . import log as logging, cmd, cfg, dyn, io
+from .parse.rich_formatter import RichFormatter
 
 LOG = logging.getLogger(__name__)
 
 
-_OUTPUT_HELP = (
+OUTPUT_HELP = (
 """How to print output. Commands can add their own custom output formats, but
 pretty much all commands should support `rich` and `json` outputs.
 
@@ -28,9 +29,9 @@ pretty much all commands should support `rich` and `json` outputs.
 
 class ArgumentParser(argparse.ArgumentParser):
 
-    def __init__(self, *args, target=None, **kwds):
+    def __init__(self, *args, target=None, view=io.View, **kwds):
         super().__init__(
-            *args, formatter_class=argparse.RawTextHelpFormatter, **kwds
+            *args, formatter_class=RichFormatter, **kwds
         )
 
         if target is not None:
@@ -58,8 +59,8 @@ class ArgumentParser(argparse.ArgumentParser):
         self.add_argument(
             "-o",
             "--output",
-            default=io.View.DEFAULT_FORMAT,
-            help=_OUTPUT_HELP,
+            default=view.DEFAULT_FORMAT,
+            help=view.help(),
         )
 
     def set_target(self, target):
@@ -78,6 +79,41 @@ class ArgumentParser(argparse.ArgumentParser):
         for module in dyn.children_modules(module__name__, module__path__):
             if hasattr(module, "add_to"):
                 module.add_to(subparsers)
+
+    def format_rich_help(self):
+        formatter = self._get_formatter()
+
+        # usage
+        formatter.add_usage(self.usage, self._actions,
+                            self._mutually_exclusive_groups)
+
+        # description
+        formatter.add_text(self.description)
+
+        # positionals, optionals and user-defined groups
+        for action_group in self._action_groups:
+            formatter.start_section(action_group.title)
+            formatter.add_text(action_group.description)
+            formatter.add_arguments(action_group._group_actions)
+            formatter.end_section()
+
+        # epilog
+        formatter.add_text(self.epilog)
+
+        # determine help from format above
+        return formatter.format_rich()
+
+    def format_help(self) -> str:
+        return io.render_to_string(self.format_rich_help())
+
+    def print_help(self, file=None):
+        if file is None:
+            console = io.OUT
+        elif isinstance(file, Console):
+            console = file
+        else:
+            console = Console(file=file)
+        console.print(self.format_rich_help())
 
 
 def make_parser() -> ArgumentParser:
