@@ -55,6 +55,8 @@ defmodule Cortex.Types.JSONSchemaMap do
   """
   def type(_params), do: :map
 
+  def cast(nil, _params), do: {:ok, nil}
+
   def cast(data, %{json_schema: json_schema}) when is_map(data) do
     case JsonXema.validate(json_schema, data) do
       {:error, %JsonXema.ValidationError{} = error} ->
@@ -76,6 +78,8 @@ defmodule Cortex.Types.JSONSchemaMap do
   end
 
   def cast(_data, _params), do: :error
+
+  def load(nil, _loader, _params), do: {:ok, nil}
 
   def load(data, _loader, %{json_schema: json_schema}) do
     case JsonXema.validate(json_schema, data) do

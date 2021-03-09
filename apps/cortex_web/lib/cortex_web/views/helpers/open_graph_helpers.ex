@@ -18,6 +18,9 @@ defmodule CortexWeb.OpenGraphHelpers do
   def flatten([]), do: []
   def flatten(element), do: [element]
 
+  def open_graph_metadata_to_list(nil),
+    do: []
+
   def open_graph_metadata_to_list({_key, value}) when is_empty(value),
     do: []
 
