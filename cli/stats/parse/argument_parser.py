@@ -66,7 +66,9 @@ class ArgumentParser(argparse.ArgumentParser):
                             self._mutually_exclusive_groups)
 
         # description
+        formatter.start_section("description")
         formatter.add_text(self.description)
+        formatter.end_section()
 
         # positionals, optionals and user-defined groups
         for action_group in self._action_groups:

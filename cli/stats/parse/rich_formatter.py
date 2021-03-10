@@ -22,6 +22,7 @@ from rich.style import Style
 from rich.markdown import Markdown
 from rich.table import Table
 from rich.segment import Segment
+from rich.containers import Renderables
 
 from stats import io, log as logging
 
@@ -29,6 +30,7 @@ LOG = logging.getLogger(__name__)
 
 MIN_WIDTH = 64
 ARG_INVOCATION_RATIO = 0.33
+
 class RichFormatter:
     """Formatter for `argparse.ArgumentParser` using `rich`.
 
@@ -42,21 +44,21 @@ class RichFormatter:
             self.heading = heading
             self.items = []
             if parent is None:
-                self.depth = 1
+                self.level = 0
             else:
-                self.depth = 1 + parent.depth
+                self.level = 1 + parent.level
 
         @property
         def title(self) -> Optional[str]:
             if self.heading is not SUPPRESS and self.heading is not None:
-                return self.heading
+                return self.heading.title()
             return None
 
         @property
         def renderable_items(self):
             return list(
                 filter(
-                    lambda x: x is not None,
+                    lambda x: x is not None and x is not io.EMPTY,
                     (func(*args) for func, args in self.items),
                 )
             )
@@ -66,15 +68,22 @@ class RichFormatter:
             return RenderGroup(*self.renderable_items)
 
         def format_rich(self):
-            group = self.render_group
+            items = self.renderable_items
 
-            if self.parent is None:
-                return group
-
-            if len(group.renderables) == 0:
+            if len(items) == 0:
                 return None
 
-            return Panel(group, title=self.title)
+            if self.parent is None:
+                return RenderGroup(*items)
+
+            if self.title is None or self.title == "":
+                return RenderGroup(*items, io.NEWLINE)
+            else:
+                return RenderGroup(
+                    *io.header(self.title),
+                    *items,
+                    io.NEWLINE,
+                )
 
         def format_help(self):
             raise "HERE"
@@ -127,12 +136,18 @@ class RichFormatter:
         if text is not SUPPRESS and text is not None:
             self._add_item(self._format_text, [text])
 
-    def add_usage(self, usage, actions, groups, prefix="Usage"):
+    def add_usage(self, usage, actions, groups, prefix="usage"):
         if usage is not SUPPRESS:
             args = usage, actions, groups
-            if prefix != "":
-                self._add_item(self._format_heading, [prefix])
-            self._add_item(self._format_usage, args)
+            if prefix == "":
+                # This is special case where code in `argparse` ends up using
+                # this method to get the usage string
+                self._add_item(self._format_usage, args)
+            else:
+                self.start_section(prefix)
+                self._add_item(self._format_usage, args)
+                self.end_section()
+
 
     def add_arguments(self, actions):
         self._add_item(self._format_actions, [actions])
@@ -156,13 +171,12 @@ class RichFormatter:
         else:
             # items = io.RenderGrouper()
             items = []
-            end = ""
 
             # if the Optional doesn't take a value, format is:
             #    -s, --long
             if action.nargs == 0:
                 for option_string in action.option_strings:
-                    items.append(Text(option_string, no_wrap=True, end=end))
+                    items.append(Text(option_string, no_wrap=True))
 
             # if the Optional takes a value, format is:
             #    -s ARGS, --long ARGS
@@ -173,15 +187,16 @@ class RichFormatter:
                     items.append(
                         Text(
                             "%s %s" % (option_string, args_string),
-                            no_wrap=True, end=end
+                            no_wrap=True,
                         )
                     )
 
-            # joined = items.join(Text(", "))
-            # group = items.to_group()
-            text = Text(", ").join(items)
+            width = sum((len(text) for text in items))
 
-            # LOG.info("HERE", group=group.renderables)
+            if width > self._action_invocation_max_width:
+                text = Text(",\n").join(items)
+            else:
+                text = Text(", ").join(items)
 
             return text
 
@@ -189,7 +204,8 @@ class RichFormatter:
         if len(actions) == 0:
             return io.EMPTY
 
-        table = Table.grid(padding=(0, 2))
+        table = Table(padding=(0, 2, 1, 0), show_header=False, box=None)
+        table.add_column(width=0)
         table.add_column(max_width=self._action_invocation_max_width)
         table.add_column()
         for action in actions:
@@ -206,7 +222,7 @@ class RichFormatter:
                     self._format_actions(list(action._get_subactions()))
                 )
 
-            table.add_row(invocation, contents.to_group())
+            table.add_row("", invocation, contents.to_group())
 
         return table
 
@@ -313,9 +329,6 @@ class RichFormatter:
         # return the text
         return text
 
-    def _format_heading(self, heading):
-        return Text(heading, style="bold red")
-
     def _format_usage(self, usage, actions, groups):
         # if usage is specified, use that
         if usage is not None:
@@ -349,7 +362,7 @@ class RichFormatter:
     def _format_text(self, text):
         if "%(prog)" in text:
             text = text % dict(prog=self._prog)
-        return Text(text)
+        return Markdown(text)
 
     def _iter_subactions(self, action):
         try:

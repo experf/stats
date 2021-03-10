@@ -11,6 +11,9 @@ from rich.console import Console, ConsoleRenderable, RichCast, RenderGroup
 from rich.theme import Theme
 from rich.pretty import Pretty
 from rich.markdown import Markdown
+from rich.rule import Rule
+from rich.text import Text
+
 from mdutils.mdutils import MdUtils
 
 from stats import cfg, etc
@@ -23,6 +26,8 @@ THEME = Theme(
         "uhoh": "bold red",
         "holup": "bold yellow",
         "todo": "bold yellow",
+        "h": "bold blue",
+        "rule.h": "blue",
     }
 )
 
@@ -30,6 +35,29 @@ OUT = Console(theme=THEME, file=sys.stdout)
 ERR = Console(theme=THEME, file=sys.stderr)
 
 EMPTY = RenderGroup()
+
+NEWLINE = Text("\n", end="")
+
+# def h1(text):
+#     yield Text(text, style="h")
+#     yield Rule(
+#         # characters="=",
+#         style="rule.h"
+#     )
+#     yield NEWLINE
+
+# def h2(text):
+#     yield Text(text, style="h")
+#     yield Rule(
+#         # characters="-",
+#         style="rule.h"
+#     )
+#     yield NEWLINE
+
+def header(text, level=1):
+    yield Text(text, style="h")
+    yield Rule(style="rule.h")
+    yield NEWLINE
 
 def is_rich(x: Any) -> bool:
     return isinstance(x, (ConsoleRenderable, RichCast))
