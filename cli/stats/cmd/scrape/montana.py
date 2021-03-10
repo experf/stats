@@ -71,7 +71,7 @@ class View(io.View):
 
         for color in self.data:
             table.add_row(
-                f"{color['var_name']}:",
+                f"${color['var_name']}:",
                 f"#{color['hex']};",
                 f"// {color['name']}",
             )
