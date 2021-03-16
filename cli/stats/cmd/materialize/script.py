@@ -4,9 +4,9 @@ LOG = logging.getLogger(__name__)
 
 def rel_paths():
     return [
-        str(path.relative_to(cfg.materialize.paths.scripts))
+        str(path.relative_to(cfg.stats.materialize.paths.scripts))
         for path
-        in cfg.materialize.paths.scripts.glob("**/*.sql")
+        in cfg.stats.materialize.paths.scripts.glob("**/*.sql")
     ]
 
 def add_to(subparsers):
@@ -24,7 +24,7 @@ def add_to(subparsers):
 
 
 def run(path):
-    abs_path = cfg.materialize.paths.scripts / path
+    abs_path = cfg.stats.materialize.paths.scripts / path
 
     sh.run(
         "psql",
