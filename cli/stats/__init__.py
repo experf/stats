@@ -1,12 +1,10 @@
 from __future__ import annotations
 from typing import *
-import sys
-import os
 
 from clavier import log as logging, io, Sesh, cfg
 from clavier.argument_parser import ArgumentParser
 
-import stats.cfg
+import stats.cfg # NEED this! And FIRST!
 from stats import cmd
 
 LOG = logging.getLogger(__name__)
