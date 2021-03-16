@@ -1,0 +1,30 @@
+stats:
+  log:
+    level: 10
+    
+  paths:
+    repo: //
+    dev: //dev
+    cli: //cli
+    umbrella: //
+    umbrella_build: //_build
+    cortex: //apps/cortex
+    cortex_web: //apps/cortex_web
+    
+  kafka:
+    host: localhost
+    port: 9091
+    netloc: localhost:9091
+    servers:
+      - localhost:9091
+    topic: events
+    
+  materialize.paths:
+    scripts: //dev/sql/materialize
+    
+  materialize.postgres:
+    username: materialize
+    host: localhost
+    port: 6875
+    database: materialize
+    url: postgres://materialize@localhost:6875/materialize

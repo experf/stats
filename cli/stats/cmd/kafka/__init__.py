@@ -1,4 +1,4 @@
-from stats import log as logging
+from clavier import log as logging
 
 LOG = logging.getLogger(__name__)
 

@@ -1,7 +1,7 @@
 # from rtmidi import MidiIn # pylint: disable=no-name-in-module
 from rtmidi.midiutil import list_input_ports
 
-from stats import log as logging
+from clavier import log as logging
 
 LOG = logging.getLogger(__name__)
 

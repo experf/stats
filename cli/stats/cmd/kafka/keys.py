@@ -4,7 +4,7 @@ import json
 from kafka import KafkaConsumer
 from kafka.structs import TopicPartition
 
-from stats import log as logging, cfg
+from clavier import log as logging, cfg
 
 LOG = logging.getLogger(__name__)
 

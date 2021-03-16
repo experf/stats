@@ -1,68 +1,35 @@
+from __future__ import annotations
 from typing import *
 import sys
 import os
 
-import argcomplete
+from clavier import log as logging, io, Sesh, cfg
+from clavier.argument_parser import ArgumentParser
 
-from . import log as logging, cmd, cfg, io
-
-from .parse.argument_parser import ArgumentParser
+import stats.cfg
+from stats import cmd
 
 LOG = logging.getLogger(__name__)
 
 
-OUTPUT_HELP = (
-"""How to print output. Commands can add their own custom output formats, but
-pretty much all commands should support `rich` and `json` outputs.
-
--   `rich` (default) -- Pretty, colorful output for humans via the [rich][]
-    Python package.
-
-    [rich]: https://rich.readthedocs.io/en/stable/
-
--   `json` -- Prints a JSON encoding via `json.dump()`. Uses the `indent=2`
-    option to make it easier on the eyes.
-"""
-)
-
-
-def make_parser() -> ArgumentParser:
-    with cfg.paths.CLI.joinpath("README.md").open("r") as file:
-        description = file.read()
-
-    parser = ArgumentParser(description=description)
-    subparsers = parser.add_subparsers(help="Select a command")
-    cmd.add_to(subparsers)
-    return parser
-
-
-def log_level_for(verbosity: Optional[int]) -> int:
-    if verbosity is None:
-        return logging.INFO
-    else:
-        return logging.DEBUG
-
-
-def is_backtracing(args, log_level):
-    return (
-        args.backtrace
-        or log_level == logging.DEBUG
-        or "STATS_BACKTRACE" in os.environ
-    )
-
-
 def run():
-    logging.setup()
+    Sesh(
+        __name__,
+        cfg.stats.paths.cli / "README.md",
+        cmd.add_to
+    ).setup(cfg.log.level).parse().exec()
+
+def old_run():
+    logging.setup(__name__, cfg.log.level)
 
     log = LOG.getChild("run")
     log.debug("[holup]Handling command...[/holup]", argv=sys.argv)
 
-    parser = make_parser()
-    argcomplete.autocomplete(parser)
+    parser = ArgumentParser.create(cfg.paths.CLI / "README.md", cmd.add_to)
     args = parser.parse_args()
-    log_level = log_level_for(args.verbose)
+    logging.set_level(__name__, verbosity=args.verbose)
 
-    logging.set_pkg_level(log_level)
+    assert hasattr(args, "__target__")
 
     # Form the call keyword args -- start with a dict of the parsed arguments
     kwds = {**args.__dict__}
@@ -79,7 +46,7 @@ def run():
     except KeyboardInterrupt:
         sys.exit(0)
     except Exception as error:
-        if is_backtracing(args, log_level):
+        if parser.is_backtracing(args):
             log.error(
                 "[holup]Terminting due to unhandled exception[/holup]...",
                 exc_info=True,
@@ -100,7 +67,7 @@ def run():
     except KeyboardInterrupt:
         sys.exit(0)
     except Exception as error:
-        if is_backtracing(args, log_level):
+        if parser.is_backtracing(args):
             log.error(
                 "[holup]Terminting due to view rendering error[/holup]...",
                 exc_info=True,

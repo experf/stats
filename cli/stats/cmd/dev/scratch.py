@@ -1,10 +1,8 @@
-import sys
-
 from rich.table import Table
 from rich.style import Style
 from rich.text import Text
 
-from stats import log as logging, io
+from clavier import log as logging, io
 
 LOG = logging.getLogger(__name__)
 

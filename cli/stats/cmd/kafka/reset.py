@@ -1,6 +1,6 @@
 import logging
 
-from stats import sh, cfg
+from clavier import sh, cfg
 
 from .. import docker_compose
 

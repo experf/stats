@@ -1,8 +1,4 @@
-import pkgutil
-import importlib.util
-import sys
-
-from stats import log as logging, dyn
+from clavier import log as logging, dyn
 
 
 LOG = logging.getLogger(__name__)

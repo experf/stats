@@ -4,9 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from rich.table import Table
 
-from stats import log as logging, io, OUTPUT_HELP
-from stats.etc import find_map
-from stats.io import OUT
+from clavier import log as logging, io, etc
 
 LOG = logging.getLogger(__name__)
 
@@ -41,7 +39,7 @@ def run(var_prefix):
 
     for label in soup("label", class_="color--option--label"):
         hex_ = label["data-hex"].replace("#", "")
-        name = find_map(
+        name = etc.find_map(
             lambda node: node.name is None and node.string.strip(),
             label.contents,
             nothing=(None, False, "")

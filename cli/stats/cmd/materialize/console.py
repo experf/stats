@@ -1,4 +1,4 @@
-from stats import sh, cfg, log as logging
+from clavier import sh, log as logging, cfg
 
 LOG = logging.getLogger(__name__)
 

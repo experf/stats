@@ -3,7 +3,6 @@ from typing import *
 import re as _re
 import shutil
 from gettext import gettext as _
-import argparse
 
 from argparse import (
     SUPPRESS,
@@ -24,7 +23,7 @@ from rich.table import Table
 from rich.segment import Segment
 from rich.containers import Renderables
 
-from stats import io, log as logging
+from . import io, log as logging
 
 LOG = logging.getLogger(__name__)
 

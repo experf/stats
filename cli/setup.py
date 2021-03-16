@@ -28,6 +28,8 @@ setuptools.setup(
         "python-rtmidi>=1.4.7,<2",
         # _creating_ Markdown, believe it or not
         "mdutils>=1.3.0,<2",
+        # sorted containers for clavier.cfg
+        "sortedcontainers>=2.3.0,<3",
     ],
     scripts = [
         'bin/stats',

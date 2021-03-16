@@ -16,12 +16,14 @@ from rich.text import Text
 
 from mdutils.mdutils import MdUtils
 
-from stats import cfg, etc
+from . import etc
+# from stats import cfg
 
 THEME = Theme(
     {
         "good": "bold green",
         "yeah": "bold green",
+        "on": "bold green",
         "bad": "bold red",
         "uhoh": "bold red",
         "holup": "bold yellow",
@@ -33,9 +35,7 @@ THEME = Theme(
 
 OUT = Console(theme=THEME, file=sys.stdout)
 ERR = Console(theme=THEME, file=sys.stderr)
-
 EMPTY = RenderGroup()
-
 NEWLINE = Text("\n", end="")
 
 # def h1(text):

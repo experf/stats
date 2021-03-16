@@ -3,7 +3,7 @@ import time
 
 from rtmidi.midiutil import open_midiinput
 
-from stats import log as logging, io
+from clavier import log as logging
 
 LOG = logging.getLogger(__name__)
 

@@ -7,15 +7,23 @@ from pathlib import Path
 import re
 from subprocess import run
 import os
+import logging
 
 from rich.panel import Panel
 from rich.padding import Padding
+from rich.console import Console
 
-from stats import log as logging, io
+try:
+    from clavier import log as logging
+    from clavier.io import OUT
+except ImportError:
+    import logging
+    from rich.console import Console
+    OUT = Console(file=sys.stdout)
 
 LOG = logging.getLogger("stats.doctest")
 
-REPO_ROOT = Path(__file__).parent.parent.parent
+REPO_ROOT = Path(__file__).parents[2]
 PKG_ROOT = REPO_ROOT / 'cli'
 
 ARGS = sys.argv[1:]
@@ -42,13 +50,17 @@ def module_for(path):
         str(Path(path).relative_to(PKG_ROOT))[:-3].split('/')
     )
 
-def pkg_modules():
-    return [
-        (module_for(path), path)
-        for path
-        in glob(PKG_ROOT / 'stats' / '**' / '*.py')
-        if is_doctest(path)
-    ]
+def module_roots(pkg_root: Path=PKG_ROOT):
+    for path_s in glob(pkg_root / "*" / "__init__.py"):
+        path = Path(path_s).parents[0]
+        yield path
+
+def pkg_modules(pkg_root: Path=PKG_ROOT):
+    for module_root in module_roots(pkg_root):
+        for path_s in glob(module_root / "**" / "*.py"):
+            path = Path(path_s)
+            if is_doctest(path):
+                yield (module_for(path), path)
 
 def env():
     return {**os.environ, "DOCTESTING": "yup"}
@@ -56,14 +68,14 @@ def env():
 def test(name, cmd):
     r = run(cmd, capture_output=True, encoding='utf8', env=env(), check=False)
     if r.returncode == 0 and len(r.stdout) == 0:
-        io.OUT.print(":white_check_mark:", name)
+        OUT.print(":white_check_mark:", name)
         return True
     else:
         if r.stdout:
-            io.OUT.print(Panel(Padding(r.stdout, 1), title=f"STDOUT {name}"))
+            OUT.print(Panel(Padding(r.stdout, 1), title=f"STDOUT {name}"))
         if r.stderr:
-            io.OUT.print(Panel(Padding(r.stderr, 1), title=f"STDERR {name}"))
-        io.OUT.print(":x:", name)
+            OUT.print(Panel(Padding(r.stderr, 1), title=f"STDERR {name}"))
+        OUT.print(":x:", name)
         return False
 
 def test_module(module):
@@ -81,7 +93,10 @@ def is_pkg_module(path):
 
 
 def main():
-    logging.setup()
+    if hasattr(logging, "setup"):
+        logging.setup("stats.doctest", level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.DEBUG)
 
     ok = True
 

@@ -1,8 +1,7 @@
 import os
 from inspect import cleandoc
 
-from stats import sh, cfg, log as logging, io
-
+from clavier import sh, log as logging, io, cfg
 
 LOG = logging.getLogger(__name__)
 
@@ -19,7 +18,7 @@ def add_to(subparsers):
         action="store_true",
         help=cleandoc(
             f"""
-            Remove build files before starting ({io.fmt(cfg.paths.UMBRELLA_BUILD)}).
+            Remove build files before starting ({io.fmt(cfg.stats.paths.umbrella_build)}).
 
             **WARNING** This incurs a *significant* start-up cost, but has proven to
                         resolve odd compilation issues that `mix clean` does not.
@@ -65,13 +64,13 @@ def add_to(subparsers):
 def run(clean=False, iex=False, no_rm_hs_cache=False):
     if no_rm_hs_cache is False:
         sh.file_absent(
-            cfg.paths.WEBPACK_HARD_SOURCE_CACHE,
+            cfg.stats.paths.webpack.hard_source_cache,
             name="`hard-source-webpack-plugin` cache directory",
         )
 
     if clean:
         sh.file_absent(
-            cfg.paths.UMBRELLA_BUILD, name="umbrella build directory"
+            cfg.stats.paths.umbrella_build, name="umbrella build directory"
         )
 
     if iex:
@@ -79,19 +78,19 @@ def run(clean=False, iex=False, no_rm_hs_cache=False):
             "iex",
             {
                 "erl": "-kernel shell_history enabled",
-                "dot-iex": cfg.paths.DEV / ".iex.exs",
+                "dot-iex": cfg.stats.paths.dev / ".iex.exs",
             },
             "-S",
             "mix",
             "phx.server",
-            chdir=cfg.paths.UMBRELLA,
+            chdir=cfg.stats.paths.umbrella,
             opts_style=" ",
         )
     else:
         sh.replace(
             "mix",
             "phx.server",
-            chdir=cfg.paths.UMBRELLA,
+            chdir=cfg.stats.paths.umbrella,
             opts_style=" ",
             env={
                 **os.environ,

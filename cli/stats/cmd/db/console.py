@@ -1,4 +1,4 @@
-from stats import sh, cfg
+from clavier import sh, cfg
 
 def add_to(subparsers):
     _parser = subparsers.add_parser(

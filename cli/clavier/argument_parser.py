@@ -1,11 +1,32 @@
+from __future__ import annotations
+from typing import *
 import argparse
+from pathlib import Path
+import os
 
 from rich.console import Console
 
-from stats import io, dyn
+from argcomplete import autocomplete
+
+from . import io, dyn, log as logging
 from .rich_formatter import RichFormatter
 
 class ArgumentParser(argparse.ArgumentParser):
+    @classmethod
+    def create(cls, description, subparser_hook):
+        if isinstance(description, Path):
+            with description.open("r") as file:
+                description = file.read()
+        elif isinstance(description, str):
+            pass
+        else:
+            raise TypeError("Expected `pathlib.Path` or `str`")
+
+        parser = cls(description=description)
+        subparsers = parser.add_subparsers(help="Select a command")
+        subparser_hook(subparsers)
+        autocomplete(parser)
+        return parser
 
     def __init__(self, *args, target=None, view=io.View, **kwds):
         super().__init__(
@@ -39,6 +60,19 @@ class ArgumentParser(argparse.ArgumentParser):
             "--output",
             default=view.DEFAULT_FORMAT,
             help=view.help(),
+        )
+
+    def env_var_name(self, name):
+        self.prog.upper() + "_" + name.upper()
+
+    def env(self, name, default=None):
+        return os.environ.get(self.env_var_name(name), default)
+
+    def is_backtracing(self, pkg_name, args):
+        return (
+            args.backtrace
+            or logging.get_pkg_logger(pkg_name) is logging.DEBUG
+            or self.env("backtrace", False)
         )
 
     def set_target(self, target):

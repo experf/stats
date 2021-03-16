@@ -1,111 +1,36 @@
+"""\
+Contains the `RichHandler` class.
+"""
+
 from __future__ import annotations
-import logging
 from typing import (
     Any,
     Optional,
     Mapping,
 )
-
-# Some way of complaining (ideally) _outside_ the logging system, to (try) to
-# avoid recursive self-destruction (yeah, I did see something about telling the
-# warning system to go through logging, so it might still explode...)
-# from warnings import warn
+import logging
 
 from rich.table import Table
 from rich.console import Console
 from rich.text import Text
 from rich.style import Style
-# from rich.containers import Renderables
 from rich.traceback import Traceback
 from rich.pretty import Pretty
 
-from .io import OUT, ERR, is_rich
-from . import cfg
-
-CRITICAL = logging.CRITICAL  # 50
-FATAL = logging.FATAL  # ↑
-ERROR = logging.ERROR  # 40
-WARNING = logging.WARNING  # 30
-WARN = logging.WARN  # ↑
-INFO = logging.INFO  # 20
-DEBUG = logging.DEBUG  # 10
-NOTSET = logging.NOTSET  # 0
-
-
-def get_pkg_logger():
-    return logging.getLogger(__name__.split(".")[0])
-
-
-def setup(level: Optional[int] = None) -> None:
-    logging.setLoggerClass(KwdsLogger)
-
-    pkg_logger = get_pkg_logger()
-
-    if level is None:
-        pkg_logger.setLevel(cfg.log.level)
-    else:
-        pkg_logger.setLevel(level)
-
-    pkg_logger.addHandler(RichHandler.singleton())
-
-
-def set_pkg_level(level: int) -> None:
-    get_pkg_logger().setLevel(level)
-
-
-class LogGetter:
-    def __init__(self, *args, **kwds):
-        self._args = args
-        self._kwds = kwds
-
-    @property
-    def _logger(self):
-        return logging.getLogger(*self._args, **self._kwds)
-
-    def __getattr__(self, name):
-        return getattr(self._logger, name)
-
-
-def getLogger(*args, **kwds):
-    return LogGetter(*args, **kwds)
-
-
-class KwdsLogger(logging.Logger):
-    def _log(
-        self,
-        level,
-        msg,
-        args,
-        exc_info=None,
-        extra=None,
-        stack_info=False,
-        **data,
-    ):
-        """
-        Low-level log implementation, proxied to allow nested logger adapters.
-        """
-
-        if extra is not None:
-            if isinstance(extra, dict):
-                extra = {"data": data, **extra}
-        else:
-            extra = {"data": data}
-
-        super()._log(
-            level,
-            msg,
-            args,
-            exc_info=exc_info,
-            stack_info=stack_info,
-            extra=extra,
-        )
-
+from .. import io
 
 class RichHandler(logging.Handler):
+    """\
+    A `logging.Handler` extension that uses [rich][] to print pretty nice log
+    entries to the console.
+
+    Output is meant for specifically humans.
+    """
+
     # Default consoles, pointing to the two standard output streams
     DEFAULT_CONSOLES = dict(
-        out=OUT,
-        err=ERR,
+        out=io.OUT,
+        err=io.ERR,
     )
 
     # By default, all logging levels log to the `err` console
@@ -156,7 +81,7 @@ class RichHandler(logging.Handler):
             # We want these guys to bub' up
             raise error
         except Exception as error:
-            ERR.print_exception()
+            io.ERR.print_exception()
             # self.handleError(record)
 
     def _emit_table(self, record):
@@ -164,7 +89,7 @@ class RichHandler(logging.Handler):
 
         console = self.consoles.get(
             self.level_map.get(record.levelno, "err"),
-            ERR,
+            io.ERR,
         )
 
         output = Table.grid(padding=(0, 1))
@@ -198,7 +123,7 @@ class RichHandler(logging.Handler):
             table.add_column(style=Style(color="#4ec9b0", italic=True))
             table.add_column()
             for key, value in record.data.items():
-                if is_rich(value):
+                if io.is_rich(value):
                     rich_value_type = None
                     rich_value = value
                 else:
