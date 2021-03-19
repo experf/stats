@@ -1,11 +1,7 @@
 from __future__ import annotations
 
-from clavier import log as logging, io
-
 from .key import Key
 from .scope import ReadScope, WriteScope
-
-LOG = logging.getLogger(__name__)
 
 class Changeset:
     """\

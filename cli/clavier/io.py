@@ -16,8 +16,8 @@ from rich.text import Text
 
 from mdutils.mdutils import MdUtils
 
+from .config import cfg
 from . import etc
-# from stats import cfg
 
 THEME = Theme(
     {
@@ -54,19 +54,28 @@ NEWLINE = Text("\n", end="")
 #     )
 #     yield NEWLINE
 
+
 def header(text, level=1):
     yield Text(text, style="h")
     yield Rule(style="rule.h")
     yield NEWLINE
 
+
 def is_rich(x: Any) -> bool:
     return isinstance(x, (ConsoleRenderable, RichCast))
+
+
+# @cfg.inject_kwds
+def rel(path: Path, to: Optional[Path] = None) -> Path:
+    if to is None:
+        to = cfg[rel, "to"]
+    return path.relative_to(to)
 
 
 def fmt_path(path: Path) -> str:
     # pylint: disable=bare-except
     try:
-        return f"//{Path(path).relative_to(cfg.paths.REPO)}"
+        return f"//{rel(path)}"
     except:
         return str(path)
 
@@ -214,3 +223,7 @@ class View:
         [rich]: https://rich.readthedocs.io/en/stable/
         """
         render_to_console(self.data, console=self.console)
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()

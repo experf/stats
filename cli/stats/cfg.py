@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from clavier import cfg, log as logging #, io
+from clavier import cfg, log as logging, io
 
 with cfg.configure("stats", src=__file__) as stats:
     stats.name = "stats"
@@ -43,5 +43,5 @@ with cfg.configure("stats", src=__file__) as stats:
                 f"/{postgres.database}"
             )
 
-# with cfg.scope(io.rel, src=__file__) as rel:
-#     rel.to = cfg["stats.paths.root"]
+with cfg.configure(io.rel, src=__file__) as rel:
+    rel.to = cfg.stats.paths.repo

@@ -1,3 +1,12 @@
+from .txt import coordinate, fmt_class
+
+class ArgTypeError(TypeError):
+    def __init__(self, arg_name, expected, given):
+        super().__init__(
+            f"Expected `{arg_name}` to be {coordinate(expected, 'or')}, given "
+            f"{fmt_class(type(given))}: {repr(given)}"
+        )
+
 class ClavierError(Exception):
     pass
 

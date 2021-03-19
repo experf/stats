@@ -92,7 +92,7 @@ class Key(tuple):
                 ...
             TypeError: Expected str, bytes, Iterable or class, given <class 'int'>: 1
         """
-
+        # print(f"HERE {repr(value)}")
         if isinstance(value, str):
             yield from value.split(cls.STRING_SEPARATOR)
         elif isinstance(value, bytes):
@@ -135,16 +135,16 @@ class Key(tuple):
             >>> Key("hey.ho.lets_go").env_name
             'HEY_HO_LETS_GO'
 
-            >>> Key(__package__, "some", "setting").env_name
-            'CLAVIER_CONFIG_SOME_SETTING'
+            >>> Key("clavier", "some", "setting").env_name
+            'CLAVIER_SOME_SETTING'
 
         Notes that this process is **_ambiguous_**:
 
-            >>> ( Key(__package__, "some", "setting")
-            ...   == Key(__package__, "some_setting") )
+            >>> ( Key("clavier", "some", "setting")
+            ...   == Key("clavier", "some_setting") )
             False
-            >>> ( Key(__package__, "some", "setting").env_name
-            ...   == Key(__package__, "some_setting").env_name )
+            >>> ( Key("clavier", "some", "setting").env_name
+            ...   == Key("clavier", "some_setting").env_name )
             True
 
         Only _you_ can prevent environment variable name collisions!
