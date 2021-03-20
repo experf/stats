@@ -6,7 +6,7 @@ with cfg.configure("stats", src=__file__) as stats:
     stats.name = "stats"
 
     with stats.configure("log") as log:
-        log.level = logging.INFO
+        log.level = "info"
 
     with stats.configure("paths") as paths:
         paths.repo = Path(__file__).resolve().parents[2]

@@ -19,6 +19,7 @@ from .kwds_logger import KwdsLogger
 from .log_getter import LogGetter
 from .rich_handler import RichHandler
 
+# Stdlib's `logging` level values, which are integers.
 TLevel = Literal[
     logging.CRITICAL,
     logging.ERROR,
@@ -27,6 +28,34 @@ TLevel = Literal[
     logging.DEBUG,
     logging.NOTSET,
 ]
+
+# String versions of the log levels, which are also accepted as level "values"
+TLevelStr = Literal[
+    str(logging.CRITICAL),
+    str(logging.ERROR),
+    str(logging.WARNING),
+    str(logging.INFO),
+    str(logging.DEBUG),
+    str(logging.NOTSET),
+]
+
+# ...and the names of stdlib `logging` constants, which are easier for us mere
+# humans to remember.
+TLevelName = Literal[
+    "CRITICAL", "FATAL", "ERROR", "WARNING", "WARN", "INFO", "DEBUG", "NOTSET",
+]
+
+# Something that can be turned into a log level defined in `logging` -- one of:
+#
+# 1.  An `int` level itself (`TLevel`)
+# 2.  One of those `int` levels as a `str` (`TLevelStr`)
+# 3.  The name of a level constant. In practice, we ignore case, but that is
+#     not reflected in the type for (hopefully) obvious reasons.
+#
+TLevelValue = Union[TLevel, TLevelStr, TLevelName]
+
+# Valid _verbose_ switch values, provided like `-v` (1), `-vv` (2), etc.
+TVerbosity = Literal[0, 1, 2, 3]
 
 # Re-defining log levels allows using this module to be swapped in for basic
 # uses of stdlib `logging`.
@@ -39,7 +68,14 @@ INFO = logging.INFO  # 20
 DEBUG = logging.DEBUG  # 10
 NOTSET = logging.NOTSET  # 0
 
-LEVEL_NAMES: Dict[str, TLevel] = dict(
+# Default log level for the package (CLI app) that is using Clavier
+DEFAULT_PKG_LEVEL = INFO
+
+# Default log level for Clavier itself
+DEFAULT_LIB_LEVEL = WARNING
+
+# Map of log levels... by (constant) name.
+LEVELS_BY_NAME: Dict[TLevelName, TLevel] = dict(
     CRITICAL=CRITICAL,
     FATAL=FATAL,
     ERROR=ERROR,
@@ -62,7 +98,7 @@ def _announce_debug(logger):
     )
 
 
-def level_for(value: Union[str, int]) -> TLevel:
+def level_for(value: TLevelValue) -> TLevel:
     """
     Make a `logging` level `int` from things you might get from an ENV var or,
     say, a human being.
@@ -101,17 +137,17 @@ def level_for(value: Union[str, int]) -> TLevel:
         if value.isdigit():
             return level_for(int(value))
         cap_value = value.upper()
-        if cap_value in LEVEL_NAMES:
-            return LEVEL_NAMES[cap_value]
+        if cap_value in LEVELS_BY_NAME:
+            return LEVELS_BY_NAME[cap_value]
         raise ValueError(
             f"Unknown log level name {repr(value)}; known level names are "
-            f"{', '.join(LEVEL_NAMES.keys())} (case-insensitive)"
+            f"{', '.join(LEVELS_BY_NAME.keys())} (case-insensitive)"
         )
     if isinstance(value, int):
-        if value in LEVEL_NAMES.values():
+        if value in LEVELS_BY_NAME.values():
             return cast(TLevel, value)
         levels = txt.coordinate(
-            [f"{v} ({k})" for k, v in LEVEL_NAMES.items()], "and", to_s=str
+            [f"{v} ({k})" for k, v in LEVELS_BY_NAME.items()], "and", to_s=str
         )
         raise ValueError(
             f"Unknown log level integer {value}; known levels are {levels}"
@@ -132,7 +168,7 @@ def get_lib_logger() -> LogGetter:
     return get_logger(_root_name(__name__))
 
 
-def set_lib_level(level: Union[str, int]) -> None:
+def set_lib_level(level: TLevelValue) -> None:
     logger = get_lib_logger()
     logger.setLevel(level_for(level))
     if level == DEBUG:
@@ -143,7 +179,7 @@ def get_pkg_logger(module_name: str) -> LogGetter:
     return get_logger(_root_name(module_name))
 
 
-def set_pkg_level(module_name: str, level: Union[str, int]) -> None:
+def set_pkg_level(module_name: str, level: TLevelValue) -> None:
     logger = get_pkg_logger(module_name)
     logger.setLevel(level_for(level))
     if level == DEBUG:
@@ -151,11 +187,11 @@ def set_pkg_level(module_name: str, level: Union[str, int]) -> None:
 
 
 def set_level(
-    module_name,
+    module_name: str,
     *,
-    level: Union[None, str, int] = None,
-    verbosity: Optional[int] = None,
-):
+    level: Optional[TLevelValue] = None,
+    verbosity: Optional[TVerbosity] = None,
+) -> None:
     if level is not None:
         set_pkg_level(level)
     if verbosity is not None:
@@ -182,10 +218,10 @@ def set_level(
             )
 
 
-def setup(module_name: str, level: TLevel = INFO) -> None:
+def setup(module_name: str, level: TLevelValue = DEFAULT_PKG_LEVEL) -> None:
     logging.setLoggerClass(KwdsLogger)
 
-    set_lib_level(WARNING)
+    set_lib_level(DEFAULT_LIB_LEVEL)
     set_pkg_level(module_name, level)
 
     rich_handler = RichHandler.singleton()
@@ -198,6 +234,7 @@ getLogger = get_logger
 setLevel = set_level
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

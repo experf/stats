@@ -32,9 +32,15 @@ class Config:
         return key in self._view and Key(key).env_name in os.environ
 
     def env_get(self, key):
-        return os.environ[Key(key).env_name]
+        value_s = os.environ[Key(key).env_name]
         typ = type(self._view[key])
-        return typ(os.environ[Key(key).env_name])
+        if typ is str:
+            return value_s
+        else:
+            try:
+                return typ(value_s)
+            except Exception:
+                return value_s
 
     def __contains__(self, key):
         return Key(key) in self._view
