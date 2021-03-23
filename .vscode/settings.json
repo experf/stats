@@ -10,4 +10,7 @@
     "recommonmark",
     "structify"
   ],
+  "[python]": {
+    "files.trimTrailingWhitespace": false
+  }
 }

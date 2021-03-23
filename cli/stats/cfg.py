@@ -11,6 +11,7 @@ with CFG.configure("stats", src=__file__) as stats:
     with stats.configure("paths") as paths:
         paths.repo = Path(__file__).resolve().parents[2]
         paths.dev = paths.repo / "dev"
+        paths.tmp = paths.repo / "tmp"
         # paths.cli = paths.repo / "cli"
         # paths.cli_docs = paths.cli / "docs"
         paths.umbrella = paths.repo

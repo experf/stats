@@ -70,7 +70,7 @@ def coordinate(
     sep: str = ",",
 ) -> str:
     """\
-    ## Examples
+    Examples:
 
     1.  Empty list
 

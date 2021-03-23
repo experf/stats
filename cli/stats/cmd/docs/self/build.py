@@ -61,6 +61,7 @@ def run(
             "output-dir": paths.cli.docs.root,
             "ext-doctest": True,
             "force": True,
+            "no-toc": True,
             "private": True,
             "separate": True,
             # "suffix": "gen.rst", # Ends up in URL

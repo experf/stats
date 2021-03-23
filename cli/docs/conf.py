@@ -15,10 +15,11 @@ import os
 import sys
 from pathlib import Path
 import re
+import inspect
 
 sys.path.insert(0, os.path.abspath(".."))
 
-# from clavier import sh
+from stats.cfg import CFG
 
 
 GIT_BRANCH_RE = re.compile(r"\*\ ([^\n]+)\n")
@@ -63,13 +64,46 @@ html_static_path = ["_static"]
 
 import commonmark
 
+r = repr
+
 def docstring(app, what, name, obj, options, lines):
+    lines_in = [*lines]
+
+    # md  = inspect.cleandoc('\n'.join(lines))
     md  = '\n'.join(lines)
     ast = commonmark.Parser().parse(md)
     rst = commonmark.ReStructuredTextRenderer().render(ast)
-    # print(rst)
     lines.clear()
     lines += rst.splitlines()
+
+    try:
+        file = inspect.getfile(obj)
+    except:
+        file = None
+
+    try:
+        module = inspect.getmodule(obj).__name__
+    except:
+        module = None
+
+    name = getattr(obj, "__qualname__", None)
+
+    if module is not None:
+        if name is not None:
+            name = f"{module}.{name}"
+        else:
+            name = module
+
+    if len(lines_in) > 0 and name is not None:
+        path = CFG.stats.paths.tmp / "rst" / f"{name}.rst"
+        # print(f"WRITE {path}")
+        with path.open("w") as fp:
+            print("### LINES IN ###", file=fp)
+            for line in lines_in:
+                print(line, file=fp)
+            print("### LINES OUT ###", file=fp)
+            for line in lines:
+                print(line, file=fp)
 
 def setup(app):
     app.connect('autodoc-process-docstring', docstring)

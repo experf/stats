@@ -104,7 +104,7 @@ def level_for(value: TLevelValue) -> TLevel:
     Make a `logging` level `int` from things you might get from an ENV var or,
     say, a human being.
 
-    ## Examples
+    Examples:
 
     1.  Integer levels can be provided as strings:
 

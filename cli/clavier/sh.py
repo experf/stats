@@ -111,13 +111,12 @@ def flat_opts(
     rel_to: Optional[Path] = None,
 ) -> Generator[str, None, None]:
     """
-    ## Examples
+    Examples:
 
     1.  Short opt with a list (or tuple) value:
-
+        
         >>> list(flat_opts({'x': [1, 2, 3]}))
         ['-x', '1', '-x', '2', '-x', '3']
-
 
     2.  Long opt with a list (or tuple) value:
 
@@ -126,12 +125,12 @@ def flat_opts(
 
     3.  Due to the recursive, yield-centric nature, nested lists work as well:
 
-        >>> list(flat_opts({'blah': [1, 2, [[3], 4], 5] }))
-        ['--blah=1', '--blah=2', '--blah=3', '--blah=4', '--blah=5']
+            >>> list(flat_opts({'blah': [1, 2, [[3], 4], 5] }))
+            ['--blah=1', '--blah=2', '--blah=3', '--blah=4', '--blah=5']
 
         Neat, huh?!
 
-
+    Blah.
     """
 
     # Handle `None` as a legit value, making life easier on callers assembling

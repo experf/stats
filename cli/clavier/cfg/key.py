@@ -6,35 +6,35 @@ class Key(tuple):
     """
     A key.
 
-    # Examples:
+    Examples:
 
-    1.  Keys can be empty:
+    Keys can be empty:
 
-            >>> Key()
-            Key()
-            >>> len(Key())
-            0
+        >>> Key()
+        Key()
+        >>> len(Key())
+        0
 
-    2.  Empty keys dispear when used as segments:
+    Empty keys disappear when used as segments:
 
-            >>> Key(Key(), "a.b")
-            Key('a', 'b')
+        >>> Key(Key(), "a.b")
+        Key('a', 'b')
 
-        This is pretty much _just_ so that `Changeset` can have an empty
-        `.prefix`, making a bit of code cleaner and clearer. Please don't abuse
-        it.
+    This is pretty much _just_ so that `Changeset` can have an empty
+    `.prefix`, making a bit of code cleaner and clearer. Please don't abuse
+    it.
 
-    3.  However, you _can't_ embed empty segments into string representations:
+    However, you _can't_ embed empty segments into string representations:
 
-            >>> Key(".a.b")
-            Traceback (most recent call last):
-                ...
-            ValueError: Each segment in a `key` must full-match [A-Za-z][A-Za-z0-9_]*, found '' in '.a.b'
+        >>> Key(".a.b")
+        Traceback (most recent call last):
+            ...
+        ValueError: Each segment in a `key` must full-match [A-Za-z][A-Za-z0-9_]*, found '' in '.a.b'
 
-            >>> Key("a..b")
-            Traceback (most recent call last):
-                ...
-            ValueError: Each segment in a `key` must full-match [A-Za-z][A-Za-z0-9_]*, found '' in 'a..b'
+        >>> Key("a..b")
+        Traceback (most recent call last):
+            ...
+        ValueError: Each segment in a `key` must full-match [A-Za-z][A-Za-z0-9_]*, found '' in 'a..b'
 
     """
 
@@ -64,7 +64,7 @@ class Key(tuple):
         """\
         Yield key segment `str`.
 
-        ## Examples
+        Examples:
 
         Splits strings:
 
@@ -94,6 +94,7 @@ class Key(tuple):
             Traceback (most recent call last):
                 ...
             TypeError: Expected str, bytes, Iterable or class, given <class 'int'>: 1
+
         """
         # print(f"HERE {repr(value)}")
         if isinstance(value, str):
@@ -130,7 +131,7 @@ class Key(tuple):
         """\
         The environment variable name for a `Key`.
 
-        ## Examples
+        Examples:
 
         We're just using `"_"` instead of `"."` to join the segments and
         upper-casing:
@@ -159,7 +160,7 @@ class Key(tuple):
         """
         Get the root key.
 
-        ## Examples
+        Examples:
 
         1.  Useful when with `__package__`
 
@@ -173,25 +174,31 @@ class Key(tuple):
 
     def __repr__(self) -> str:
         """\
-        ## Examples
+        Here.
+
+        Examples:
 
             >>> repr(Key("a"))
             "Key('a')"
 
             >>> repr(Key("a.b.c"))
             "Key('a', 'b', 'c')"
+
         """
         return "Key(" + ', '.join(repr(s) for s in self) + ")"
 
     def __str__(self):
-        """
-        ## Examples
+        """\
+        Here.
+
+        Examples:
 
             >>> str(Key("a"))
             'a'
 
             >>> str(Key("a", "b", "c"))
             'a.b.c'
+
         """
         return self.STRING_SEPARATOR.join(self)
 
@@ -199,13 +206,14 @@ class Key(tuple):
         """\
         Is this key empty?
 
-        ## Examples
+        Examples:
 
             >>> Key().is_empty()
             True
 
             >>> Key("a.b.c").is_empty()
             False
+
         """
         return len(self) == 0
 
@@ -231,6 +239,7 @@ class Key(tuple):
 
             >>> list(Key("blah").scopes()) == []
             True
+
         """
         for stop in range(1, len(self)):
             yield Key(self[0:stop])
