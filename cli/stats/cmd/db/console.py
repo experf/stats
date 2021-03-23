@@ -1,4 +1,4 @@
-from clavier import sh, cfg
+from clavier import sh, CFG
 
 def add_to(subparsers):
     _parser = subparsers.add_parser(
@@ -13,7 +13,7 @@ def run():
         "mix", "config.get", {"output": "json"},
         ":cortex", "Cortex.Repo",
         format="json",
-        chdir=cfg.paths.UMBRELLA
+        chdir=CFG.stats.paths.UMBRELLA
     )
 
     sh.replace(

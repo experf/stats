@@ -43,3 +43,15 @@ which does the same thing.
 
 > 📢 You need to do this in _each_ and _every_ terminal you want completion
 > active in, at least until we figure out some auto-magic method of loading it.
+
+Naming Convention
+------------------------------------------------------------------------------
+
+Names — especially Python file names — are an inconsistent mess loaded with 
+archaic, cryptic abbreviations.
+
+This is the opposite of what I normally do. I've leaned towards the Ruby/Rails
+naming convention since the first time I saw RoR. I think I've broken from that
+tradition here for perhaps two reasons:
+
+

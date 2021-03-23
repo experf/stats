@@ -9,7 +9,7 @@ from rich.console import Console
 from argcomplete import autocomplete
 
 from . import io, dyn, log as logging
-from .rich_formatter import RichFormatter
+from .rich_fmt import RichFormatter
 
 class ArgumentParser(argparse.ArgumentParser):
     @classmethod
@@ -37,6 +37,7 @@ class ArgumentParser(argparse.ArgumentParser):
             self.set_target(target)
 
         self.add_argument(
+            "-B",
             "--backtrace",
             action="store_true",
             help="Print backtraces on error",
@@ -49,21 +50,21 @@ class ArgumentParser(argparse.ArgumentParser):
         # )
 
         self.add_argument(
-            "-v",
+            "-V",
             "--verbose",
             action="count",
             help="Make noise.",
         )
 
         self.add_argument(
-            "-o",
+            "-O",
             "--output",
             default=view.DEFAULT_FORMAT,
             help=view.help(),
         )
 
     def env_var_name(self, name):
-        self.prog.upper() + "_" + name.upper()
+        return self.prog.upper() + "_" + name.upper()
 
     def env(self, name, default=None):
         return os.environ.get(self.env_var_name(name), default)
@@ -71,7 +72,7 @@ class ArgumentParser(argparse.ArgumentParser):
     def is_backtracing(self, pkg_name, args):
         return (
             args.backtrace
-            or logging.get_pkg_logger(pkg_name) is logging.DEBUG
+            or logging.get_pkg_logger(pkg_name).level is logging.DEBUG
             or self.env("backtrace", False)
         )
 

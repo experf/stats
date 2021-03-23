@@ -1,4 +1,4 @@
-from clavier import sh, log as logging, cfg
+from clavier import sh, log as logging, CFG
 
 LOG = logging.getLogger(__name__)
 
@@ -10,4 +10,4 @@ def add_to(subparsers):
     )
 
 def run():
-    return cfg.to_dict()
+    return CFG.to_dict()

@@ -1,4 +1,4 @@
-from clavier import sh, log as logging, cfg
+from clavier import sh, log as logging, CFG
 
 LOG = logging.getLogger(__name__)
 
@@ -13,10 +13,10 @@ def add_to(subparsers):
 def run():
     LOG.info(
         "Connecting to Materialize...",
-        url=cfg.materialize.postgres.url,
+        url=CFG.stats.materialize.postgres.url,
     )
     sh.replace(
         "psql",
         {"pset": "expanded=auto"},
-        cfg.materialize.postgres.url
+        CFG.stats.materialize.postgres.url
     )

@@ -1,4 +1,4 @@
-from clavier import sh, log as logging, cfg
+from clavier import sh, log as logging, CFG
 
 LOG = logging.getLogger(__name__)
 
@@ -13,7 +13,7 @@ def add_to(subparsers):
         "--app",
         choices=[
             f.name
-            for f in (cfg.stats.paths.umbrella / "apps").iterdir()
+            for f in (CFG.stats.paths.umbrella / "apps").iterdir()
             if f.is_dir() and (f / "mix.exs").is_file()
         ],
         help="Run in a specific app directory",
@@ -26,8 +26,8 @@ def add_to(subparsers):
 
 def run(args=tuple(), app=None):
     if app is None:
-        chdir = cfg.stats.paths.umbrella
+        chdir = CFG.stats.paths.umbrella
     else:
-        chdir = cfg.stats.paths.umbrella / "apps" / app
+        chdir = CFG.stats.paths.umbrella / "apps" / app
 
     sh.replace("mix", *args, chdir=chdir)

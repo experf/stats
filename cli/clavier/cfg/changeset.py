@@ -13,14 +13,14 @@ class Changeset:
 
     Intended use:
 
-        >>> from clavier import cfg
-        >>> with cfg.configure("stats.doctest", src=__file__) as c:
+        >>> from clavier import CFG
+        >>> with CFG.configure("stats.doctest", src=__file__) as c:
         ...     c.x = "ex"
         ...     c.y = "why?"
         ...
-        >>> cfg.stats.doctest.x
+        >>> CFG.stats.doctest.x
         'ex'
-        >>> cfg.stats.doctest.y
+        >>> CFG.stats.doctest.y
         'why?'
 
     In that example, `c` is a `WriteScope` with `._key` of

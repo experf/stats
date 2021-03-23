@@ -9,6 +9,7 @@ from typing import (
     Mapping,
 )
 import logging
+import inspect
 
 from rich.table import Table
 from rich.console import Console
@@ -16,6 +17,7 @@ from rich.text import Text
 from rich.style import Style
 from rich.traceback import Traceback
 from rich.pretty import Pretty
+from rich.highlighter import ReprHighlighter
 
 from .. import io
 
@@ -129,11 +131,26 @@ class RichHandler(logging.Handler):
                 else:
                     value_type = type(value)
                     if hasattr(value_type, "__name__"):
-                        rich_value_type = value_type.__name__
+                        if (
+                            hasattr(value_type, "__module__") and
+                            value_type.__module__ != "builtins"
+                        ):
+                            rich_value_type = \
+                                f"{value_type.__module__}.{value_type.__name__}"
+                        else:
+                            rich_value_type = value_type.__name__
                     else:
                         rich_value_type = Pretty(value_type)
                     if isinstance(value, str):
                         rich_value = value
+                    elif (
+                        inspect.isfunction(value) and
+                        hasattr(value, "__module__") and
+                        hasattr(value, "__name__")
+                    ):
+                        rich_value = ReprHighlighter()(
+                            f"<function {value.__module__}.{value.__name__}>"
+                        )
                     else:
                         rich_value = Pretty(value)
                 table.add_row(key, rich_value_type, rich_value)

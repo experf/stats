@@ -1,21 +1,29 @@
 from pathlib import Path
 
-from clavier import cfg, log as logging, io
+from clavier import CFG, io
 
-with cfg.configure("stats", src=__file__) as stats:
+with CFG.configure("stats", src=__file__) as stats:
     stats.name = "stats"
 
     with stats.configure("log") as log:
-        log.level = "info"
+        log.level = "INFO"
 
     with stats.configure("paths") as paths:
         paths.repo = Path(__file__).resolve().parents[2]
         paths.dev = paths.repo / "dev"
-        paths.cli = paths.repo / "cli"
+        # paths.cli = paths.repo / "cli"
+        # paths.cli_docs = paths.cli / "docs"
         paths.umbrella = paths.repo
         paths.umbrella_build = paths.umbrella / "_build"
         paths.cortex = paths.umbrella / "apps" / "cortex"
         paths.cortex_web = paths.umbrella / "apps" / "cortex_web"
+
+        with paths.configure("cli") as cli:
+            cli.root = paths.repo / "cli"
+
+            with cli.configure("docs") as docs:
+                docs.root = cli.root / "docs"
+                docs.build = docs.root / "_build"
 
         with paths.configure("webpack") as webpack:
             webpack.hard_source_cache = \
@@ -43,5 +51,5 @@ with cfg.configure("stats", src=__file__) as stats:
                 f"/{postgres.database}"
             )
 
-with cfg.configure(io.rel, src=__file__) as rel:
-    rel.to = cfg.stats.paths.repo
+with CFG.configure(io.rel, src=__file__) as rel:
+    rel.to = CFG.stats.paths.repo

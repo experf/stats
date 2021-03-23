@@ -1,4 +1,4 @@
-from clavier import sh, log as logging, cfg
+from clavier import sh, log as logging, CFG
 
 LOG = logging.getLogger(__name__)
 
@@ -21,13 +21,11 @@ def add_to(subparsers):
 def run(serve=False):
     LOG.info("[holup]Resetting Cortex database...[/holup]")
 
-    paths = cfg[__package__, "paths"]
-
-    sh.run("mix", "ecto.reset", chdir=paths.cortex)
+    sh.run("mix", "ecto.reset", chdir=CFG.stats.paths.cortex)
 
     LOG.info("[yeah]Database reset.[/yeah]")
 
     if serve:
         LOG.info("[holup]Starting Phoenix server...[/holup]")
 
-        sh.replace("mix", "phx.server", chdir=paths.umbrella)
+        sh.replace("mix", "phx.server", chdir=CFG.stats.paths.umbrella)

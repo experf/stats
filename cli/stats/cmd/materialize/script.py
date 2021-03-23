@@ -1,12 +1,12 @@
-from clavier import sh, log as logging, cfg
+from clavier import sh, log as logging, CFG
 
 LOG = logging.getLogger(__name__)
 
 def rel_paths():
     return [
-        str(path.relative_to(cfg.stats.materialize.paths.scripts))
+        str(path.relative_to(CFG.stats.materialize.paths.scripts))
         for path
-        in cfg.stats.materialize.paths.scripts.glob("**/*.sql")
+        in CFG.stats.materialize.paths.scripts.glob("**/*.sql")
     ]
 
 def add_to(subparsers):
@@ -24,11 +24,11 @@ def add_to(subparsers):
 
 
 def run(path):
-    abs_path = cfg.stats.materialize.paths.scripts / path
+    abs_path = CFG.stats.materialize.paths.scripts / path
 
     sh.run(
         "psql",
-        cfg.materialize.postgres.url,
+        CFG.stats.materialize.postgres.url,
         text=True,
         input=abs_path,
     )

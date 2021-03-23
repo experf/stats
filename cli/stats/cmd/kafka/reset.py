@@ -1,6 +1,6 @@
 import logging
 
-from clavier import sh, cfg
+from clavier import sh, CFG
 
 from .. import docker_compose
 
@@ -20,7 +20,7 @@ def run():
     docker_compose.run(["down"])
 
     sh.file_absent(
-        cfg.paths.DEV / "data",
+        CFG.stats.paths.DEV / "data",
         name="docker-compose data directory"
     )
 

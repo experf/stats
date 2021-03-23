@@ -1,4 +1,4 @@
-from clavier import sh, cfg
+from clavier import sh, CFG
 
 def add_to(subparsers):
     parser = subparsers.add_parser(
@@ -21,9 +21,9 @@ def run(args=tuple()):
         "iex",
         {
             "erl": "-kernel shell_history enabled",
-            "dot-iex": cfg.paths.DEV / ".iex.exs",
+            "dot-iex": CFG.stats.paths.DEV / ".iex.exs",
         },
         "-S", "mix", *args,
-        chdir=cfg.paths.UMBRELLA,
+        chdir=CFG.stats.paths.UMBRELLA,
         opts_style=" ",
     )

@@ -11,7 +11,7 @@ import argparse
 import sys
 
 from . import log as logging, err, io
-from .argument_parser import ArgumentParser
+from .arg_par import ArgumentParser
 
 class Sesh:
     """\
@@ -47,16 +47,18 @@ class Sesh:
         logging.setup(self.pkg_name, log_level)
         return self
 
-    def parse(self: Sesh, *args, **kwds) -> Sesh:
+    @log.inject
+    def parse(self, log, *args, **kwds) -> Sesh:
         self._args = self.parser.parse_args(*args, **kwds)
         logging.set_level(self.pkg_name, verbosity=self.args.verbose)
+        log.debug("Parsed arguments", **self._args.__dict__)
         return self
 
     @log.inject
     def run(self, log) -> int:
         if not hasattr(self.args, "__target__"):
-            log.error("HERE", self_args=self.args)
-            raise err.InternalError("HERE!!!")
+            log.error("Missing __target__ arg", self_args=self.args)
+            raise err.InternalError("Missing __target__ arg")
 
         # Form the call keyword args -- start with a dict of the parsed arguments
         kwds = {**self.args.__dict__}

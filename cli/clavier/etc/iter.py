@@ -1,3 +1,7 @@
+"""\
+Operating primarily on `typing.Iterable` objects.
+"""
+
 from typing import (
     Generator,
     TypeVar,
@@ -13,14 +17,7 @@ from typing import (
     List,
 )
 
-# ❗❗❗ ATTENTION ❗❗❗
-#
-# Do **_NOT_** import _any_ sibling modules (or their descdenants) here. No
-# `stats.log` or anything else.
-#
-# Everything should be able to use this modules, and Python strait-up can't deal
-# with circular imports.
-#
+from .type import Null, is_null
 
 K = TypeVar("K")
 T = TypeVar("T")
@@ -33,24 +30,14 @@ TKey = TypeVar("TKey")
 TValue = TypeVar("TValue")
 TAlias = TypeVar("TAlias")
 
-TNothing = TypeVar("TNothing")
-
-Nope = NewType("Nope", Union[None, Literal[False]])  # type: ignore
-
-
-def is_nope(x: Any) -> bool:
-    """
-    >>> is_nope(None)
-    True
-
-    >>> is_nope(False)
-    True
-
-    >>> any(is_nope(x) for x in ('', [], {}, 0, 0.0))
-    False
-    """
-    return x is None or x is False
-
+# Used to as the type variables for arguments that are used as identify null
+# results returned from given functions.
+#
+# We generally consider exactly `None` and `False` to indicate null results —
+# see `.type.Null` and `.type.is_null` — but optionally defer control to the
+# caller where we can.
+#
+TNullResult = TypeVar("TNullResult")
 
 @overload
 def find(
@@ -92,14 +79,14 @@ def find(predicate, itr, not_found=None):
     []
     """
     for item in itr:
-        if not is_nope(predicate(item)):
+        if not is_null(predicate(item)):
             return item
     return not_found
 
 
 @overload
 def find_map(
-    fn: Callable[[TItem], Union[TResult, Nope]],
+    fn: Callable[[TItem], Union[TResult, Null]],
     itr: Iterable[TItem],
 ) -> Optional[TResult]:
     pass
@@ -107,7 +94,7 @@ def find_map(
 
 @overload
 def find_map(
-    fn: Callable[[TItem], Union[TResult, Nope]],
+    fn: Callable[[TItem], Union[TResult, Null]],
     itr: Iterable[TItem],
     not_found: TNotFound,
 ) -> Union[TResult, TNotFound]:
@@ -116,19 +103,19 @@ def find_map(
 
 @overload
 def find_map(
-    fn: Callable[[TItem], Union[TResult, TNothing]],
+    fn: Callable[[TItem], Union[TResult, TNullResult]],
     itr: Iterable[TItem],
-    nothing: Container[TNothing],
+    nothing: Container[TNullResult],
 ) -> Optional[TResult]:
     pass
 
 
 @overload
 def find_map(
-    fn: Callable[[TItem], Union[TResult, TNothing]],
+    fn: Callable[[TItem], Union[TResult, TNullResult]],
     itr: Iterable[TItem],
     not_found: TNotFound,
-    nothing: Container[TNothing],
+    nothing: Container[TNullResult],
 ) -> Union[TResult, TNotFound]:
     pass
 

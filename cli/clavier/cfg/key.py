@@ -4,7 +4,9 @@ import re
 
 class Key(tuple):
     """
-    ## Examples:
+    A key.
+
+    # Examples:
 
     1.  Keys can be empty:
 
@@ -33,6 +35,7 @@ class Key(tuple):
             Traceback (most recent call last):
                 ...
             ValueError: Each segment in a `key` must full-match [A-Za-z][A-Za-z0-9_]*, found '' in 'a..b'
+
     """
 
     STRING_SEPARATOR = "."
@@ -150,6 +153,23 @@ class Key(tuple):
         Only _you_ can prevent environment variable name collisions!
         """
         return "_".join(self).upper()
+
+    @property
+    def root(self) -> Key:
+        """
+        Get the root key.
+
+        ## Examples
+
+        1.  Useful when with `__package__`
+
+            >>> Key("clavier.cfg").root
+            Key('clavier')
+
+        """
+        if self.is_empty():
+            raise IndexError("The empty Key has no root")
+        return self.__class__(self[0])
 
     def __repr__(self) -> str:
         """\

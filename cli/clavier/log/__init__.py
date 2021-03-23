@@ -15,6 +15,7 @@ from typing import (
 from warnings import warn
 
 from .. import txt, err
+from clavier.cfg import CFG
 from .kwds_logger import KwdsLogger
 from .log_getter import LogGetter
 from .rich_handler import RichHandler
@@ -169,11 +170,11 @@ def get_lib_logger() -> LogGetter:
 
 
 def set_lib_level(level: TLevelValue) -> None:
+    level = level_for(level)
     logger = get_lib_logger()
-    logger.setLevel(level_for(level))
+    logger.setLevel(level)
     if level == DEBUG:
         _announce_debug(logger)
-
 
 def get_pkg_logger(module_name: str) -> LogGetter:
     return get_logger(_root_name(module_name))
@@ -221,12 +222,12 @@ def set_level(
 def setup(module_name: str, level: TLevelValue = DEFAULT_PKG_LEVEL) -> None:
     logging.setLoggerClass(KwdsLogger)
 
-    set_lib_level(DEFAULT_LIB_LEVEL)
-    set_pkg_level(module_name, level)
-
     rich_handler = RichHandler.singleton()
     get_lib_logger().addHandler(rich_handler)
     get_pkg_logger(module_name).addHandler(rich_handler)
+
+    set_lib_level(CFG.clavier.log.level)
+    set_pkg_level(module_name, level)
 
 
 # Support the weird camel-case that stdlib `logging` uses...

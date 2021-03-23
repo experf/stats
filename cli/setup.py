@@ -1,6 +1,7 @@
 import setuptools
+from pathlib import Path
 
-with open("README.md", "r") as fh:
+with open(Path(__file__).parent / "README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(

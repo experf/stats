@@ -1,4 +1,4 @@
-from clavier import sh, log as logging, cfg
+from clavier import sh, log as logging, CFG
 
 LOG = logging.getLogger(__name__)
 
@@ -11,25 +11,25 @@ def add_to(subparsers):
 
 
 def run():
-    views_dir = cfg.paths.DEV / "sql" / "materialize" / "views"
+    views_dir = CFG.stats.paths.DEV / "sql" / "materialize" / "views"
 
     sh.run(
         "psql",
-        cfg.materialize.postgres.url,
+        CFG.stats.materialize.postgres.url,
         text=True,
         input=(views_dir / "events_bytes.sql"),
     )
 
     sh.run(
         "psql",
-        cfg.materialize.postgres.url,
+        CFG.stats.materialize.postgres.url,
         text=True,
         input=(views_dir / "events.sql"),
     )
 
     sh.run(
         "psql",
-        cfg.materialize.postgres.url,
+        CFG.stats.materialize.postgres.url,
         text=True,
         input=(views_dir / "substack_subscriber_events.sql"),
     )

@@ -10,14 +10,14 @@ from collections import UserList
 from rich.console import Console, ConsoleRenderable, RichCast, RenderGroup
 from rich.theme import Theme
 from rich.pretty import Pretty
-from rich.markdown import Markdown
 from rich.rule import Rule
 from rich.text import Text
+from rich.syntax import Syntax
 
 from mdutils.mdutils import MdUtils
 
-from .config import cfg
-from . import etc
+from .cfg import CFG
+from . import etc, txt
 
 THEME = Theme(
     {
@@ -61,6 +61,10 @@ def header(text, level=1):
     yield NEWLINE
 
 
+def code(code, lexer_name, code_width: Optional[int]=80, **opts):
+    return Syntax(code, lexer_name, code_width=code_width, **opts)
+
+
 def is_rich(x: Any) -> bool:
     return isinstance(x, (ConsoleRenderable, RichCast))
 
@@ -68,7 +72,7 @@ def is_rich(x: Any) -> bool:
 # @cfg.inject_kwds
 def rel(path: Path, to: Optional[Path] = None) -> Path:
     if to is None:
-        to = cfg[rel, "to"]
+        to = CFG[rel, "to"]
     return path.relative_to(to)
 
 
@@ -79,6 +83,10 @@ def fmt_path(path: Path) -> str:
     except:
         return str(path)
 
+def fmt_cmd(cmd, *, code_width: int=80, **opts):
+    if isinstance(cmd, (list, tuple)):
+        cmd = txt.fmt_cmd(cmd, code_width=code_width)
+    return code(cmd, "shell", **opts)
 
 def fmt(x):
     if isinstance(x, Path):

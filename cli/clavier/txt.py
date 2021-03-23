@@ -15,9 +15,10 @@ This module prints things... as plain, markdown-ish strings. It doesn't depend
 on anything outside the standard library, and should probably stay that way.
 """
 
-from typing import Sequence, Callable, Any
+from typing import Sequence, Callable, Any, Iterable, Union
 import inspect
 from pathlib import Path
+import shlex
 
 
 def tick(value) -> str:
@@ -32,6 +33,25 @@ def fmt_class(cls) -> str:
 
 def fmt_path(path: Path) -> str:
     return tick(path)
+
+def fmt_cmd(
+    cmd: Iterable[str],
+    *,
+    code_width: int=80,
+    indent: Union[str, int]="  "
+):
+    if isinstance(indent, int):
+        indent = " " * indent
+    lines = [""]
+    for token in cmd:
+        quoted = shlex.quote(token)
+        if len(lines[-1]) + 1 + len(quoted) > code_width - 2:
+            lines[-1] += " \\"
+            lines.append(indent)
+        if not lines[-1].isspace():
+            lines[-1] += " "
+        lines[-1] += quoted
+    return "\n".join(lines)
 
 
 def fmt(x: Any) -> str:

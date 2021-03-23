@@ -4,19 +4,20 @@ from rich.table import Table
 from rich.style import Style
 from rich.text import Text
 
-from clavier import log as logging, io, cfg
+from clavier import log as logging, io, CFG
 
 LOG = logging.getLogger(__name__)
 
-CSV_PATH = cfg.stats.paths.dev / "ref" / "theatre-terms.csv"
 DEFAULT_LENGTH = 8
 
+def csv_path():
+    return CFG.stats.paths.dev / "ref" / "theatre-terms.csv"
 
 def add_to(subparsers):
     parser = subparsers.add_parser(
         "names",
         target=run,
-        help=(f"Filter short names from {io.fmt(CSV_PATH)}"),
+        help=(f"Filter short names from {io.fmt(csv_path())}"),
     )
     parser.add_argument(
         "-l",
@@ -28,7 +29,7 @@ def add_to(subparsers):
 
 
 def run(limit):
-    with CSV_PATH.open("r") as file:
+    with csv_path().open("r") as file:
         return [row for row in csv.reader(file) if len(row[0]) <= limit]
 
 class View(io.View):

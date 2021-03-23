@@ -28,6 +28,9 @@ class Config:
     def configure(self, *prefix, **meta) -> Changeset:
         return Changeset(config=self, prefix=prefix, meta=meta)
 
+    def configure_root(self, package, **meta) -> Changeset:
+        return Changeset(config=self, prefix=Key(package).root, meta=meta)
+
     def env_has(self, key) -> bool:
         return key in self._view and Key(key).env_name in os.environ
 

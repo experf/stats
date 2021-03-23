@@ -4,7 +4,7 @@ import json
 from kafka import KafkaConsumer
 from kafka.structs import TopicPartition
 
-from clavier import log as logging, cfg
+from clavier import log as logging, CFG
 
 LOG = logging.getLogger(__name__)
 
@@ -33,13 +33,13 @@ def iter_key_paths(dct: Dict, /, key_path=tuple()):
 
 def run(event_type):
     consumer = KafkaConsumer(
-        cfg.kafka.topic,
-        bootstrap_servers=cfg.kafka.servers,
+        CFG.stats.kafka.topic,
+        bootstrap_servers=CFG.stats.kafka.servers,
         value_deserializer=json.loads,
         auto_offset_reset="earliest",
     )
 
-    partition = TopicPartition(cfg.kafka.topic, 0)
+    partition = TopicPartition(CFG.stats.kafka.topic, 0)
 
     beginning_offsets = consumer.beginning_offsets([partition])
     beginning_offset = beginning_offsets[partition]

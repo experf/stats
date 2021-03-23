@@ -1,4 +1,4 @@
-from clavier import log as logging, sh, cfg
+from clavier import log as logging, sh, CFG
 
 LOG = logging.getLogger(__name__)
 
@@ -11,7 +11,7 @@ def add_to(subparsers):
             "Docker Compose -- runs Zookeeper and Kafka.\n"
             "\n"
             "This command proxies arguments through to `docker-compose`,\n"
-            f"prepending `--project-name {cfg.stats.name}`"
+            f"prepending `--project-name {CFG.stats.name}`"
         ),
     )
 
@@ -25,7 +25,7 @@ def add_to(subparsers):
 def run(args=tuple()):
     sh.run(
         "docker-compose",
-        "--project-name", cfg.stats.name,
+        "--project-name", CFG.stats.name,
         *args,
-        chdir=cfg.stats.paths.dev,
+        chdir=CFG.stats.paths.dev,
     )

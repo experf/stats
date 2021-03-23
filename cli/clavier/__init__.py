@@ -1,2 +1,2 @@
 from .sesh import Sesh
-from .config import cfg
+from .cfg import CFG
