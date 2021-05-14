@@ -10,4 +10,7 @@ defmodule CortexWeb.PageController do
     render(conn, "index.html", title: "Home", nav: "Stats")
   end
 
+  def splash(conn, _params) do
+    render(conn, "splash.html", title: "splash", nav: "Stats")
+  end
 end

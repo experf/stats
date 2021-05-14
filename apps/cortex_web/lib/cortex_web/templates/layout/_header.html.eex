@@ -1,4 +1,4 @@
-<header class="shadow-sm p-2 bg-white">
+<header class="shadow-sm p-2 bg-white index-header">
   <section class="container">
     <nav role="navigation" class="navbar navbar-expand-lg">
 
@@ -39,7 +39,7 @@
 
           <a class="navbar-brand" href="/">
             <img src="/images/temp-logo.svg" width="30" height="30" class="d-inline-block align-top" alt="">
-          expand.live
+          Expanded Performance
           </a>
 
           <%= if @current_user && @current_user.confirmed_at do %>
@@ -71,3 +71,10 @@
     </nav>
   </section>
 </header>
+
+<div class="m-3 splash-header">
+  <a class="navbar-brand" href="/">
+    <img src="/images/temp-logo.svg" width="50" height="50" class="d-inline-block align-top" alt="">
+    <div class="splash-product-name">Expand Live</h3>
+  </a>
+</div>

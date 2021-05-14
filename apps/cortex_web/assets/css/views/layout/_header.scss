@@ -27,3 +27,33 @@
 .header-toggle-btn {
   height:15px;
 }
+
+.splash-header {
+  display:none;
+}
+
+
+body.splash .index-header {
+  display:none;
+}
+
+body.splash .splash-header {
+  display:block;
+}
+
+.splash-header a {
+  font-size:1.6em;
+}
+
+.splash-header .navbar-brand {
+  margin-right:0;
+}
+
+.splash-product-name {
+  display:inline-block;
+  margin-top:8px;
+}
+
+.splash-product-name .navbar-brand {
+  font-family:$archivo-black;
+}
