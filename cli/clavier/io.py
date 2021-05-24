@@ -79,7 +79,7 @@ def rel(path: Path, to: Optional[Path] = None) -> Path:
 def fmt_path(path: Path) -> str:
     # pylint: disable=bare-except
     try:
-        return f"//{rel(path)}"
+        return f"@/{rel(path)}"
     except:
         return str(path)
 
