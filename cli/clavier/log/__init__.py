@@ -194,7 +194,7 @@ def set_level(
     verbosity: Optional[TVerbosity] = None,
 ) -> None:
     if level is not None:
-        set_pkg_level(level)
+        set_pkg_level(module_name, level)
     if verbosity is not None:
         if verbosity == 0:
             set_pkg_level(module_name, INFO)
