@@ -8,7 +8,3 @@
 	path = apps/cortex_web/priv/crawler-user-agents
 	url = https://github.com/nrser/crawler-user-agents.git
 	branch = nrser/stats
-[submodule "nansi"]
-	path = deploy/collections/ansible_collections/nrser/nansi
-	url = https://github.com/nrser/nansi.git
-	branch = collection
