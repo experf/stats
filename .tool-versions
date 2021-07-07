@@ -1,4 +1,4 @@
 # Latest as of 2021-01-13 (NodeJS is LTS)
 erlang 23.2.1
 elixir 1.11.3-otp-23
-nodejs 14.15.4
+nodejs 14.17.2

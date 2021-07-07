@@ -6,7 +6,7 @@
   become_user: root
   
   roles:
-    - role: nrser.nansi.postgres
+    - role: nansi.postgres.install
   
   tasks:
     - name: Make sure psycopg2 is installed

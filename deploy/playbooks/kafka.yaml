@@ -1,23 +1,40 @@
 ---
-- name: >-
-    Deploy Kafka to stats servers
+- name: Deploy Kafka to stats servers
   hosts: kafka
   become: true
   become_user: root
   
   tasks:
+    - apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - software-properties-common
+    
+    - name: Install Docker CE
+      nansi.apt.ext:
+        state: present
+        key_id: 9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88
+        key_url: https://download.docker.com/linux/ubuntu/gpg
+        repository_repo: >-
+          deb [arch={arch}] https://download.docker.com/linux/ubuntu {release} stable
+        names:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+    
     # Resources:
     # 
     # 1.  https://medium.com/better-programming/a-simple-apache-kafka-cluster-with-docker-kafdrop-and-python-cf45ab99e2b9
     # 
     - name: Deploy single-instance Zookeeper
-      nrser.nansi.systemd_docker_service:
+      nansi.systemd.docker_service:
         name: zookeeper
         state: present
         description: Zookeeper (for Kafka)
         tag: "zookeeper:3.6.2"
         config:
-          - nrser.nansi.serialize:
+          - nansi.copy.serialize:
               data:
                 ZOO_MY_ID: 1
                 ZOO_SERVERS: server.1=0.0.0.0:2888:2889;2181
@@ -33,7 +50,7 @@
           env-file: "{config}/.env"
   
     - name: Deploy single-instance Kafka
-      nrser.nansi.systemd_docker_service:
+      nansi.systemd.docker_service:
         name: kafka
         state: present
         description: Kafka Broker
@@ -41,7 +58,7 @@
         requires:
           - zookeeper.service
         config:
-          - nrser.nansi.serialize:
+          - nansi.copy.serialize:
               data:
                 KAFKA_ADVERTISED_LISTENERS: LISTENER_HOST_NETWORK://127.0.0.1:9091
                 KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_HOST_NETWORK:PLAINTEXT

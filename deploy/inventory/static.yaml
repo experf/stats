@@ -2,8 +2,9 @@
 # 
 all:
   hosts:
-    pixeldust:
-      ansible_host: 52.188.205.122
+    spf:
+      ansible_host: 3.13.82.241
+      ansible_user: ubuntu
       # tf_provider: azurerm
       # tf_resource: azurerm_linux_virtual_machine
       
@@ -14,34 +15,27 @@ all:
   # 
   #     @/inventory/group_vars/<group_name>.yaml
   # 
-  children:
-    # Provider Groups
-    # ========================================================================
-    
-    azure:
-      hosts:
-        pixeldust:
-    
+  children:    
     # Operating System Groups
     # ========================================================================
     
     ubuntu:
       hosts:
-        pixeldust: {}
+        spf: {}
     
     # Application Groups
     # ========================================================================
         
     db:
       hosts:
-        pixeldust: {}
+        spf: {}
         
     kafka:
       hosts:
-        pixeldust: {}
+        spf: {}
         
     beam:
       hosts:
-        pixeldust: {}
+        spf: {}
     
     

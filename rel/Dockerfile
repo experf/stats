@@ -1,6 +1,7 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
+ARG DEBIAN_FRONTEND=noninteractive
 
-ENV REFRESHED_AT=2021-02-28 \
+ENV REFRESHED_AT=2021-07-07 \
     LANG=en_US.UTF-8 \
     TERM=xterm
 
@@ -17,7 +18,10 @@ RUN \
   bash setup_14.x && \
   rm setup_14.x && \
   apt-get update -y && \
-  apt-get install -y esl-erlang=1:23.2.3-1 elixir=1.11.2-1 nodejs=14.16.0-1nodesource1 
+  apt-get install -y \
+    esl-erlang=1:23.2.3-1 \
+    elixir=1.11.2-1 \
+    nodejs=14.17.2-deb-1nodesource1
 
 RUN mix local.rebar --force && \
     mix local.hex --force && \
