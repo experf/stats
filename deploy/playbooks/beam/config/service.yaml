@@ -13,7 +13,7 @@
   tasks:
     - name: >-
         Configure `{{ STATS_BEAM_SERVICE_NAME }}` Systemd service
-      nrser.nansi.systemd_unit:
+      nansi.systemd.unit:
         name: "{{ STATS_BEAM_SERVICE_NAME }}"
         data:
           Unit:

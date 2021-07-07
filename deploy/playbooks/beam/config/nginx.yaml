@@ -6,12 +6,12 @@
   become_user: root
   
   roles:
-    - role: nrser.nansi.nginx
+    - role: nansi.nginx.support
   
   tasks:    
     - name: >-
         Configure {{ CORTEX_WEB_HOST }} Nginx site
-      nrser.nansi.nginx_site:
+      nansi.nginx.site:
         name: stats
         server_names:
           - "{{ CORTEX_WEB_HOST }}"
@@ -24,7 +24,7 @@
     
     - name: >-
         Configure {{ CORTEX_WEB_LINK_URL_HOST }} Nginx site
-      nrser.nansi.nginx_site:
+      nansi.nginx.site:
         name: "{{ CORTEX_WEB_LINK_URL_HOST }}"
         server_names:
           - "{{ CORTEX_WEB_LINK_URL_HOST }}"

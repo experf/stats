@@ -32,7 +32,7 @@
       unarchive:
         src: >-
           {{  (CTL_REPO_ROOT, 'rel', 'artifacts', archive_filename)
-              | nrser.nansi.to_path }}
+              | nansi.util.to_path }}
         dest: "{{ STATS_BEAM_DEST }}"
         mode: 0755
         

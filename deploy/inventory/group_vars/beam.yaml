@@ -9,8 +9,11 @@ STATS_BEAM_VERSION: 0.1.0
 # name should help structural comprehension.
 STATS_BEAM_PROJECT_NAME: "{{ STATS_NAME }}"
 
+STATS_BEAM_HOME: >-
+  /usr/local/experf/{{ STATS_NAME }}
+
 STATS_BEAM_DEST: >-
-  /usr/local/experf/{{ STATS_NAME }}/beam/{{ STATS_BEAM_VERSION }}
+  {{ STATS_BEAM_HOME }}/beam/{{ STATS_BEAM_VERSION }}
 
 STATS_BEAM_SERVICE_NAME: "{{ STATS_NAME }}.beam"
 

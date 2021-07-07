@@ -1,0 +1,28 @@
+---
+- name: >-
+    Create eval.sh script
+  hosts: beam
+  become: true
+  become_user: root
+  
+  vars:
+    bin: "{{ STATS_BEAM_DEST }}/bin/{{ STATS_BEAM_PROJECT_NAME }}"
+    db_url: >-
+      ecto://{{ STATS_USER }}:{{ STATS_DB_PASSWORD }}@{{ STATS_DB_HOST }}/{{ STATS_DB_NAME }}
+  
+  tasks:
+    - name: >-
+        Create stats home directory {{ STATS_BEAM_HOME }}
+      file:
+        path: "{{ STATS_BEAM_HOME }}"
+        state: directory
+    
+    - name: >-
+        Render `eval.sh` script template
+      ansible.builtin.template:
+        src: eval.sh
+        dest: "{{ STATS_BEAM_HOME }}/eval.sh"
+        mode: 0700
+        owner: "{{ STATS_USER }}"
+        group: "{{ STATS_USER }}"
+    
