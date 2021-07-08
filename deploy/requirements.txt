@@ -1,2 +1,1 @@
-# nansi>=0.1.0
--e ../../../nrser/nansi
+nansi>=0.1.1
