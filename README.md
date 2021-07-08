@@ -30,17 +30,21 @@ But, the procession _should_ look something like (from repo root):
     >     brew install --no-binaries nrser/versions/autoconf@2.69
     >     PATH="$(brew --prefix autoconf@2.69)/bin:$PATH" asdf install erlang [VERSION]
     > 
-    > **_You'll want to replace `[VERSION]` with the string in 
+    > **_You'll want to replace `[VERSION]` with the string in
+    > `@/.tool-versions`.
     
 2.  `./dev/bin/setup`
-2.  
+3.  `mix deps`
+4.  `mix ecto.create`
+5.  `mix ecto.migrate`
+6.  `stats phx` (or `mix phx.server`)
 
 ...
 
 Building Releases
 ------------------------------------------------------------------------------
 
-See [@/rel/README.md](rel/README.md])
+See [@/rel/README.md](rel/README.md)
 
 Deploying
 ------------------------------------------------------------------------------
