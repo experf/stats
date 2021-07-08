@@ -86,8 +86,10 @@ defmodule CortexWeb.AppRouter do
 
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
+
     get "/users/settings/confirm_email/:token",
-      UserSettingsController, :confirm_email
+        UserSettingsController,
+        :confirm_email
 
     resources "/links", LinkController, except: [:delete]
     resources "/scrapers", ScraperController
@@ -95,6 +97,8 @@ defmodule CortexWeb.AppRouter do
 
   scope "/", CortexWeb do
     pipe_through [:browser]
+
+    get "/splash", PageController, :splash
 
     delete "/users/log_out", UserSessionController, :delete
     get "/users/confirm", UserConfirmationController, :new

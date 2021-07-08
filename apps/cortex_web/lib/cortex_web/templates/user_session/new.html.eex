@@ -1,45 +1,48 @@
-<h1>
-  <i class="bi bi-exclamation-diamond"></i>
-  Private Property
-  <i class="bi bi-exclamation-diamond"></i>
-</h1>
-<h3>NO TRESPASSING</h3>
-<h5>Authorized personnel only beyond this point</h5>
-
-<%= form_for  @conn,
-              Routes.user_session_path(@conn, :create),
-              [as: :user],
-              fn f -> %>
-
-  <%= if @error_message do %>
-    <div class="alert alert-danger">
-      <p><%= @error_message %></p>
-    </div>
-  <% end %>
-
-  <div class="form-floating">
-    <%= email_input f, :email, required: true, class: "form-control" %>
-    <%= label f, :email %>
+<div class="row d-flex mt-5">
+  <div class="col-6">
+    <h1>Welcome to the Stats system for EXPAND.LIVE</h1>
+    <h5>Sign in to experience the power of stats</h4>
   </div>
+  <div class="col-6">
+    <div class="container border rounded p-4 w-75 bg-white">
+    <h3 class="mb-3">Sign In</h3>
+    <%= form_for  @conn,
+                  Routes.user_session_path(@conn, :create),
+                  [as: :user],
+                  fn f -> %>
 
-  <div class="form-floating">
-    <%= password_input f, :password, required: true, class: "form-control" %>
-    <%= label f, :password %>
+      <%= if @error_message do %>
+        <div class="alert alert-danger">
+          <p><%= @error_message %></p>
+        </div>
+      <% end %>
+
+      <div class="form-floating">
+        <%= email_input f, :email, required: true, class: "form-control" %>
+        <%= label f, :email %>
+      </div>
+
+      <div class="form-floating">
+        <%= password_input f, :password, required: true, class: "form-control" %>
+        <%= label f, :password %>
+      </div>
+
+      <div class="form-check">
+        <%= checkbox f, :remember_me, class: "form-check-input" %>
+        <%= label f, :remember_me, "Keep me logged in", class: "form-check-label" %>
+      </div>
+
+      <div class="form-actions">
+        <%= submit "Sign In", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+
+    <p>
+      <%= link "Sign Up",
+        to: Routes.user_registration_path(@conn, :new) %> |
+      <%= link "Forgot your password?",
+        to: Routes.user_reset_password_path(@conn, :new) %>
+    </p>
   </div>
-
-  <div class="form-check">
-    <%= checkbox f, :remember_me, class: "form-check-input" %>
-    <%= label f, :remember_me, "Keep me logged in", class: "form-check-label" %>
   </div>
-
-  <div class="form-actions">
-    <%= submit "Log in", class: "btn btn-primary" %>
-  </div>
-<% end %>
-
-<p>
-  <%= link "Activate Account",
-    to: Routes.user_registration_path(@conn, :new) %> |
-  <%= link "Forgot your password?",
-    to: Routes.user_reset_password_path(@conn, :new) %>
-</p>
+</div>
