@@ -7,7 +7,7 @@ defmodule Cortex.AccountsTest do
 
   describe "get_user_by_email/1" do
     test "does not return the user if the email does not exist" do
-      refute Accounts.get_user_by_email("unknown@futureperfect.studio")
+      refute Accounts.get_user_by_email("unknown@expand.live")
     end
 
     test "returns the user if the email exists" do
@@ -19,7 +19,7 @@ defmodule Cortex.AccountsTest do
   describe "get_user_by_email_and_password/2" do
     test "does not return the user if the email does not exist" do
       refute Accounts.get_user_by_email_and_password(
-               "unknown@futureperfect.studio",
+               "unknown@expand.live",
                "hello world!"
              )
     end
@@ -66,7 +66,7 @@ defmodule Cortex.AccountsTest do
     test "validates email and password when given" do
       {:error, changeset} =
         Accounts.register_user(%{
-          email: "not valid@futureperfect.studio",
+          email: "not valid@expand.live",
           password: "not valid"
         })
 
@@ -90,7 +90,7 @@ defmodule Cortex.AccountsTest do
     test "validates email uniqueness" do
       %{email: email} = user_fixture()
 
-      assert String.ends_with?(email, "@futureperfect.studio")
+      assert String.ends_with?(email, "@expand.live")
 
       {:error, changeset} = Accounts.register_user(%{email: email})
       assert "has already been taken" in errors_on(changeset).email
@@ -162,7 +162,7 @@ defmodule Cortex.AccountsTest do
     test "validates email", %{user: user} do
       {:error, changeset} =
         Accounts.apply_user_email(user, valid_user_password(), %{
-          email: "not valid@futureperfect.studio"
+          email: "not valid@expand.live"
         })
 
       assert %{email: ["must have the @ sign and no spaces"]} =
@@ -217,7 +217,7 @@ defmodule Cortex.AccountsTest do
         extract_user_token(fn url ->
           Accounts.deliver_update_email_instructions(
             user,
-            "current@futureperfect.studio",
+            "current@expand.live",
             url
           )
         end)
@@ -229,7 +229,7 @@ defmodule Cortex.AccountsTest do
 
       assert user_token.user_id == user.id
       assert user_token.sent_to == user.email
-      assert user_token.context == "change:current@futureperfect.studio"
+      assert user_token.context == "change:current@expand.live"
     end
   end
 
@@ -275,7 +275,7 @@ defmodule Cortex.AccountsTest do
       token: token
     } do
       assert Accounts.update_user_email(
-               %{user | email: "current@futureperfect.studio"},
+               %{user | email: "current@expand.live"},
                token
              ) == :error
 

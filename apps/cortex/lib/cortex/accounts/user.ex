@@ -42,7 +42,7 @@ defmodule Cortex.Accounts.User do
     |> validate_format(:email, ~r/^[^\s@]+@[^\s]+$/,
       message: "must have the @ sign and no spaces"
     )
-    |> validate_format(:email, ~r/@futureperfect\.studio$/i,
+    |> validate_format(:email, ~r/@expand\.live$/i,
       message: "not a recognized internal email address"
     )
     |> validate_length(:email, max: 160)

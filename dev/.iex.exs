@@ -46,8 +46,8 @@ defmodule SS do
     }
   end
 
-  def xander_email(), do: "xander@futureperfect.studio"
-  def neil_email(), do: "neil@neilsouza.com"
+  def xander_email(), do: "xander@expand.live"
+  def neil_email(), do: "neil@expand.live"
 
   defmodule Events do
     def all() do

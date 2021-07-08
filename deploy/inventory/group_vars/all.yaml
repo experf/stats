@@ -13,7 +13,7 @@ HUMANS:
     git:
       "user.name": nrser
       "user.email": neil@neilsouza.com
-    org_email: neil@futureperfect.studio
+    org_email: neil@expand.live
   
   - name: xander
     admin: true
@@ -21,7 +21,7 @@ HUMANS:
     git:
       "user.name": xanderseren
       "user.email": xander@theactualschool.com
-    org_email: xander@futureperfect.studio
+    org_email: xander@expand.live
 
 ONEPASSWORD_SUBDOMAIN: futureperfectcreativestudio
 ONEPASSWORD_USERNAME: >-

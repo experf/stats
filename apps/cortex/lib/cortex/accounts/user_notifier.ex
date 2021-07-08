@@ -13,7 +13,7 @@ defmodule Cortex.Accounts.UserNotifier do
     subject = "TEST TEST"
     case new()
          |> to(to)
-         |> from({"Expanded Stats", "stats@futureperfect.studio"})
+         |> from({"Expanded Stats", "stats@expand.live"})
          |> subject(subject)
          # |> html_body("<h1>Hello #{user.name}</h1>")
          |> text_body(body)

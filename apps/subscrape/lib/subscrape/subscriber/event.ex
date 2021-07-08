@@ -114,7 +114,7 @@ defmodule Subscrape.Subscriber.Event do
 
   Get all of Xander's events, which may take multiple requests in serial:
 
-      >>> config |> Subscrape.Subscriber.Event.all("xander@futureperfect.studio")
+      >>> config |> Subscrape.Subscriber.Event.all("xander@expand.live")
       { :ok,
         [
           %{
@@ -161,11 +161,11 @@ defmodule Subscrape.Subscriber.Event do
   #
   #     >>> config
   #     ... |> Subscrape.Subscriber.Event.map(
-  #     ...   ["xander@futureperfect.studio", "neil@neilsouza.com"]
+  #     ...   ["xander@expand.live", "neil@neilsouza.com"]
   #     ... )
   #     { :ok,
   #       [
-  #         {"xander@futureperfect.studio",
+  #         {"xander@expand.live",
   #           [
   #             %{
   #               "post_title" => "Immersive film festival, art-making and AI, and proto-VR from 1975",

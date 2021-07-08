@@ -5,7 +5,7 @@ defmodule Cortex.AccountsFixtures do
   """
 
   def unique_user_email,
-    do: "stats-test-user#{System.unique_integer()}@futureperfect.studio"
+    do: "stats-test-user#{System.unique_integer()}@expand.live"
   def valid_user_password, do: "hello world!"
 
   def user_fixture(attrs \\ %{}) do

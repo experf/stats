@@ -110,7 +110,7 @@ defmodule Cortex.Scrapers.Substack.Subscriber.Event do
       ...>  url: nil
       ...> }
       ...> |> Cortex.Scrapers.Substack.Subscriber.Event.to_cortex_event(
-      ...>  "xander@futureperfect.studio",
+      ...>  "xander@expand.live",
       ...>  "milk"
       ...> )
       {
@@ -119,7 +119,7 @@ defmodule Cortex.Scrapers.Substack.Subscriber.Event do
           app: "milk",
           type: "substack.subscriber.event",
           subtype: "email.open",
-          email: "xander@futureperfect.studio",
+          email: "xander@expand.live",
           src: %{
             post_title: "Experiential art, cloud gaming, and a mind-altering mirrored dome",
             post_url: "/p/experiential-art-cloud-gaming-and",

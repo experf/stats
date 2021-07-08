@@ -37,7 +37,7 @@ defmodule Subscrape.Subscriber do
   Each _entry_ in the subscriber list looks something like:
 
       %{
-        email: "xander@futureperfect.studio",
+        email: "xander@expand.live",
         expiry: nil,
         id: 16585900,
         lastActivity: %{
@@ -99,7 +99,7 @@ defmodule Subscrape.Subscriber do
 
   ## Example
 
-      > config |> Subscrape.Subscriber.get("xander@futureperfect.studio")
+      > config |> Subscrape.Subscriber.get("xander@expand.live")
       { :ok,
         %{
           "amount_paid" => 0,
@@ -117,7 +117,7 @@ defmodule Subscrape.Subscriber do
             "num_web_post_views" => 4,
             "num_shares_last_7d" => 0,
             "num_subs_gifted" => 0,
-            "user_email_address" => "xander@futureperfect.studio",
+            "user_email_address" => "xander@expand.live",
             "is_group_member" => false,
             "num_unique_email_posts_seen_last_7d" => 0,
             "user_id" => 16585900,
@@ -158,7 +158,7 @@ defmodule Subscrape.Subscriber do
             "num_unique_web_posts_seen_last_30d" => 2
           }
           "data_updated_at" => "2021-02-15T00:07:42.864000000-08:00",
-          "email" => "xander@futureperfect.studio",
+          "email" => "xander@expand.live",
           "email_disabled" => false,
           "emails_opened" => 6,
           "emails_received" => 8,
