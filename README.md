@@ -37,7 +37,11 @@ But, the procession _should_ look something like (from repo root):
 3.  `mix deps`
 4.  `mix ecto.create`
 5.  `mix ecto.migrate`
-6.  `stats phx` (or `mix phx.server`)
+6.  Change directory in `@/apps/cortex_web/assets` then
+    
+        yarn install
+    
+7.  `stats phx` (or `mix phx.server`)
 
 ...
 
