@@ -35,7 +35,7 @@ But, the procession _should_ look something like (from repo root):
     
 2.  `./dev/bin/setup`
 3.  `/usr/local/opt/postgres/bin/createuser -s postgres`
-4.  `mix deps`
+4.  `mix deps.get`
 5.  `mix ecto.create`
 6.  `mix ecto.migrate`
 7.  Change directory in `@/apps/cortex_web/assets` then
