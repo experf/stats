@@ -2,7 +2,7 @@
 # Variables for servers running the BEAM runtime, which means the `Stats` Elixir
 # umbrella app in our case.
 
-STATS_BEAM_VERSION: 0.1.0
+STATS_BEAM_VERSION: 0.1.1
 
 # Currently the same as the system name by (nascent) convention, but it seems
 # like using this var where it directly represents the Elixir (Mix) project 
