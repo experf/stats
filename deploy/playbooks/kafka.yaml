@@ -16,8 +16,10 @@
         state: present
         key_id: 9DC8 5822 9FC7 DD38 854A  E2D8 8D81 803C 0EBF CD88
         key_url: https://download.docker.com/linux/ubuntu/gpg
+        # FIXME Hardcode values for now, need to figure out why the subs aren't
+        #       working...
         repository_repo: >-
-          deb [arch={arch}] https://download.docker.com/linux/ubuntu {release} stable
+          deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
         names:
           - docker-ce
           - docker-ce-cli
@@ -45,8 +47,8 @@
           hostname: zookeeper
           network: host
           volume:
-            - "zookeeper-data:/data:rw"
-            - "zookeeper-datalog:/datalog:rw"
+            - "/data/zookeeper-data:/data:rw"
+            - "/data/zookeeper-datalog:/datalog:rw"
           env-file: "{config}/.env"
   
     - name: Deploy single-instance Kafka
@@ -73,5 +75,5 @@
           hostname: kafka
           network: host
           volume:
-            - "kafka-data:/var/lib/kafka/data:rw"
+            - "/data/kafka:/var/lib/kafka/data:rw"
           env-file: "{config}/.env"
