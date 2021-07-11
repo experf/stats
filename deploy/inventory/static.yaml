@@ -38,4 +38,7 @@ all:
       hosts:
         spf: {}
     
+    materialize:
+      hosts:
+        spf: {}
     

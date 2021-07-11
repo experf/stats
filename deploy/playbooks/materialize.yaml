@@ -1,0 +1,21 @@
+---
+- name: Deploy Materialize event streaming database
+  hosts: materialize
+  become: true
+  become_user: root
+  
+  tasks:
+    # Resources:
+    # 
+    # 1.  https://medium.com/better-programming/a-simple-apache-kafka-cluster-with-docker-kafdrop-and-python-cf45ab99e2b9
+    # 
+    - name: Deploy single-instance Materialize
+      nansi.systemd.docker_service:
+        name: materialized
+        state: present
+        description: Materialize event streaming database
+        tag: "materialize/materialized:v0.5.2"
+        command: "--workers 1"
+        opts:
+          hostname: materialized
+          network: host
