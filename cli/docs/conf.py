@@ -93,9 +93,14 @@ def docstring(app, what, name, obj, options, lines):
             name = f"{module}.{name}"
         else:
             name = module
+    
+    dest = CFG.stats.paths.tmp / "rst"
+
+    if not dest.exists():
+        dest.mkdir()
 
     if len(lines_in) > 0 and name is not None:
-        path = CFG.stats.paths.tmp / "rst" / f"{name}.rst"
+        path = dest / f"{name}.rst"
         # print(f"WRITE {path}")
         with path.open("w") as fp:
             print("### LINES IN ###", file=fp)
